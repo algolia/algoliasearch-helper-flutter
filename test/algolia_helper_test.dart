@@ -4,17 +4,18 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('Initiate Algolia Helper', () {
-    const applicationID = 'YOUR_APPLICATION_ID';
-    const apiKey2 = 'YOUR_API_KEY';
+    const applicationID = 'APPLICATION_ID';
+    const apiKey = 'API_KEY';
+    const indexName = 'INDEX_NAME';
 
     const client = Algolia.init(
       applicationId: applicationID,
-      apiKey: apiKey2,
+      apiKey: apiKey,
     );
-    const algoliaHelper = AlgoliaHelper(client);
+    const algoliaHelper = AlgoliaHelper(client, indexName);
     expect(algoliaHelper.client, client);
 
-    var algoliaHelper2 = AlgoliaHelper.of(applicationID, apiKey2);
+    var algoliaHelper2 = AlgoliaHelper.of(applicationID, apiKey, indexName);
     expect(algoliaHelper2.client.applicationId, applicationID);
   });
 }
