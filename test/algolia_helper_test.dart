@@ -12,10 +12,11 @@ void main() {
       applicationId: applicationID,
       apiKey: apiKey,
     );
-    const algoliaHelper = AlgoliaHelper(client, indexName);
+    final algoliaHelper = AlgoliaHelper(client, indexName);
     expect(algoliaHelper.client, client);
 
-    var algoliaHelper2 = AlgoliaHelper.of(applicationID, apiKey, indexName);
+    final algoliaHelper2 = AlgoliaHelper.create(
+        applicationID: applicationID, apiKey: apiKey, indexName: indexName);
     expect(algoliaHelper2.client.applicationId, applicationID);
   });
 }
