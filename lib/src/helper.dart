@@ -5,7 +5,6 @@ import 'package:algolia/algolia.dart';
 import 'listener.dart';
 
 class AlgoliaHelper {
-  /// AlgoliaHelper's default constructor.
   AlgoliaHelper(this.client, this.indexName) : _query = client.index(indexName);
 
   /// Inner Algolia API client.
@@ -27,22 +26,24 @@ class AlgoliaHelper {
       AlgoliaQuery Function(AlgoliaQuery)? config}) {
     final client = Algolia.init(applicationId: applicationID, apiKey: apiKey);
     var algoliaHelper = AlgoliaHelper(client, indexName);
-    if (config != null) algoliaHelper.queryParameters((query) => config(query));
+    if (config != null) algoliaHelper.config((query) => config(query));
     return algoliaHelper;
   }
 
+  /// Set query string.
   void query(String query) {
     _query = _query.query(query);
   }
 
-  void queryParameters(AlgoliaQuery Function(AlgoliaQuery) config) {
+  /// Set query configuration.
+  void config(AlgoliaQuery Function(AlgoliaQuery query) config) {
     _query = config(_query);
   }
 
   /// Add a search operation callback
   Listener on(
-      {Function(AlgoliaQuerySnapshot)? onResult,
-      Function(AlgoliaError)? onError}) {
+      {Function(AlgoliaQuerySnapshot response)? onResult,
+      Function(AlgoliaError error)? onError}) {
     final listener = Listener(onResult: onResult, onError: onError);
     return this.listener(listener);
   }
@@ -63,16 +64,11 @@ class AlgoliaHelper {
     _listeners.clear();
   }
 
-  /// Run search operation. Listeners will be notified on result/error.
-  Future<AlgoliaQuerySnapshot> search() {
+  /// Run search operation.
+  /// Listeners will be notified on result/error.
+  void search() {
     Future<AlgoliaQuerySnapshot> objects = _query.getObjects();
     _setSearchListeners(objects);
-    return objects;
-  }
-
-  /// Run search asynchronously, and notify listeners on response.
-  void searchAsync() {
-    search().ignore();
   }
 
   void _setSearchListeners(Future<AlgoliaQuerySnapshot> call) {

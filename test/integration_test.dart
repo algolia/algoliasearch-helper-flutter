@@ -3,7 +3,7 @@ import 'package:algolia_helper/algolia_helper.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('Operation callback', () {
+  test('Operation callback', () async {
     final algoliaHelper = AlgoliaHelper.create(
         applicationID: 'latency',
         apiKey: 'afc3dd66dd1293e2e2736a5a51b05c0a',
@@ -25,16 +25,15 @@ void main() {
     );
 
     algoliaHelper.query("apple");
-    var search = algoliaHelper.search();
+    algoliaHelper.search();
 
-    search.whenComplete(() {
-      expect(res1?.hasHits, true);
-      expect(err1, null);
-      expect(res2?.hasHits, true);
-      expect(err2, null);
-      expect(res1?.length == res2?.length, true);
-    });
-    expect(search, completes);
+    await Future.delayed(const Duration(seconds: 2), () {});
+
+    expect(res1?.hasHits, true);
+    expect(err1, null);
+    expect(res2?.hasHits, true);
+    expect(err2, null);
+    expect(res1?.length == res2?.length, true);
   });
 
   test('Operation failed', () async {
@@ -57,7 +56,7 @@ void main() {
       onError: (value) => err2 = value,
     );
 
-    algoliaHelper.searchAsync();
+    algoliaHelper.search();
 
     // wait 2 secs
     await Future.delayed(const Duration(seconds: 2), () {});
