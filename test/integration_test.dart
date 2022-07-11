@@ -1,6 +1,5 @@
 import 'package:algolia/algolia.dart';
 import 'package:algolia_helper/algolia_helper.dart';
-import 'package:algolia_helper/src/search_params.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -27,8 +26,6 @@ void main() {
 
     algoliaHelper.query("apple");
     var search = algoliaHelper.search();
-
-    SearchParams();
 
     search.whenComplete(() {
       expect(res1?.hasHits, true);

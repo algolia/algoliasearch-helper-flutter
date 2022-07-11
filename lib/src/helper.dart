@@ -70,7 +70,7 @@ class AlgoliaHelper {
     return objects;
   }
 
-  /// Run
+  /// Run search asynchronously, and notify listeners on response.
   void searchAsync() {
     search().ignore();
   }
