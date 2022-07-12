@@ -1,10 +1,11 @@
-import 'dart:async';
-
 import 'package:algolia/algolia.dart';
+import 'package:algolia_helper/src/future.dart';
+import 'package:algolia_helper/src/subscription.dart';
 
-import 'listener.dart';
+import 'observable.dart';
+import 'observer.dart';
 
-class AlgoliaHelper {
+class AlgoliaHelper extends Observable {
   AlgoliaHelper(this.client, this.indexName) : _query = client.index(indexName);
 
   /// Inner Algolia API client.
@@ -12,9 +13,6 @@ class AlgoliaHelper {
 
   /// Index name.
   final String indexName;
-
-  /// List of search operation listeners
-  final List<Listener> _listeners = [];
 
   AlgoliaQuery _query;
 
@@ -41,41 +39,18 @@ class AlgoliaHelper {
   }
 
   /// Add a search operation callback
-  Listener on(
+  Subscription on(
       {Function(AlgoliaQuerySnapshot response)? onResult,
-      Function(AlgoliaError error)? onError}) {
-    final listener = Listener(onResult: onResult, onError: onError);
-    return this.listener(listener);
-  }
-
-  /// Add search operation listener
-  Listener listener(Listener listener) {
-    _listeners.add(listener);
-    return listener;
-  }
-
-  /// Remove a search operation callback
-  bool remove(Listener listener) {
-    return _listeners.remove(listener);
-  }
-
-  /// Remove all search listeners
-  void clear() {
-    _listeners.clear();
+      Function(AlgoliaError error)? onError,
+      Function? onComplete}) {
+    final obs =
+        Observer(onNext: onResult, onError: onError, onComplete: onComplete);
+    return observer(obs);
   }
 
   /// Run search operation.
   /// Listeners will be notified on result/error.
   void search() {
-    Future<AlgoliaQuerySnapshot> objects = _query.getObjects();
-    _setSearchListeners(objects);
-  }
-
-  void _setSearchListeners(Future<AlgoliaQuerySnapshot> call) {
-    for (var listener in _listeners) {
-      call
-          .then((value) => listener.onResult?.call(value))
-          .catchError((error) => listener.onError?.call(error));
-    }
+    _query.getObjects().subscribe(observers);
   }
 }
