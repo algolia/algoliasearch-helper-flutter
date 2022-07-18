@@ -7,8 +7,9 @@ void main() {
     final algoliaHelper = AlgoliaHelper.create(
         applicationID: 'latency',
         apiKey: 'afc3dd66dd1293e2e2736a5a51b05c0a',
-        indexName: 'instant_search',
-        config: (query) => query.setHitsPerPage(1));
+        indexName: 'instant_search');
+
+    algoliaHelper.setHitPerPage(1);
 
     AlgoliaQuerySnapshot? res1;
     AlgoliaError? err1;
