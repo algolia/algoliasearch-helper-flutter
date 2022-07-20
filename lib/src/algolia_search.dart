@@ -15,6 +15,7 @@ extension AlgoliaQueryExt on AlgoliaQuery {
     state.hitsPerPage?.let((it) => query = query.setHitsPerPage(it));
     state.query?.let((it) => query = query.query(it));
     state.facets?.let((it) => query = query.setFacets(it));
+    state.ruleContexts?.let((it) => query = query.setRuleContexts(it));
     return query;
   }
 }

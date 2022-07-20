@@ -9,7 +9,7 @@ import 'response.dart';
 import 'state.dart';
 
 class AlgoliaHelper {
-  AlgoliaHelper._(this._client, this._indexName, state) {
+  AlgoliaHelper(this.client, this.indexName, state) {
     _state = BehaviorSubject<SearchState>.seeded(state);
     responses =
         _state.stream.asyncMap((state) => _search(state)).handleError(_error);
@@ -21,16 +21,15 @@ class AlgoliaHelper {
       required String apiKey,
       required String indexName,
       SearchState state = const SearchState()}) {
-    // initial call ?
     final client = Algolia.init(applicationId: applicationID, apiKey: apiKey);
-    return AlgoliaHelper._(client, indexName, state);
+    return AlgoliaHelper(client, indexName, state);
   }
 
   /// Inner Algolia API client.
-  final Algolia _client;
+  final Algolia client;
 
   /// Index name.
-  final String _indexName;
+  final String indexName;
 
   /// Search state stream
   late BehaviorSubject _state;
@@ -79,7 +78,7 @@ class AlgoliaHelper {
 
   /// Run search query using [state] and get a search .
   Future<SearchResponse> _search(SearchState state) async {
-    final objects = await _client.index(_indexName).queryOf(state).getObjects();
+    final objects = await client.index(indexName).queryOf(state).getObjects();
     return objects.toSearchResponse();
   }
 
