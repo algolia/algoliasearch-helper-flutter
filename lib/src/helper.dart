@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:algolia/algolia.dart';
-import 'package:rxdart/subjects.dart';
+import 'package:logging/logging.dart';
+import 'package:rxdart/rxdart.dart';
 
 import 'algolia_search.dart';
 import 'exception.dart';
@@ -9,10 +10,13 @@ import 'response.dart';
 import 'state.dart';
 
 class AlgoliaHelper {
-  AlgoliaHelper(this.client, this.indexName, state) {
+  AlgoliaHelper._(
+      this.client, this.indexName, SearchState state, Duration debounce) {
     _state = BehaviorSubject<SearchState>.seeded(state);
-    responses =
-        _state.stream.asyncMap((state) => _search(state)).handleError(_error);
+    responses = _state.stream
+        .debounceTime(debounce)
+        .asyncMap((state) => _search(state))
+        .handleError(_error);
   }
 
   /// AlgoliaHelper's factory.
@@ -20,9 +24,10 @@ class AlgoliaHelper {
       {required String applicationID,
       required String apiKey,
       required String indexName,
-      SearchState state = const SearchState()}) {
+      SearchState state = const SearchState(),
+      Duration debounce = const Duration(milliseconds: 100)}) {
     final client = Algolia.init(applicationId: applicationID, apiKey: apiKey);
-    return AlgoliaHelper(client, indexName, state);
+    return AlgoliaHelper._(client, indexName, state, debounce);
   }
 
   /// Inner Algolia API client.
@@ -37,7 +42,8 @@ class AlgoliaHelper {
   /// Search results stream
   late Stream<SearchResponse> responses;
 
-  late StreamController<SearchError> errors = StreamController<SearchError>();
+  /// Events logger
+  final _logger = Logger('AlgoliaHelper');
 
   /// Set query string.
   void query(String query) {
@@ -73,23 +79,28 @@ class AlgoliaHelper {
   void _updateState(SearchState Function(SearchState state) apply) {
     final current = _state.value;
     final newState = apply(current);
+    _logger.config("State updated from $current to $newState");
     _state.sink.add(newState);
   }
 
   /// Run search query using [state] and get a search .
   Future<SearchResponse> _search(SearchState state) async {
+    _logger.info("Start search: $state");
     final objects = await client.index(indexName).queryOf(state).getObjects();
+    _logger.info("Response search : $objects");
     return objects.toSearchResponse();
   }
 
   /// Convert [AlgoliaError] to [SearchError].
   void _error(error) {
+    _logger.severe("Search error thrown: $error");
     if (error is AlgoliaError) throw error.toSearchError();
     throw error;
   }
 
   /// Dispose of underlying resources.
   void dispose() {
+    _logger.fine("helper is disposed");
     _state.close();
   }
 }
