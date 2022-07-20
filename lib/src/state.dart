@@ -1,11 +1,20 @@
+/// Representation of search state.
 class SearchState {
   const SearchState({this.query, this.page, this.hitsPerPage, this.facets});
 
+  /// Search query string
   final String? query;
+
+  /// Search page number
   final int? page;
+
+  /// Number of hits per page
   final int? hitsPerPage;
+
+  /// Search facets list
   final List<String>? facets;
 
+  /// Make a copy of the search state.
   SearchState copyWith(
       {String? query, int? page, int? hitsPerPage, List<String>? facets}) {
     return SearchState(

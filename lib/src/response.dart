@@ -1,6 +1,8 @@
+/// Search operation response.
 class SearchResponse {
   SearchResponse(this.raw);
 
+  /// Raw search response
   final Map<String, dynamic> raw;
 
   List<dynamic> get hits => raw['hits'] ?? [];

@@ -1,6 +1,4 @@
 import 'package:algolia_helper/algolia_helper.dart';
-import 'package:algolia_helper/src/exception.dart';
-import 'package:algolia_helper/src/search_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

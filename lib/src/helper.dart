@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:algolia/algolia.dart';
-import 'package:algolia_helper/src/exception.dart';
-import 'package:algolia_helper/src/search_response.dart';
 import 'package:rxdart/subjects.dart';
 
 import 'algolia_search.dart';
-import 'search_state.dart';
+import 'exception.dart';
+import 'response.dart';
+import 'state.dart';
 
 class AlgoliaHelper {
   AlgoliaHelper._(this._client, this._indexName, state) {
@@ -21,6 +21,7 @@ class AlgoliaHelper {
       required String apiKey,
       required String indexName,
       SearchState state = const SearchState()}) {
+    // initial call ?
     final client = Algolia.init(applicationId: applicationID, apiKey: apiKey);
     return AlgoliaHelper._(client, indexName, state);
   }
