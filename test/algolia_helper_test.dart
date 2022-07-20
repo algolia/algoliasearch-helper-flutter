@@ -1,22 +1,16 @@
-import 'package:algolia/algolia.dart';
 import 'package:algolia_helper/algolia_helper.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('Initiate Algolia Helper', () {
-    const applicationID = 'APPLICATION_ID';
-    const apiKey = 'API_KEY';
-    const indexName = 'INDEX_NAME';
+  test('Initiate Algolia Helper', () async {
+    const applicationID = 'latency';
+    const apiKey = 'afc3dd66dd1293e2e2736a5a51b05c0a';
+    const indexName = 'instant_search';
 
-    const client = Algolia.init(
-      applicationId: applicationID,
-      apiKey: apiKey,
-    );
-    final algoliaHelper = AlgoliaHelper(client, indexName);
-    expect(algoliaHelper.client, client);
-
-    final algoliaHelper2 = AlgoliaHelper.create(
-        applicationID: applicationID, apiKey: apiKey, indexName: indexName);
-    expect(algoliaHelper2.client.applicationId, applicationID);
+    final helper = AlgoliaHelper.create(applicationID: applicationID, apiKey: apiKey, indexName: indexName);
+    helper.dispose();
+    final list = await helper.responses.toList();
+    print(list);
+    expect(list.isEmpty, true);
   });
 }

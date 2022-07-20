@@ -1,66 +1,95 @@
+import 'dart:async';
+
 import 'package:algolia/algolia.dart';
+import 'package:algolia_helper/src/exception.dart';
+import 'package:algolia_helper/src/search_response.dart';
+import 'package:rxdart/subjects.dart';
 
 import 'algolia_search.dart';
-import 'extensions.dart';
-import 'observable.dart';
-import 'observer.dart';
 import 'search_state.dart';
-import 'subscription.dart';
 
-class AlgoliaHelper extends Observable {
-  AlgoliaHelper(this.client, this.indexName);
-
-  /// Inner Algolia API client.
-  final Algolia client;
-
-  /// Index name.
-  final String indexName;
-
-  /// Search internal state
-  SearchState _state = const SearchState();
+class AlgoliaHelper {
+  AlgoliaHelper._(this._client, this._indexName, state) {
+    _state = BehaviorSubject<SearchState>.seeded(state);
+    responses =
+        _state.stream.asyncMap((state) => _search(state)).handleError(_error);
+  }
 
   /// AlgoliaHelper's factory.
   factory AlgoliaHelper.create(
       {required String applicationID,
       required String apiKey,
-      required String indexName}) {
+      required String indexName,
+      SearchState state = const SearchState()}) {
     final client = Algolia.init(applicationId: applicationID, apiKey: apiKey);
-    return AlgoliaHelper(client, indexName);
+    return AlgoliaHelper._(client, indexName, state);
   }
+
+  /// Inner Algolia API client.
+  final Algolia _client;
+
+  /// Index name.
+  final String _indexName;
+
+  /// Search state stream
+  late BehaviorSubject _state;
+
+  /// Search results stream
+  late Stream<SearchResponse> responses;
+
+  late StreamController<SearchError> errors = StreamController<SearchError>();
 
   /// Set query string.
   void query(String query) {
-    _state = _state.copyWith(query: query);
+    _updateState((state) => state.copyWith(query: query));
   }
 
   /// Set search page.
   void setPage(int page) {
-    _state = _state.copyWith(page: page);
+    _updateState((state) => state.copyWith(page: page));
   }
 
   /// Set hits per search page.
   void setHitPerPage(int page) {
-    _state = _state.copyWith(page: page);
+    _updateState((state) => state.copyWith(page: page));
   }
 
   /// Set search facets.
   void setFacets(List<String> facets) {
-    _state = _state.copyWith(facets: facets);
+    _updateState((state) => state.copyWith(facets: facets));
   }
 
-  /// Add a search operation callback
-  Subscription on(
-      {Function(AlgoliaQuerySnapshot response)? onResult,
-      Function(AlgoliaError error)? onError,
-      Function? onComplete}) {
-    final obs =
-        Observer(onNext: onResult, onError: onError, onComplete: onComplete);
-    return observer(obs);
+  /// Apply search state configuration.
+  void applyState(SearchState Function(SearchState state) config) {
+    _updateState((state) => config(state));
   }
 
-  /// Run search operation.
-  /// Listeners will be notified on result/error.
-  void search() {
-    client.index(indexName).queryOf(_state).getObjects().subscribe(observers);
+  /// Override current state with an empty state.
+  void clearState() {
+    _updateState((_) => const SearchState());
+  }
+
+  /// Apply changes to the current state
+  void _updateState(SearchState Function(SearchState state) apply) {
+    final current = _state.value;
+    final newState = apply(current);
+    _state.sink.add(newState);
+  }
+
+  /// Run search query using [state] and get a search .
+  Future<SearchResponse> _search(SearchState state) async {
+    final objects = await _client.index(_indexName).queryOf(state).getObjects();
+    return objects.toSearchResponse();
+  }
+
+  /// Convert [AlgoliaError] to [SearchError].
+  void _error(error) {
+    if (error is AlgoliaError) throw error.toSearchError();
+    throw error;
+  }
+
+  /// Dispose of underlying resources.
+  void dispose() {
+    _state.close();
   }
 }

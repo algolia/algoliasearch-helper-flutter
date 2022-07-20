@@ -1,9 +1,13 @@
 import 'package:algolia/algolia.dart';
+import 'package:algolia_helper/src/exception.dart';
 
-import 'extensions.dart';
+import 'search_response.dart';
 import 'search_state.dart';
+import 'utils.dart';
 
-extension AlgoliaSearchState on AlgoliaIndexReference {
+/// Extensions over [AlgoliaQuery].
+extension AlgoliaQueryExt on AlgoliaQuery {
+  /// Create [AlgoliaQuery] instance based on [state].
   AlgoliaQuery queryOf(SearchState state) {
     AlgoliaQuery query = this;
     state.query?.let((it) => query = query.query(it));
@@ -12,5 +16,18 @@ extension AlgoliaSearchState on AlgoliaIndexReference {
     state.query?.let((it) => query = query.query(it));
     state.facets?.let((it) => query = query.setFacets(it));
     return query;
+  }
+}
+
+/// Extensions over [AlgoliaQuery].
+extension AlgoliaQuerySnapshotExt on AlgoliaQuerySnapshot {
+  SearchResponse toSearchResponse() {
+    return SearchResponse((toMap()));
+  }
+}
+
+extension AlgoliaErrorExt on AlgoliaError {
+  SearchError toSearchError() {
+    return SearchError(error, statusCode);
   }
 }
