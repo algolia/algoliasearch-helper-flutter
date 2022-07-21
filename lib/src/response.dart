@@ -1,11 +1,15 @@
 /// Search operation response.
 class SearchResponse {
-  SearchResponse(this.raw);
+  SearchResponse(this.raw)
+      : hits = (raw['hits'] as List<dynamic>? ?? [])
+            .map((hit) => Hit.from(hit))
+            .toList();
 
   /// Raw search response
   final Map<String, dynamic> raw;
 
-  List<dynamic> get hits => raw['hits'] ?? [];
+  /// Search hits list
+  final List<Hit> hits;
 
   String get params => raw['params'];
 
@@ -46,5 +50,31 @@ class SearchResponse {
   @override
   String toString() {
     return 'SearchResponse{raw: $raw}';
+  }
+}
+
+/// Represents search hit result
+class Hit {
+  Hit(this.json);
+
+  factory Hit.from(hit) {
+    final raw = Map<String, dynamic>.from(hit);
+    return Hit(raw);
+  }
+
+  /// Hit raw json as map
+  final Map<String, dynamic> json;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Hit && runtimeType == other.runtimeType && json == other.json;
+
+  @override
+  int get hashCode => json.hashCode;
+
+  @override
+  String toString() {
+    return 'Hit{json: $json}';
   }
 }

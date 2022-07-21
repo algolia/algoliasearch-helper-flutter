@@ -5,11 +5,12 @@ import 'package:logging/logging.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'algolia_search.dart';
+import 'disposable.dart';
 import 'exception.dart';
 import 'response.dart';
 import 'state.dart';
 
-class AlgoliaHelper {
+class AlgoliaHelper implements Disposable {
   AlgoliaHelper._(
       this.client, this.indexName, SearchState state, Duration debounce) {
     _state = BehaviorSubject<SearchState>.seeded(state);
@@ -99,6 +100,7 @@ class AlgoliaHelper {
   }
 
   /// Dispose of underlying resources.
+  @override
   void dispose() {
     _logger.fine("helper is disposed");
     _state.close();

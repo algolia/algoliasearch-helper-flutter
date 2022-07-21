@@ -11,12 +11,6 @@ void main() {
     );
 
     helper.query("apple");
-
-    helper.responses.listen((event) {
-      // afficher
-    }).onError((error) {
-      // error handling
-    });
     var response = await helper.responses.take(1).first;
 
     expect(response.hits.length, 1);
