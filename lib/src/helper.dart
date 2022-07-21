@@ -37,7 +37,7 @@ class AlgoliaHelper {
   final String indexName;
 
   /// Search state stream
-  late BehaviorSubject _state;
+  late BehaviorSubject<SearchState> _state;
 
   /// Search results stream
   late Stream<SearchResponse> responses;
