@@ -9,6 +9,14 @@ import 'exception.dart';
 import 'response.dart';
 import 'state.dart';
 
+/// Algolia helper main entry point.
+///
+/// This implementation has the following opinionated behavior:
+///
+/// 1. There is always an initial [SearchState]
+/// 2. State changes (including initial state) trigger search operation
+/// 3. Only distinct state changes trigger search
+/// 4. There is a debounce period for state changes
 class AlgoliaHelper {
   AlgoliaHelper._(
       this.client, this.indexName, SearchState state, Duration debounce) {
@@ -32,6 +40,7 @@ class AlgoliaHelper {
   }
 
   /// Inner Algolia API client.
+  /// TODO: should be private
   final Algolia client;
 
   /// Index name.
