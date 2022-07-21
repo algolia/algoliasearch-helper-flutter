@@ -1,6 +1,5 @@
 library algolia_helper;
 
-export 'src/disposable.dart' show Disposable;
 export 'src/exception.dart' show AlgoliaException, SearchError;
 export 'src/helper.dart' show AlgoliaHelper;
 export 'src/response.dart' show SearchResponse, Hit;
