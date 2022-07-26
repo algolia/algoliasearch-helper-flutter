@@ -57,7 +57,7 @@ class SearchResponse {
 class Hit {
   Hit(this.json);
 
-  factory Hit.from(hit) {
+  factory Hit.from(Map hit) {
     final raw = Map<String, dynamic>.from(hit);
     return Hit(raw);
   }

@@ -14,11 +14,10 @@ import 'state.dart';
 /// This implementation has the following opinionated behavior:
 ///
 /// 1. There is always an initial [SearchState]
-/// 2. State changes (including initial state) trigger search operation
-/// 3. Only distinct state changes trigger search
-/// 4. There is a debounce period for state changes
-class AlgoliaHelper {
-  AlgoliaHelper._(
+/// 2. Distinct state changes (including initial state) trigger search operation
+/// 3. State changes are debounced
+class SearchHelper {
+  SearchHelper._(
       this.client, this.indexName, SearchState state, Duration debounce) {
     _state = BehaviorSubject<SearchState>.seeded(state);
     responses = _state.stream
@@ -29,14 +28,14 @@ class AlgoliaHelper {
   }
 
   /// AlgoliaHelper's factory.
-  factory AlgoliaHelper.create(
+  factory SearchHelper.create(
       {required String applicationID,
       required String apiKey,
       required String indexName,
       SearchState state = const SearchState(),
       Duration debounce = const Duration(milliseconds: 100)}) {
     final client = Algolia.init(applicationId: applicationID, apiKey: apiKey);
-    return AlgoliaHelper._(client, indexName, state, debounce);
+    return SearchHelper._(client, indexName, state, debounce);
   }
 
   /// Inner Algolia API client.
