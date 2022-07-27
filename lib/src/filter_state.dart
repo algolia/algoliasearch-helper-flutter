@@ -4,31 +4,42 @@ import 'filter.dart';
 import 'filter_group.dart';
 
 class FilterState {
-  final _filters = BehaviorSubject<MutableFilters>.seeded(MutableFilters._());
+  final _filters =
+      BehaviorSubject<ImmutableFilters>.seeded(ImmutableFilters._());
 
   Stream<Filters> get filters => _filters.stream;
 
-  void apply(Function(MutableFilters filters) block) {
+  void apply(ImmutableFilters Function(ImmutableFilters filters) block) {
     final current = _filters.value;
-    block(current);
-    _filters.sink.add(current);
+    final updated = block(current);
+    _filters.sink.add(updated);
   }
 }
 
-class MutableFilters extends Filters {
-  MutableFilters._() : super._();
+class ImmutableFilters extends Filters {
+  ImmutableFilters._(
+      {Map<FilterGroupID, Set<FilterFacet>> facetGroups = const {},
+      Map<FilterGroupID, Set<FilterTag>> tagGroups = const {},
+      Map<FilterGroupID, Set<FilterNumeric>> numericGroups = const {},
+      Map<String, HierarchicalFilter> hierarchicalGroups = const {}})
+      : super._(facetGroups, tagGroups, numericGroups, hierarchicalGroups);
 
-  add(FilterGroupID groupID, Iterable<Filter> filters) {
+  ImmutableFilters add(FilterGroupID groupID, Iterable<Filter> filters) {
     for (final filter in filters) {
       switch (filter.runtimeType) {
         case FilterFacet:
-          return facetGroups.add(groupID, filter as FilterFacet);
+          return copyWith(
+              facetGroups: facetGroups.add(groupID, filter as FilterFacet));
         case FilterTag:
-          return tagGroups.add(groupID, filter as FilterTag);
+          return copyWith(
+              tagGroups: tagGroups.add(groupID, filter as FilterTag));
         case FilterNumeric:
-          return numericGroups.add(groupID, filter as FilterNumeric);
+          return copyWith(
+              numericGroups:
+                  numericGroups.add(groupID, filter as FilterNumeric));
       }
     }
+    return this;
   }
 
   set(Map<FilterGroupID, Set<Filter>> map) {
@@ -67,10 +78,23 @@ class MutableFilters extends Filters {
   }
 
   @override
+  ImmutableFilters copyWith(
+      {Map<FilterGroupID, Set<FilterFacet>>? facetGroups = const {},
+      Map<FilterGroupID, Set<FilterTag>>? tagGroups = const {},
+      Map<FilterGroupID, Set<FilterNumeric>>? numericGroups = const {},
+      Map<String, HierarchicalFilter>? hierarchicalGroups = const {}}) {
+    return ImmutableFilters._(
+        facetGroups: facetGroups ?? this.facetGroups,
+        tagGroups: tagGroups ?? this.tagGroups,
+        numericGroups: numericGroups ?? this.numericGroups,
+        hierarchicalGroups: hierarchicalGroups ?? this.hierarchicalGroups);
+  }
+
+  @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       super == other &&
-          other is MutableFilters &&
+          other is ImmutableFilters &&
           runtimeType == other.runtimeType;
 
   @override
@@ -78,12 +102,13 @@ class MutableFilters extends Filters {
 }
 
 class Filters {
-  Filters._();
+  Filters._(this.facetGroups, this.tagGroups, this.numericGroups,
+      this.hierarchicalGroups);
 
-  final Map<FilterGroupID, Set<FilterFacet>> facetGroups = {};
-  final Map<FilterGroupID, Set<FilterTag>> tagGroups = {};
-  final Map<FilterGroupID, Set<FilterNumeric>> numericGroups = {};
-  final Map<String, HierarchicalFilter> hierarchicalGroups = {};
+  final Map<FilterGroupID, Set<FilterFacet>> facetGroups;
+  final Map<FilterGroupID, Set<FilterTag>> tagGroups;
+  final Map<FilterGroupID, Set<FilterNumeric>> numericGroups;
+  final Map<String, HierarchicalFilter> hierarchicalGroups;
 
   Set<FilterFacet>? getFacetFilters(FilterGroupID groupID) {
     return facetGroups[groupID];
@@ -136,6 +161,18 @@ class Filters {
     }
   }
 
+  Filters copyWith(
+      {Map<FilterGroupID, Set<FilterFacet>>? facetGroups = const {},
+      Map<FilterGroupID, Set<FilterTag>>? tagGroups = const {},
+      Map<FilterGroupID, Set<FilterNumeric>>? numericGroups = const {},
+      Map<String, HierarchicalFilter>? hierarchicalGroups = const {}}) {
+    return Filters._(
+        facetGroups ?? this.facetGroups,
+        tagGroups ?? this.tagGroups,
+        numericGroups ?? this.numericGroups,
+        hierarchicalGroups ?? this.hierarchicalGroups);
+  }
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -160,9 +197,10 @@ class Filters {
 }
 
 extension FiltersExt<T extends Filter> on Map<FilterGroupID, Set<T>> {
-  void add(FilterGroupID groupID, T filter) {
-    final Set<T> current = this[groupID] ?? <T>{};
-    current.add(filter);
-    addEntries([MapEntry(groupID, current)]);
+  Map<FilterGroupID, Set<T>> add(FilterGroupID groupID, T filter) {
+    final current = Set.from(this[groupID] ?? <T>{});
+    final filters = Set.unmodifiable(current..add(filter));
+    final updated = Map.from(this)..addEntries([MapEntry(groupID, filters)]);
+    return Map.unmodifiable(updated);
   }
 }
