@@ -14,6 +14,25 @@ class FilterFacet implements Filter {
   final bool isNegated;
   final dynamic value;
   final int? score;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FilterFacet &&
+          runtimeType == other.runtimeType &&
+          attribute == other.attribute &&
+          isNegated == other.isNegated &&
+          value == other.value &&
+          score == other.score;
+
+  @override
+  int get hashCode =>
+      attribute.hashCode ^ isNegated.hashCode ^ value.hashCode ^ score.hashCode;
+
+  @override
+  String toString() {
+    return 'FilterFacet{attribute: $attribute, isNegated: $isNegated, value: $value, score: $score}';
+  }
 }
 
 class FilterTag implements Filter {
@@ -24,6 +43,23 @@ class FilterTag implements Filter {
   @override
   final bool isNegated;
   final String value;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FilterTag &&
+          runtimeType == other.runtimeType &&
+          attribute == other.attribute &&
+          isNegated == other.isNegated &&
+          value == other.value;
+
+  @override
+  int get hashCode => attribute.hashCode ^ isNegated.hashCode ^ value.hashCode;
+
+  @override
+  String toString() {
+    return 'FilterTag{attribute: $attribute, isNegated: $isNegated, value: $value}';
+  }
 }
 
 class FilterNumeric implements Filter {

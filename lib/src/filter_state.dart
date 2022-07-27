@@ -4,12 +4,14 @@ import 'filter.dart';
 import 'filter_group.dart';
 
 class FilterState {
-  final filters = BehaviorSubject<MutableFilters>();
+  final _filters = BehaviorSubject<MutableFilters>.seeded(MutableFilters._());
+
+  Stream<Filters> get filters => _filters.stream;
 
   void apply(Function(MutableFilters filters) block) {
-    final current = filters.value;
+    final current = _filters.value;
     block(current);
-    filters.sink.add(current);
+    _filters.sink.add(current);
   }
 }
 
@@ -63,6 +65,16 @@ class MutableFilters extends Filters {
     // TODO: implement clearExcept
     throw UnimplementedError();
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      super == other &&
+          other is MutableFilters &&
+          runtimeType == other.runtimeType;
+
+  @override
+  int get hashCode => super.hashCode;
 }
 
 class Filters {
@@ -122,6 +134,28 @@ class Filters {
       default:
         return false;
     }
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Filters &&
+          runtimeType == other.runtimeType &&
+          facetGroups == other.facetGroups &&
+          tagGroups == other.tagGroups &&
+          numericGroups == other.numericGroups &&
+          hierarchicalGroups == other.hierarchicalGroups;
+
+  @override
+  int get hashCode =>
+      facetGroups.hashCode ^
+      tagGroups.hashCode ^
+      numericGroups.hashCode ^
+      hierarchicalGroups.hashCode;
+
+  @override
+  String toString() {
+    return 'Filters{facetGroups: $facetGroups, tagGroups: $tagGroups, numericGroups: $numericGroups, hierarchicalGroups: $hierarchicalGroups}';
   }
 }
 

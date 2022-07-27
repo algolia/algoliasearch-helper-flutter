@@ -6,6 +6,7 @@ import 'package:rxdart/rxdart.dart';
 
 import 'algolia_search.dart';
 import 'exception.dart';
+import 'filter_state.dart';
 import 'response.dart';
 import 'state.dart';
 
@@ -16,8 +17,8 @@ import 'state.dart';
 /// 1. There is always an initial [SearchState]
 /// 2. Distinct state changes (including initial state) trigger search operation
 /// 3. State changes are debounced
-class SearchHelper {
-  SearchHelper._(
+class Searcher {
+  Searcher._(
       this.client, this.indexName, SearchState state, Duration debounce) {
     _state = BehaviorSubject<SearchState>.seeded(state);
     responses = _state.stream
@@ -28,14 +29,14 @@ class SearchHelper {
   }
 
   /// AlgoliaHelper's factory.
-  factory SearchHelper.create(
+  factory Searcher.create(
       {required String applicationID,
       required String apiKey,
       required String indexName,
       SearchState state = const SearchState(),
       Duration debounce = const Duration(milliseconds: 100)}) {
     final client = Algolia.init(applicationId: applicationID, apiKey: apiKey);
-    return SearchHelper._(client, indexName, state, debounce);
+    return Searcher._(client, indexName, state, debounce);
   }
 
   /// Inner Algolia API client.
@@ -111,5 +112,13 @@ class SearchHelper {
   void dispose() {
     _logger.fine("helper is disposed");
     _state.close();
+  }
+}
+
+extension SearcherExt on Searcher {
+  StreamSubscription connect(FilterState filterState) {
+    return filterState.filters.listen((event) {
+      // TODO: update Search state (filterGroups)
+    });
   }
 }
