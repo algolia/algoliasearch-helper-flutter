@@ -3,10 +3,21 @@ class Filter {
 
   final String attribute;
   final bool isNegated;
+
+  /// Create [FilterFacet] instance.
+  static FilterFacet facet(String attribute, dynamic value,
+      [bool isNegated = false, int? score]) {
+    return FilterFacet._(attribute, value, isNegated, score);
+  }
+
+  /// Create [FilterTag] instance.
+  static FilterTag tag(String value, [bool isNegated = false]) {
+    return FilterTag._(value, isNegated);
+  }
 }
 
 class FilterFacet implements Filter {
-  FilterFacet(this.attribute, this.value, [this.isNegated = false, this.score]);
+  FilterFacet._(this.attribute, this.value, [this.isNegated = false, this.score]);
 
   @override
   final String attribute;
@@ -36,7 +47,7 @@ class FilterFacet implements Filter {
 }
 
 class FilterTag implements Filter {
-  FilterTag(this.value, [this.isNegated = false]);
+  FilterTag._(this.value, [this.isNegated = false]);
 
   @override
   final String attribute = "_tag";

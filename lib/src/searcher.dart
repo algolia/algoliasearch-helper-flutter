@@ -17,8 +17,8 @@ import 'state.dart';
 /// 1. There is always an initial [SearchState]
 /// 2. Distinct state changes (including initial state) trigger search operation
 /// 3. State changes are debounced
-class Searcher {
-  Searcher._(
+class HitsSearcher {
+  HitsSearcher._(
       this.client, this.indexName, SearchState state, Duration debounce) {
     _state = BehaviorSubject<SearchState>.seeded(state);
     responses = _state.stream
@@ -29,14 +29,14 @@ class Searcher {
   }
 
   /// AlgoliaHelper's factory.
-  factory Searcher.create(
+  factory HitsSearcher.create(
       {required String applicationID,
       required String apiKey,
       required String indexName,
       SearchState state = const SearchState(),
       Duration debounce = const Duration(milliseconds: 100)}) {
     final client = Algolia.init(applicationId: applicationID, apiKey: apiKey);
-    return Searcher._(client, indexName, state, debounce);
+    return HitsSearcher._(client, indexName, state, debounce);
   }
 
   /// Inner Algolia API client.
@@ -115,7 +115,7 @@ class Searcher {
   }
 }
 
-extension SearcherExt on Searcher {
+extension SearcherExt on HitsSearcher {
   StreamSubscription connect(FilterState filterState) {
     return filterState.filters.listen((event) {
       // TODO: update Search state (filterGroups)
