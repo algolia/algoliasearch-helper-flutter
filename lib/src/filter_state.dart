@@ -1,18 +1,57 @@
-import 'package:algolia_helper/src/utils.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'filter.dart';
 import 'filter_group.dart';
+import 'utils.dart';
 
 class FilterState {
-  final _filters =
-      BehaviorSubject<ImmutableFilters>.seeded(ImmutableFilters._());
+  Stream<Filters> get filters => _filters.stream.distinct();
 
-  Stream<Filters> get filters => _filters.stream;
+  final BehaviorSubject<ImmutableFilters> _filters =
+      BehaviorSubject.seeded(ImmutableFilters._());
 
-  void apply(ImmutableFilters Function(ImmutableFilters filters) block) {
+  void add(FilterGroupID groupID, Iterable<Filter> filters) {
+    _apply((it) => it.add(groupID, filters));
+  }
+
+  void remove(FilterGroupID groupID, Iterable<Filter> filters) {
+    _apply((it) => it.remove(groupID, filters));
+  }
+
+  void toggle(FilterGroupID groupID, Filter filter) {
+    return contains(groupID, filter)
+        ? remove(groupID, [filter])
+        : add(groupID, [filter]);
+  }
+
+  bool contains(FilterGroupID groupID, Filter filter) {
+    return _filters.value.contains(groupID, filter);
+  }
+
+  void addHierarchical(
+      String attribute, HierarchicalFilter hierarchicalFilter) {
+    // TODO: implement addHierarchical
+    throw UnimplementedError();
+  }
+
+  void removeHierarchical(String attribute) {
+    // TODO: implement removeHierarchical
+    throw UnimplementedError();
+  }
+
+  void clear(Iterator<FilterGroupID> groupIDs) {
+    // TODO: implement clear
+    throw UnimplementedError();
+  }
+
+  void clearExcept(Iterator<FilterGroupID> groupIDs) {
+    // TODO: implement clearExcept
+    throw UnimplementedError();
+  }
+
+  void _apply(ImmutableFilters Function(ImmutableFilters filters) action) {
     final current = _filters.value;
-    final updated = block(current);
+    final updated = action(current);
     _filters.sink.add(updated);
   }
 }
@@ -66,13 +105,14 @@ class ImmutableFilters extends Filters {
         case FilterNumeric:
           return copyWith(
               numericGroups:
-              numericGroups.add(groupID, filter as FilterNumeric));
+                  numericGroups.add(groupID, filter as FilterNumeric));
       }
     }
     return this;
   }
 
-  ImmutableFilters addHierarchical(String attribute, HierarchicalFilter hierarchicalFilter) {
+  ImmutableFilters addHierarchical(
+      String attribute, HierarchicalFilter hierarchicalFilter) {
     // TODO: implement addHierarchical
     throw UnimplementedError();
   }
@@ -212,10 +252,10 @@ class Filters {
 }
 
 extension FiltersExt<T extends Filter> on Map<FilterGroupID, Set<T>> {
-
   /// Returns new filter group instance with updated values.
   Map<FilterGroupID, Set<T>> add(FilterGroupID groupID, T filter) {
     final Set<T> current = Set.from(this[groupID] ?? <T>{});
+    if (current.contains(filter)) return this; // already exists, fast way out
     final filters = Set.unmodifiable(current..add(filter));
     final updated = Map.from(this)..addEntries([MapEntry(groupID, filters)]);
     return Map.unmodifiable(updated);
@@ -224,14 +264,12 @@ extension FiltersExt<T extends Filter> on Map<FilterGroupID, Set<T>> {
   /// Returns new filter group instance with updated values.
   Map<FilterGroupID, Set<T>> remove(FilterGroupID groupID, T filter) {
     final Set<T> current = Set.from(this[groupID] ?? <T>{});
-    if (!current.contains(filter)) return this;
+    if (!current.contains(filter)) return this; // do not exists, fast way out
     final filters = Set.unmodifiable(current..remove(filter));
     final updated = filters.isEmpty
         ? Map.from(this).apply((it) => it.remove(groupID))
-        : Map.from(this).apply((it) => it.addEntries([MapEntry(groupID, filters)]));
-
-
-    //final updated = Map.from(this)..addEntries([MapEntry(groupID, filters)]);
+        : Map.from(this)
+            .apply((it) => it.addEntries([MapEntry(groupID, filters)]));
     return Map.unmodifiable(updated);
   }
 }

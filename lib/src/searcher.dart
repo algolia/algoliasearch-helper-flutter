@@ -8,7 +8,8 @@ import 'algolia_search.dart';
 import 'exception.dart';
 import 'filter_state.dart';
 import 'response.dart';
-import 'state.dart';
+import 'search_state.dart';
+import 'state_builder.dart';
 
 /// Algolia helper main entry point.
 ///
@@ -18,8 +19,7 @@ import 'state.dart';
 /// 2. Distinct state changes (including initial state) trigger search operation
 /// 3. State changes are debounced
 class HitsSearcher {
-  HitsSearcher._(
-      this.client, this.indexName, SearchState state, Duration debounce) {
+  HitsSearcher._(this.client, SearchState state, Duration debounce) {
     _state = BehaviorSubject<SearchState>.seeded(state);
     responses = _state.stream
         .debounceTime(debounce)
@@ -28,23 +28,30 @@ class HitsSearcher {
         .handleError(_error);
   }
 
-  /// AlgoliaHelper's factory.
-  factory HitsSearcher.create(
+  /// HitsSearcher's factory.
+  factory HitsSearcher(
       {required String applicationID,
       required String apiKey,
       required String indexName,
-      SearchState state = const SearchState(),
       Duration debounce = const Duration(milliseconds: 100)}) {
     final client = Algolia.init(applicationId: applicationID, apiKey: apiKey);
-    return HitsSearcher._(client, indexName, state, debounce);
+    final state = SearchState(indexName: indexName);
+    return HitsSearcher._(client, state, debounce);
+  }
+
+  /// HitsSearcher's factory.
+  factory HitsSearcher.create(
+      {required String applicationID,
+      required String apiKey,
+      required SearchState state,
+      Duration debounce = const Duration(milliseconds: 100)}) {
+    final client = Algolia.init(applicationId: applicationID, apiKey: apiKey);
+    return HitsSearcher._(client, state, debounce);
   }
 
   /// Inner Algolia API client.
   /// TODO: should be private
   final Algolia client;
-
-  /// Index name.
-  final String indexName;
 
   /// Search state stream
   late BehaviorSubject<SearchState> _state;
@@ -60,29 +67,9 @@ class HitsSearcher {
     _updateState((state) => state.copyWith(query: query));
   }
 
-  /// Set search page.
-  void setPage(int page) {
-    _updateState((state) => state.copyWith(page: page));
-  }
-
-  /// Set hits per search page.
-  void setHitPerPage(int page) {
-    _updateState((state) => state.copyWith(page: page));
-  }
-
-  /// Set search facets.
-  void setFacets(List<String> facets) {
-    _updateState((state) => state.copyWith(facets: facets));
-  }
-
   /// Apply search state configuration.
   void applyState(SearchState Function(SearchState state) config) {
     _updateState((state) => config(state));
-  }
-
-  /// Override current state with an empty state.
-  void clearState() {
-    _updateState((_) => const SearchState());
   }
 
   /// Apply changes to the current state
@@ -96,7 +83,7 @@ class HitsSearcher {
   /// Run search query using [state] and get a search .
   Future<SearchResponse> _search(SearchState state) async {
     _logger.info("Start search: $state");
-    final objects = await client.index(indexName).queryOf(state).getObjects();
+    final objects = await client.queryOf(state).getObjects();
     _logger.info("Response search : $objects");
     return objects.toSearchResponse();
   }
@@ -115,10 +102,11 @@ class HitsSearcher {
   }
 }
 
+/// Extensions over [HitsSearcher]
 extension SearcherExt on HitsSearcher {
-  StreamSubscription connect(FilterState filterState) {
-    return filterState.filters.listen((event) {
-      // TODO: update Search state (filterGroups)
-    });
+  /// Creates a connection between [HitsSearcher] and [FilterState].
+  StreamSubscription connectFilterState(FilterState filterState) {
+    return filterState.filters
+        .listen((filters) => applyState((state) => state.withFilters(filters)));
   }
 }

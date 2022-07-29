@@ -1,7 +1,17 @@
 import 'filter.dart';
 
+/// Create and [FilterGroupID] with operator [FilterOperator.and].
+FilterGroupID groupAnd([String name = ""]) =>
+    FilterGroupID(name, FilterOperator.and);
+
+/// Create and [FilterGroupID] with operator [FilterOperator.or].
+FilterGroupID groupOr([String name = ""]) =>
+    FilterGroupID(name, FilterOperator.or);
+
+/// Identifier of a filter group.
+/// The group name is for access purpose only, won't be used for the actual filters generation.
 class FilterGroupID {
-  FilterGroupID(this.name, this.operator);
+  FilterGroupID([this.name = "", this.operator = FilterOperator.and]);
 
   final String name;
   final FilterOperator operator;
@@ -48,21 +58,4 @@ class HierarchicalFilter {
   String toString() {
     return 'HierarchicalFilter{attributes: $attributes, path: $path, filter: $filter}';
   }
-}
-
-abstract class FilterGroup<T> {
-  FilterGroup(this.filters, this.name);
-
-  Set<T> filters;
-  String? name;
-}
-
-class FilterGroupAnd<T> implements FilterGroup<T> {
-  FilterGroupAnd(this.filters, this.name);
-
-  @override
-  Set<T> filters;
-
-  @override
-  String? name;
 }

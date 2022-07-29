@@ -1,35 +1,28 @@
-/// Creates a [HighlightedString] from a highlighted string.
-HighlightedString highlightTokenizer(String string,
-    {String preTag = "<em>",
-    String postTag = "</em>",
-    bool isInverted = false}) {
-  List<HighlightToken> tokens = [];
+import 'response.dart';
 
-  final re = RegExp("$preTag(\\w+)$postTag");
-  final matches = re.allMatches(string).toList();
-
-  void append(String string, bool isHighlighted) {
-    tokens.add(HighlightToken(string, isHighlighted));
+/// Extension over [Hit].
+extension Highlightable on Hit {
+  /// Get [HighlightedString] of an attribute
+  HighlightedString getHightlightedString(String attribute,
+      [String preTag = _Defaults.preTag,
+      String postTag = _Defaults.postTag,
+      bool inverted = false]) {
+    final Map<String, dynamic> highlightResult = json["_highlightResult"];
+    final String highlighted = highlightResult[attribute];
+    return HighlightedString.of(highlighted,
+        preTag: preTag, postTag: postTag, inverted: inverted);
   }
-
-  int prev = 0;
-  for (final match in matches) {
-    if (prev != match.start) {
-      append(string.substring(prev, match.start), isInverted);
-    }
-    append(match.group(1)!, !isInverted);
-    prev = match.end;
-  }
-  if (prev != string.length) {
-    append(string.substring(prev), isInverted);
-  }
-
-  return HighlightedString(string, tokens);
 }
 
 /// Highlighted string as a list of tokens.
 class HighlightedString {
-  HighlightedString(this.original, this.tokens);
+  HighlightedString._(this.original, this.tokens);
+
+  factory HighlightedString.of(String string,
+          {String preTag = _Defaults.preTag,
+          String postTag = _Defaults.postTag,
+          bool inverted = false}) =>
+      _highlightTokenizer(string, preTag, postTag, inverted);
 
   final String original;
   final Iterable<HighlightToken> tokens;
@@ -51,9 +44,36 @@ class HighlightedString {
   }
 }
 
+/// Creates a [HighlightedString] from a highlighted string.
+HighlightedString _highlightTokenizer(
+    String string, String preTag, String postTag, bool inverted) {
+  List<HighlightToken> tokens = [];
+
+  final re = RegExp("$preTag(\\w+)$postTag");
+  final matches = re.allMatches(string).toList();
+
+  void append(String string, bool isHighlighted) {
+    tokens.add(HighlightToken._(string, isHighlighted));
+  }
+
+  int prev = 0;
+  for (final match in matches) {
+    if (prev != match.start) {
+      append(string.substring(prev, match.start), inverted);
+    }
+    append(match.group(1)!, !inverted);
+    prev = match.end;
+  }
+  if (prev != string.length) {
+    append(string.substring(prev), inverted);
+  }
+
+  return HighlightedString._(string, tokens);
+}
+
 /// Highlight string token.
 class HighlightToken {
-  HighlightToken(this.content, this.highlighted);
+  HighlightToken._(this.content, this.highlighted);
 
   final String content;
   final bool highlighted;
@@ -73,4 +93,9 @@ class HighlightToken {
   String toString() {
     return 'HighlightToken{content: $content, highlighted: $highlighted}';
   }
+}
+
+class _Defaults {
+  static const preTag = "<em>";
+  static const postTag = "</em>";
 }

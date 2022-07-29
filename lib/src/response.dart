@@ -1,3 +1,5 @@
+import 'package:algolia_helper/algolia_helper.dart';
+
 /// Search operation response.
 class SearchResponse {
   SearchResponse(this.raw)

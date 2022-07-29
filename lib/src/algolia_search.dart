@@ -2,14 +2,14 @@ import 'package:algolia/algolia.dart';
 import 'package:algolia_helper/src/exception.dart';
 
 import 'response.dart';
-import 'state.dart';
+import 'search_state.dart';
 import 'utils.dart';
 
-/// Extensions over [AlgoliaQuery].
-extension AlgoliaQueryExt on AlgoliaQuery {
+/// Extensions over [Algolia] client.
+extension AlgoliaExt on Algolia {
   /// Create [AlgoliaQuery] instance based on [state].
   AlgoliaQuery queryOf(SearchState state) {
-    AlgoliaQuery query = this;
+    AlgoliaQuery query = index(state.indexName);
     state.query?.let((it) => query = query.query(it));
     state.page?.let((it) => query = query.setPage(it));
     state.hitsPerPage?.let((it) => query = query.setHitsPerPage(it));
