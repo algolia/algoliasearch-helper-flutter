@@ -17,7 +17,8 @@ class Filter {
 }
 
 class FilterFacet implements Filter {
-  FilterFacet._(this.attribute, this.value, [this.isNegated = false, this.score]);
+  FilterFacet._(this.attribute, this.value,
+      [this.isNegated = false, this.score]);
 
   @override
   final String attribute;

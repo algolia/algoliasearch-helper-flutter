@@ -7,7 +7,7 @@ import 'package:rxdart/rxdart.dart';
 import 'algolia_search.dart';
 import 'exception.dart';
 import 'filter_state.dart';
-import 'response.dart';
+import 'search_response.dart';
 import 'search_state.dart';
 import 'state_builder.dart';
 
