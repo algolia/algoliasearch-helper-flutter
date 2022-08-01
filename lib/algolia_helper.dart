@@ -1,6 +1,10 @@
 library algolia_helper;
 
-export 'src/exception.dart' show AlgoliaException, SearchError;
-export 'src/helper.dart' show SearchHelper;
-export 'src/response.dart' show SearchResponse, Hit;
-export 'src/state.dart' show SearchState;
+export 'src/exception.dart';
+export 'src/filter.dart';
+export 'src/filter_group.dart';
+export 'src/filter_state.dart';
+export 'src/highlighting.dart';
+export 'src/hits_searcher.dart';
+export 'src/search_response.dart';
+export 'src/search_state.dart';
