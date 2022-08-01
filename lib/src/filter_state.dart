@@ -14,6 +14,10 @@ class FilterState {
     _apply((it) => it.add(groupID, filters));
   }
 
+  void set(Map<FilterGroupID, Set<Filter>> map) {
+    _apply((it) => it.set(map));
+  }
+
   void remove(FilterGroupID groupID, Iterable<Filter> filters) {
     _apply((it) => it.remove(groupID, filters));
   }
@@ -30,23 +34,19 @@ class FilterState {
 
   void addHierarchical(
       String attribute, HierarchicalFilter hierarchicalFilter) {
-    // TODO: implement addHierarchical
-    throw UnimplementedError();
+    _apply((it) => it.addHierarchical(attribute, hierarchicalFilter));
   }
 
   void removeHierarchical(String attribute) {
-    // TODO: implement removeHierarchical
-    throw UnimplementedError();
+    _apply((it) => it.removeHierarchical(attribute));
   }
 
-  void clear(Iterator<FilterGroupID> groupIDs) {
-    // TODO: implement clear
-    throw UnimplementedError();
+  void clear(Iterable<FilterGroupID> groupIDs) {
+    _apply((it) => it.clear(groupIDs));
   }
 
-  void clearExcept(Iterator<FilterGroupID> groupIDs) {
-    // TODO: implement clearExcept
-    throw UnimplementedError();
+  void clearExcept(Iterable<FilterGroupID> groupIDs) {
+    _apply((it) => it.clearExcept(groupIDs));
   }
 
   void _apply(ImmutableFilters Function(ImmutableFilters filters) action) {
@@ -82,9 +82,12 @@ class ImmutableFilters extends Filters {
     return this;
   }
 
-  set(Map<FilterGroupID, Set<Filter>> map) {
-    // TODO: implement set
-    throw UnimplementedError();
+  ImmutableFilters set(Map<FilterGroupID, Set<Filter>> map) {
+    var filters = ImmutableFilters._();
+    for (final entry in map.entries) {
+      filters = filters.add(entry.key, entry.value);
+    }
+    return filters;
   }
 
   ImmutableFilters toggle(FilterGroupID groupID, Filter filter) {
@@ -98,14 +101,14 @@ class ImmutableFilters extends Filters {
       switch (filter.runtimeType) {
         case FilterFacet:
           return copyWith(
-              facetGroups: facetGroups.add(groupID, filter as FilterFacet));
+              facetGroups: facetGroups.delete(groupID, filter as FilterFacet));
         case FilterTag:
           return copyWith(
-              tagGroups: tagGroups.add(groupID, filter as FilterTag));
+              tagGroups: tagGroups.delete(groupID, filter as FilterTag));
         case FilterNumeric:
           return copyWith(
               numericGroups:
-                  numericGroups.add(groupID, filter as FilterNumeric));
+                  numericGroups.delete(groupID, filter as FilterNumeric));
       }
     }
     return this;
@@ -113,23 +116,33 @@ class ImmutableFilters extends Filters {
 
   ImmutableFilters addHierarchical(
       String attribute, HierarchicalFilter hierarchicalFilter) {
-    // TODO: implement addHierarchical
-    throw UnimplementedError();
+    if (hierarchicalGroups.containsKey(attribute)) return this;
+    final groups = Map<String, HierarchicalFilter>.from(hierarchicalGroups)
+      ..[attribute] = hierarchicalFilter;
+    return copyWith(hierarchicalGroups: Map.unmodifiable(groups));
   }
 
   ImmutableFilters removeHierarchical(String attribute) {
-    // TODO: implement removeHierarchical
-    throw UnimplementedError();
+    if (!hierarchicalGroups.containsKey(attribute)) return this;
+    final groups = Map<String, HierarchicalFilter>.from(hierarchicalGroups)
+      ..remove(attribute);
+    return copyWith(hierarchicalGroups: Map.unmodifiable(groups));
   }
 
-  ImmutableFilters clear(Iterator<FilterGroupID> groupIDs) {
-    // TODO: implement clear
-    throw UnimplementedError();
+  ImmutableFilters clear([Iterable<FilterGroupID>? groupIDs]) {
+    if (groupIDs == null || groupIDs.isEmpty) return ImmutableFilters._();
+    return ImmutableFilters._(
+        facetGroups: facetGroups.deleteGroups(groupIDs),
+        numericGroups: numericGroups.deleteGroups(groupIDs),
+        tagGroups: tagGroups.deleteGroups(groupIDs));
   }
 
-  ImmutableFilters clearExcept(Iterator<FilterGroupID> groupIDs) {
-    // TODO: implement clearExcept
-    throw UnimplementedError();
+  ImmutableFilters clearExcept(Iterable<FilterGroupID> groupIDs) {
+    if (groupIDs.isEmpty) return ImmutableFilters._();
+    return ImmutableFilters._(
+        facetGroups: facetGroups.deleteGroupsExcept(groupIDs),
+        numericGroups: numericGroups.deleteGroupsExcept(groupIDs),
+        tagGroups: tagGroups.deleteGroupsExcept(groupIDs));
   }
 
   @override
@@ -144,25 +157,19 @@ class ImmutableFilters extends Filters {
         numericGroups: numericGroups ?? this.numericGroups,
         hierarchicalGroups: hierarchicalGroups ?? this.hierarchicalGroups);
   }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      super == other &&
-          other is ImmutableFilters &&
-          runtimeType == other.runtimeType;
-
-  @override
-  int get hashCode => super.hashCode;
 }
 
+/// Map of filter groups convenience type.
+typedef FilterGroupMap<T> = Map<FilterGroupID, Set<T>>;
+
+/// Filter groups: facet, tag, numeric and hierarchical.
 class Filters {
   Filters._(this.facetGroups, this.tagGroups, this.numericGroups,
       this.hierarchicalGroups);
 
-  final Map<FilterGroupID, Set<FilterFacet>> facetGroups;
-  final Map<FilterGroupID, Set<FilterTag>> tagGroups;
-  final Map<FilterGroupID, Set<FilterNumeric>> numericGroups;
+  final FilterGroupMap<FilterFacet> facetGroups;
+  final FilterGroupMap<FilterTag> tagGroups;
+  final FilterGroupMap<FilterNumeric> numericGroups;
   final Map<String, HierarchicalFilter> hierarchicalGroups;
 
   Set<FilterFacet>? getFacetFilters(FilterGroupID groupID) {
@@ -251,25 +258,42 @@ class Filters {
   }
 }
 
-extension FiltersExt<T extends Filter> on Map<FilterGroupID, Set<T>> {
+extension FilterGroupMapExt<T extends Filter> on FilterGroupMap<T> {
   /// Returns new filter group instance with updated values.
-  Map<FilterGroupID, Set<T>> add(FilterGroupID groupID, T filter) {
-    final Set<T> current = Set.from(this[groupID] ?? <T>{});
+  FilterGroupMap<T> add(FilterGroupID groupID, T filter) {
+    final current = Set<T>.from(this[groupID] ?? const {});
     if (current.contains(filter)) return this; // already exists, fast way out
     final filters = Set.unmodifiable(current..add(filter));
     final updated = Map.from(this)..addEntries([MapEntry(groupID, filters)]);
-    return Map.unmodifiable(updated);
+    return Map<FilterGroupID, Set<T>>.unmodifiable(updated);
   }
 
   /// Returns new filter group instance with updated values.
-  Map<FilterGroupID, Set<T>> remove(FilterGroupID groupID, T filter) {
-    final Set<T> current = Set.from(this[groupID] ?? <T>{});
+  FilterGroupMap<T> delete(FilterGroupID groupID, T filter) {
+    final current = Set<T>.from(this[groupID] ?? const {});
     if (!current.contains(filter)) return this; // do not exists, fast way out
-    final filters = Set.unmodifiable(current..remove(filter));
+    final filters = Set<T>.unmodifiable(current..remove(filter));
     final updated = filters.isEmpty
-        ? Map.from(this).apply((it) => it.remove(groupID))
-        : Map.from(this)
+        ? FilterGroupMap<T>.from(this).apply((it) => it.remove(groupID))
+        : FilterGroupMap<T>.from(this)
             .apply((it) => it.addEntries([MapEntry(groupID, filters)]));
-    return Map.unmodifiable(updated);
+    return FilterGroupMap<T>.unmodifiable(updated);
+  }
+
+  /// Returns new filter group instance without deleted groups.
+  FilterGroupMap<T> deleteGroups(Iterable<FilterGroupID> groupIDs) {
+    final current = FilterGroupMap<T>.from(this);
+    for (final groupID in groupIDs) {
+      current.remove(groupID);
+    }
+    return current.length != length
+        ? FilterGroupMap<T>.unmodifiable(current)
+        : this;
+  }
+
+  /// Returns new filter group instance without deleted groups.
+  FilterGroupMap<T> deleteGroupsExcept(Iterable<FilterGroupID> groupIDs) {
+    final deletable = keys.where((groupID) => !groupIDs.contains(groupID));
+    return deleteGroups(deletable);
   }
 }
