@@ -49,6 +49,8 @@ class FilterState {
     _modify((it) => it.clearExcept(groupIDs));
   }
 
+  Filters snapshot() => _filters.value;
+
   void _modify(_ImmutableFilters Function(_ImmutableFilters filters) action) {
     final current = _filters.value;
     final updated = action(current);
