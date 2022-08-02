@@ -1,6 +1,6 @@
 import 'package:algolia/algolia.dart';
-import 'package:algolia_helper/src/exception.dart';
 
+import 'exception.dart';
 import 'search_response.dart';
 import 'search_state.dart';
 import 'utils.dart';
