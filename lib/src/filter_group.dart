@@ -1,17 +1,17 @@
 import 'filter.dart';
 
-/// Create and [FilterGroupID] with operator [FilterOperator.and].
-FilterGroupID groupAnd([String name = ""]) =>
-    FilterGroupID(name, FilterOperator.and);
-
-/// Create and [FilterGroupID] with operator [FilterOperator.or].
-FilterGroupID groupOr([String name = ""]) =>
-    FilterGroupID(name, FilterOperator.or);
-
 /// Identifier of a filter group.
 /// The group name is for access purpose only, won't be used for the actual filters generation.
 class FilterGroupID {
   FilterGroupID([this.name = "", this.operator = FilterOperator.and]);
+
+  /// Create and [FilterGroupID] with operator [FilterOperator.and].
+  factory FilterGroupID.and([String name = ""]) =>
+      FilterGroupID(name, FilterOperator.and);
+
+  /// Create and [FilterGroupID] with operator [FilterOperator.or].
+  factory FilterGroupID.groupOr([String name = ""]) =>
+      FilterGroupID(name, FilterOperator.or);
 
   final String name;
   final FilterOperator operator;

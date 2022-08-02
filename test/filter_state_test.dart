@@ -5,7 +5,7 @@ void main() {
   test('FilterState add facet', () {
     final filterState = FilterState();
 
-    final groupA = groupAnd("GroupA");
+    final groupA = FilterGroupID.and("GroupA");
     filterState.add(groupA, [Filter.facet("Category", "A")]);
     filterState.add(groupA, [Filter.facet("Category", "A")]);
     filterState.add(groupA, [Filter.facet("Category", "B")]);
