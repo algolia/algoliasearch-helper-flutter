@@ -1,5 +1,5 @@
 import 'package:algolia_helper/algolia_helper.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('Successful search operation', () async {
