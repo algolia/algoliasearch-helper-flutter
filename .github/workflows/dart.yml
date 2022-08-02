@@ -38,33 +38,33 @@ jobs:
       - name: mono_repo self validate
         run: dart pub global run mono_repo generate --validate
   job_002:
-    name: "unit_test; PKG: helper_dart; `flutter test`"
+    name: "unit_test; PKG: helper_dart; `dart test`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:2.17.5;packages:helper_dart;commands:test"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:helper_dart;commands:test_0"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;sdk:2.17.5;packages:helper_dart
-            os:ubuntu-latest;pub-cache-hosted;sdk:2.17.5
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:helper_dart
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: subosito/flutter-action@2fb73e25c9488eb544b9b14b2ce00c4c2baf789e
+      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
-          channel: "2.17.5"
+          sdk: stable
       - id: checkout
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: helper_dart_pub_upgrade
-        name: helper_dart; flutter pub pub upgrade
+        name: helper_dart; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: helper_dart
-        run: flutter pub pub upgrade
-      - name: helper_dart; flutter test
+        run: dart pub upgrade
+      - name: helper_dart; dart test
         if: "always() && steps.helper_dart_pub_upgrade.conclusion == 'success'"
         working-directory: helper_dart
-        run: flutter test
+        run: dart test
     needs:
       - job_001
   job_003:
@@ -75,15 +75,15 @@ jobs:
         uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:2.17.5;packages:helper_flutter;commands:test"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:helper_flutter;commands:test_1"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;sdk:2.17.5;packages:helper_flutter
-            os:ubuntu-latest;pub-cache-hosted;sdk:2.17.5
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:helper_flutter
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - uses: subosito/flutter-action@2fb73e25c9488eb544b9b14b2ce00c4c2baf789e
         with:
-          channel: "2.17.5"
+          channel: stable
       - id: checkout
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: helper_flutter_pub_upgrade
