@@ -1,6 +1,5 @@
+import 'package:algolia_helper_flutter/helper.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:helper_flutter/helper_flutter.dart';
 
 void main() {
   test('adds one to input values', () {

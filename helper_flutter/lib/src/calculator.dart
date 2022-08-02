@@ -1,4 +1,3 @@
-library helper_flutter;
 
 /// A Calculator.
 class Calculator {
