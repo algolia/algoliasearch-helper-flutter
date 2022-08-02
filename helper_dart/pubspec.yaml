@@ -1,7 +1,7 @@
 name: algolia_helper_dart
 description: Algolia Dart Helper
 version: 0.0.1
-homepage:
+homepage: https://github.com/algolia/algoliasearch-helper-dart/helper_dart
 
 environment:
   sdk: ">=2.17.5 <3.0.0"
