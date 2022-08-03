@@ -119,6 +119,22 @@ class Filters {
     }
   }
 
+  Set<FilterGroup> toFilterGroups() {
+    final facets = facetGroups
+        .toList((groupID, filters) => FacetFilterGroup(groupID, filters))
+        .unmodifiable();
+    final tags = tagGroups
+        .toList((groupID, filters) => TagFilterGroup(groupID, filters))
+        .unmodifiable();
+    final numerics = numericGroups
+        .toList((groupID, filters) => NumericFilterGroup(groupID, filters))
+        .unmodifiable();
+    final hierarchical = hierarchicalGroups
+        .toList((name, filter) => HierarchicalFilterGroup(name, {filter}))
+        .unmodifiable();
+    return {...facets, ...tags, ...numerics, ...hierarchical};
+  }
+
   Filters copyWith(
       {Map<FilterGroupID, Set<FilterFacet>>? facetGroups,
       Map<FilterGroupID, Set<FilterTag>>? tagGroups,

@@ -153,3 +153,29 @@ enum NumericOperator {
 
   final String operator;
 }
+
+/// Filter for hierarchical
+class HierarchicalFilter {
+  HierarchicalFilter(this.attributes, this.path, this.filter);
+
+  final List<String> attributes;
+  final List<FilterFacet> path;
+  final FilterFacet filter;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is HierarchicalFilter &&
+          runtimeType == other.runtimeType &&
+          attributes == other.attributes &&
+          path == other.path &&
+          filter == other.filter;
+
+  @override
+  int get hashCode => attributes.hashCode ^ path.hashCode ^ filter.hashCode;
+
+  @override
+  String toString() {
+    return 'HierarchicalFilter{attributes: $attributes, path: $path, filter: $filter}';
+  }
+}
