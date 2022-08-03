@@ -1,3 +1,5 @@
+import 'filter_group.dart';
+
 /// Representation of search state.
 class SearchState {
   const SearchState(
@@ -6,7 +8,7 @@ class SearchState {
       this.page,
       this.hitsPerPage,
       this.facets,
-      this.filters,
+      this.filterGroups,
       this.ruleContexts});
 
   /// Index name
@@ -24,13 +26,11 @@ class SearchState {
   /// Search facets list
   final List<String>? facets;
 
-  /// Search filters
-  final String? filters;
+  /// Set of filter groups
+  final Set<FilterGroup>? filterGroups;
 
   /// Search rule contexts
   final List<String>? ruleContexts;
-
-  // TODO: filters groups
 
   /// Make a copy of the search state.
   SearchState copyWith(
@@ -39,7 +39,7 @@ class SearchState {
       int? page,
       int? hitsPerPage,
       List<String>? facets,
-      String? filters,
+      Set<FilterGroup>? filterGroups,
       List<String>? ruleContexts}) {
     return SearchState(
         indexName: indexName ?? this.indexName,
@@ -47,7 +47,7 @@ class SearchState {
         page: page ?? this.page,
         hitsPerPage: hitsPerPage ?? this.hitsPerPage,
         facets: facets ?? this.facets,
-        filters: filters ?? this.filters,
+        filterGroups: filterGroups ?? this.filterGroups,
         ruleContexts: ruleContexts ?? this.ruleContexts);
   }
 
@@ -61,7 +61,7 @@ class SearchState {
           page == other.page &&
           hitsPerPage == other.hitsPerPage &&
           facets == other.facets &&
-          filters == other.filters &&
+          filterGroups == other.filterGroups &&
           ruleContexts == other.ruleContexts;
 
   @override
@@ -71,11 +71,11 @@ class SearchState {
       page.hashCode ^
       hitsPerPage.hashCode ^
       facets.hashCode ^
-      filters.hashCode ^
+      filterGroups.hashCode ^
       ruleContexts.hashCode;
 
   @override
   String toString() {
-    return 'SearchState{indexName: $indexName, query: $query, page: $page, hitsPerPage: $hitsPerPage, facets: $facets, filters: $filters, ruleContexts: $ruleContexts}';
+    return 'SearchState{indexName: $indexName, query: $query, page: $page, hitsPerPage: $hitsPerPage, facets: $facets, filterGroups: $filterGroups, ruleContexts: $ruleContexts}';
   }
 }

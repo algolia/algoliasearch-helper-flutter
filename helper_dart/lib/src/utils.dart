@@ -9,3 +9,25 @@ extension ObjectExt<T> on T {
     return this;
   }
 }
+
+/// Extension over [Map]
+extension MapExt<K, E> on Map<K, E> {
+  /// Convert [Map] entries into a list.
+  List<T> toList<T>(T Function(K key, E value) builder) =>
+      entries.map((e) => builder(e.key, e.value)).toList();
+
+  /// Get unmodifiable copy of this Map.
+  Map<K, E> unmodifiable() => Map<K, E>.unmodifiable(this);
+}
+
+/// Extension over [List]
+extension ListExt<T> on List<T> {
+  /// Get unmodifiable copy of this list.
+  List<T> unmodifiable() => List<T>.unmodifiable(this);
+}
+
+/// Extension over [Set]
+extension SetExt<T> on Set<T> {
+  /// Get unmodifiable copy of this set.
+  Set<T> unmodifiable() => Set<T>.unmodifiable(this);
+}

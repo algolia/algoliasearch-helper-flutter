@@ -1,3 +1,5 @@
+import 'package:algolia_helper_dart/algolia.dart';
+
 import 'filter.dart';
 
 /// Identifier of a filter group.
@@ -33,29 +35,34 @@ class FilterGroupID {
   }
 }
 
+/// Group filter operator
 enum FilterOperator { and, or }
 
-class HierarchicalFilter {
-  HierarchicalFilter(this.attributes, this.path, this.filter);
+/// Represents a filter group
+abstract class FilterGroup<T> {
+  FilterGroup(this.groupID, this.filters);
 
-  final List<String> attributes;
-  final List<FilterFacet> path;
-  final FilterFacet filter;
+  final FilterGroupID groupID;
+  final Set<T> filters;
+}
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is HierarchicalFilter &&
-          runtimeType == other.runtimeType &&
-          attributes == other.attributes &&
-          path == other.path &&
-          filter == other.filter;
+/// Facets filter group
+class FacetFilterGroup extends FilterGroup<FilterFacet> {
+  FacetFilterGroup(super.groupID, super.filters);
+}
 
-  @override
-  int get hashCode => attributes.hashCode ^ path.hashCode ^ filter.hashCode;
+/// Tags filter group
+class TagFilterGroup extends FilterGroup<FilterTag> {
+  TagFilterGroup(super.groupIDr, super.filters);
+}
 
-  @override
-  String toString() {
-    return 'HierarchicalFilter{attributes: $attributes, path: $path, filter: $filter}';
-  }
+/// Numeric facets filter group
+class NumericFilterGroup extends FilterGroup<FilterNumeric> {
+  NumericFilterGroup(super.groupID, super.filters);
+}
+
+/// Hierarchical filter group
+class HierarchicalFilterGroup extends FilterGroup<HierarchicalFilter> {
+  HierarchicalFilterGroup(String name, Set<HierarchicalFilter> filters)
+      : super(FilterGroupID(name, FilterOperator.and), filters);
 }

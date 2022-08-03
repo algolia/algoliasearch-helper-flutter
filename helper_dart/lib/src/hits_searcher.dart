@@ -8,7 +8,6 @@ import 'filter_state.dart';
 import 'hits_searcher_service.dart';
 import 'search_response.dart';
 import 'search_state.dart';
-import 'state_builder.dart';
 
 /// Algolia helper main entry point.
 ///
@@ -31,7 +30,9 @@ class HitsSearcher {
           {required String applicationID,
           required String apiKey,
           required String indexName,
-          bool disjunctiveFacetingEnabled = false, /// TODO: default to true when disjunctive faceting is implemented
+          bool disjunctiveFacetingEnabled = false,
+
+          /// TODO: default to true when disjunctive faceting is implemented
           Duration debounce = const Duration(milliseconds: 100)}) =>
       HitsSearcher.create(
           applicationID: applicationID,
@@ -45,7 +46,9 @@ class HitsSearcher {
       {required String applicationID,
       required String apiKey,
       required SearchState state,
-      bool disjunctiveFacetingEnabled = false, /// TODO: default to true when disjunctive faceting is implemented
+      bool disjunctiveFacetingEnabled = false,
+
+      /// TODO: default to true when disjunctive faceting is implemented
       Duration debounce = const Duration(milliseconds: 100)}) {
     final client = Algolia.init(applicationId: applicationID, apiKey: apiKey);
     final service = HitsSearchService(client, disjunctiveFacetingEnabled);
@@ -97,7 +100,7 @@ class HitsSearcher {
 extension SearcherExt on HitsSearcher {
   /// Creates a connection between [HitsSearcher] and [FilterState].
   StreamSubscription connectFilterState(FilterState filterState) {
-    return filterState.filters
-        .listen((filters) => applyState((state) => state.withFilters(filters)));
+    return filterState.filters.listen((filters) => applyState(
+        (state) => state.copyWith(filterGroups: filters.toFilterGroups())));
   }
 }
