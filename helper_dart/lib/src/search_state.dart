@@ -30,6 +30,8 @@ class SearchState {
   /// Search rule contexts
   final List<String>? ruleContexts;
 
+  // TODO: filters groups
+
   /// Make a copy of the search state.
   SearchState copyWith(
       {String? indexName,

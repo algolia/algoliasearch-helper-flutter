@@ -4,9 +4,8 @@ import 'package:algolia/algolia.dart';
 import 'package:logging/logging.dart';
 import 'package:rxdart/rxdart.dart';
 
-import 'algolia_search.dart';
-import 'exception.dart';
 import 'filter_state.dart';
+import 'hits_searcher_service.dart';
 import 'search_response.dart';
 import 'search_state.dart';
 import 'state_builder.dart';
@@ -19,39 +18,43 @@ import 'state_builder.dart';
 /// 2. Distinct state changes (including initial state) trigger search operation
 /// 3. State changes are debounced
 class HitsSearcher {
-  HitsSearcher._(this.client, SearchState state, Duration debounce) {
+  HitsSearcher._(this.searchService, SearchState state, Duration debounce) {
     _state = BehaviorSubject<SearchState>.seeded(state);
     responses = _state.stream
         .debounceTime(debounce)
         .distinct()
-        .asyncMap((state) => _search(state))
-        .handleError(_error);
+        .asyncMap((state) => searchService.search(state));
   }
 
   /// HitsSearcher's factory.
   factory HitsSearcher(
-      {required String applicationID,
-      required String apiKey,
-      required String indexName,
-      Duration debounce = const Duration(milliseconds: 100)}) {
-    final client = Algolia.init(applicationId: applicationID, apiKey: apiKey);
-    final state = SearchState(indexName: indexName);
-    return HitsSearcher._(client, state, debounce);
-  }
+          {required String applicationID,
+          required String apiKey,
+          required String indexName,
+          bool disjunctiveFacetingEnabled = false, /// TODO: default to true when disjunctive faceting is implemented
+          Duration debounce = const Duration(milliseconds: 100)}) =>
+      HitsSearcher.create(
+          applicationID: applicationID,
+          apiKey: apiKey,
+          state: SearchState(indexName: indexName),
+          disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
+          debounce: debounce);
 
   /// HitsSearcher's factory.
   factory HitsSearcher.create(
       {required String applicationID,
       required String apiKey,
       required SearchState state,
+      bool disjunctiveFacetingEnabled = false, /// TODO: default to true when disjunctive faceting is implemented
       Duration debounce = const Duration(milliseconds: 100)}) {
     final client = Algolia.init(applicationId: applicationID, apiKey: apiKey);
-    return HitsSearcher._(client, state, debounce);
+    final service = HitsSearchService(client, disjunctiveFacetingEnabled);
+    return HitsSearcher._(service, state, debounce);
   }
 
   /// Inner Algolia API client.
   /// TODO: should be private
-  final Algolia client;
+  Algolia get client => searchService.client;
 
   /// Search state stream
   late BehaviorSubject<SearchState> _state;
@@ -59,8 +62,11 @@ class HitsSearcher {
   /// Search results stream
   late Stream<SearchResponse> responses;
 
+  /// Service handling search requests
+  final HitsSearchService searchService;
+
   /// Events logger
-  final _logger = Logger('AlgoliaHelper');
+  final _logger = Logger('HitsSearcher');
 
   /// Set query string.
   void query(String query) {
@@ -78,21 +84,6 @@ class HitsSearcher {
     final newState = apply(current);
     _logger.config("State updated from $current to $newState");
     _state.sink.add(newState);
-  }
-
-  /// Run search query using [state] and get a search .
-  Future<SearchResponse> _search(SearchState state) async {
-    _logger.info("Start search: $state");
-    final objects = await client.queryOf(state).getObjects();
-    _logger.info("Response search : $objects");
-    return objects.toSearchResponse();
-  }
-
-  /// Convert [AlgoliaError] to [SearchError].
-  void _error(error) {
-    _logger.severe("Search error thrown: $error");
-    if (error is AlgoliaError) throw error.toSearchError();
-    throw error;
   }
 
   /// Dispose of underlying resources.

@@ -8,27 +8,43 @@ import 'utils.dart';
 
 /// Service handling search requests.
 class HitsSearchService {
-  HitsSearchService(this.client);
+  HitsSearchService(this.client, this.disjunctiveFacetingEnabled);
 
   final Algolia client;
+  final bool disjunctiveFacetingEnabled;
   final _logger = Logger("HitsSearchService");
 
-  /// Run search query using [state] and get a search .
-  Future<SearchResponse> search(SearchState state) async {
-    _logger.info("Start search: $state");
+  /// Run search query using [state] and get a search result.
+  Future<SearchResponse> search(SearchState state) {
+    return disjunctiveFacetingEnabled
+        ? singleQuerySearch(state)
+        : disjunctiveSearch(state);
+  }
+
+  /// Build a single search request using [state] and get a search result.
+  Future<SearchResponse> singleQuerySearch(SearchState state) async {
+    _logger.fine("Start search: $state");
     try {
-      final objects = await client.queryOf(state).getObjects();
-      _logger.info("Response search : $objects");
-      return objects.toSearchResponse();
+      final response = await client.queryOf(state).getObjects();
+      _logger.fine("Search response : $response");
+      return response.toSearchResponse();
     } catch (exception) {
       _logger.severe("Search exception thrown: $exception");
       throw launderException(exception);
     }
   }
 
+  /// Build multiple search requests using [state] and get a search result.
   Future<SearchResponse> disjunctiveSearch(SearchState state) async {
-    /// TODO
-    throw UnimplementedError();
+    _logger.fine("Start disjunctive search: $state");
+    try {
+      final responses = await client.multipleQueriesOf(state).getObjects();
+      _logger.fine("Search responses: $responses");
+      return responses.toSearchResponse();
+    } catch (exception) {
+      _logger.severe("Search exception thrown: $exception");
+      throw launderException(exception);
+    }
   }
 
   /// Coerce an [AlgoliaError] to a [SearchError].
@@ -50,19 +66,29 @@ extension AlgoliaExt on Algolia {
     return query;
   }
 
-  List<AlgoliaQuery> advancedQueryOf(SearchState state) {
-    /// TODO: Builds multiple search queries based on [state].
+  /// Create multiple queries from search
+  AlgoliaMultiIndexesReference multipleQueriesOf(SearchState state) {
+    /// TODO: Builds multiple search queries based on state.
     throw UnimplementedError();
   }
 }
 
-/// Extensions over [AlgoliaQuery].
+/// Extensions over [AlgoliaQuerySnapshot].
 extension AlgoliaQuerySnapshotExt on AlgoliaQuerySnapshot {
   SearchResponse toSearchResponse() {
     return SearchResponse((toMap()));
   }
 }
 
+/// Extensions over a list of [AlgoliaQuerySnapshot].
+extension ListAlgoliaQuerySnapshotExt on List<AlgoliaQuerySnapshot> {
+  SearchResponse toSearchResponse() {
+    // TODO: convert list of search response to a single search response
+    throw UnimplementedError();
+  }
+}
+
+/// Extensions over [AlgoliaError].
 extension AlgoliaErrorExt on AlgoliaError {
   SearchError toSearchError() {
     return SearchError(error, statusCode);
