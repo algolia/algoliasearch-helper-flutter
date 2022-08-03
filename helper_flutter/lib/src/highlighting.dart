@@ -1,4 +1,4 @@
-import 'package:algolia_helper_flutter/helper.dart';
+import 'package:algolia_helper_dart/algolia.dart';
 import 'package:flutter/widgets.dart';
 
 extension HighlightingExt on HighlightedString {
