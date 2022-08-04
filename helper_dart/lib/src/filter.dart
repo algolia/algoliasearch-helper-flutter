@@ -6,36 +6,47 @@ class Filter {
   final bool isNegated;
 
   /// Creates [FilterFacet] instance.
-  static FilterFacet facet(String attribute, dynamic value,
-      [bool isNegated = false, int? score]) {
-    return FilterFacet._(attribute, value, isNegated, score);
-  }
+  static FilterFacet facet(
+    String attribute,
+    dynamic value, [
+    bool isNegated = false,
+    int? score,
+  ]) =>
+      FilterFacet._(attribute, value, isNegated, score);
 
   /// Creates [FilterTag] instance.
-  static FilterTag tag(String value, [bool isNegated = false]) {
-    return FilterTag._(value, isNegated);
-  }
+  static FilterTag tag(String value, [bool isNegated = false]) =>
+      FilterTag._(value, isNegated);
 
   /// Creates [FilterNumeric] instance as numeric comparison.
   static FilterNumeric comparison(
-      String attribute, NumericOperator operator, num number,
-      [bool isNegated = false]) {
-    return FilterNumeric.comparison(attribute, operator, number, isNegated);
-  }
+    String attribute,
+    NumericOperator operator,
+    num number, [
+    bool isNegated = false,
+  ]) =>
+      FilterNumeric.comparison(attribute, operator, number, isNegated);
 
   /// Creates [FilterNumeric] instance as numeric comparison.
-  static FilterNumeric range(String attribute, num lowerBound, num upperBound,
-      [bool isNegated = false]) {
-    return FilterNumeric.range(attribute, lowerBound, upperBound, isNegated);
-  }
+  static FilterNumeric range(
+    String attribute,
+    num lowerBound,
+    num upperBound, [
+    bool isNegated = false,
+  ]) =>
+      FilterNumeric.range(attribute, lowerBound, upperBound, isNegated);
 }
 
 /// A [FilterFacet] matches exactly an [attribute] with a [value].
 /// An optional [score] allows to assign a priority between several
 /// [FilterFacet] that are evaluated in the same filter group.
 class FilterFacet implements Filter {
-  const FilterFacet._(this.attribute, this.value,
-      [this.isNegated = false, this.score]);
+  const FilterFacet._(
+    this.attribute,
+    this.value, [
+    this.isNegated = false,
+    this.score,
+  ]);
 
   @override
   final String attribute;
@@ -59,9 +70,12 @@ class FilterFacet implements Filter {
       attribute.hashCode ^ isNegated.hashCode ^ value.hashCode ^ score.hashCode;
 
   @override
-  String toString() {
-    return 'FilterFacet{attribute: $attribute, isNegated: $isNegated, value: $value, score: $score}';
-  }
+  String toString() => 'FilterFacet{'
+      'attribute: $attribute,'
+      ' isNegated: $isNegated,'
+      ' value: $value,'
+      ' score: $score'
+      '}';
 }
 
 /// A [FilterTag] filters on a specific [value].
@@ -70,7 +84,7 @@ class FilterTag implements Filter {
   const FilterTag._(this.value, [this.isNegated = false]);
 
   @override
-  final String attribute = "_tag";
+  final String attribute = '_tag';
   @override
   final bool isNegated;
   final String value;
@@ -88,9 +102,11 @@ class FilterTag implements Filter {
   int get hashCode => attribute.hashCode ^ isNegated.hashCode ^ value.hashCode;
 
   @override
-  String toString() {
-    return 'FilterTag{attribute: $attribute, isNegated: $isNegated, value: $value}';
-  }
+  String toString() => 'FilterTag{'
+      ' attribute: $attribute,'
+      ' isNegated: $isNegated,'
+      ' value: $value'
+      '}';
 }
 
 /// A [FilterNumeric] filters on a numeric [value].
@@ -105,15 +121,22 @@ class FilterNumeric implements Filter {
 
   /// Creates numeric value as a comparison.
   factory FilterNumeric.comparison(
-      String attribute, NumericOperator operator, num number,
-      [bool isNegated = false]) {
+    String attribute,
+    NumericOperator operator,
+    num number, [
+    bool isNegated = false,
+  ]) {
     final value = NumericComparison._(operator, number);
     return FilterNumeric._(attribute, value, isNegated);
   }
 
   /// Creates numeric value as a range.
-  factory FilterNumeric.range(String attribute, num lowerBound, num upperBound,
-      [bool isNegated = false]) {
+  factory FilterNumeric.range(
+    String attribute,
+    num lowerBound,
+    num upperBound, [
+    bool isNegated = false,
+  ]) {
     final value = NumericRange._(lowerBound, upperBound);
     return FilterNumeric._(attribute, value, isNegated);
   }
@@ -142,12 +165,12 @@ class NumericComparison implements NumericValue {
 
 /// Numeric comparison operators
 enum NumericOperator {
-  less("<"),
-  lessOrEquals("<="),
-  equals("="),
-  notEquals("!="),
-  greaterOrEquals(">="),
-  greater(">");
+  less('<'),
+  lessOrEquals('<='),
+  equals('='),
+  notEquals('!='),
+  greaterOrEquals('>='),
+  greater('>');
 
   const NumericOperator(this.operator);
 
@@ -175,7 +198,9 @@ class HierarchicalFilter {
   int get hashCode => attributes.hashCode ^ path.hashCode ^ filter.hashCode;
 
   @override
-  String toString() {
-    return 'HierarchicalFilter{attributes: $attributes, path: $path, filter: $filter}';
-  }
+  String toString() => 'HierarchicalFilter{'
+      'attributes: $attributes,'
+      ' path: $path,'
+      ' filter: $filter'
+      '}';
 }

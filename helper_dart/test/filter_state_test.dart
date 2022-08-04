@@ -5,10 +5,11 @@ void main() {
   test('FilterState add facet', () {
     final filterState = FilterState();
 
-    final groupA = FilterGroupID.and("GroupA");
-    filterState.add(groupA, [Filter.facet("Category", "A")]);
-    filterState.add(groupA, [Filter.facet("Category", "A")]);
-    filterState.add(groupA, [Filter.facet("Category", "B")]);
+    final groupA = FilterGroupID.and('GroupA');
+    filterState
+      ..add(groupA, [Filter.facet('Category', 'A')])
+      ..add(groupA, [Filter.facet('Category', 'A')])
+      ..add(groupA, [Filter.facet('Category', 'B')]);
 
     final snapshot = filterState.snapshot();
     expect(snapshot.facetGroups.containsKey(groupA), true);

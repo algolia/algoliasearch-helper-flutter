@@ -3,25 +3,33 @@ import 'search_response.dart';
 /// Extension over [Hit].
 extension Highlightable on Hit {
   /// Get [HighlightedString] of an attribute
-  HighlightedString getHightlightedString(String attribute,
-      [String preTag = _Defaults.preTag,
-      String postTag = _Defaults.postTag,
-      bool inverted = false]) {
-    final Map<String, dynamic> highlightResult = json["_highlightResult"];
-    final String highlighted = highlightResult[attribute];
-    return HighlightedString.of(highlighted,
-        preTag: preTag, postTag: postTag, inverted: inverted);
+  HighlightedString getHightlightedString(
+    String attribute, [
+    String preTag = _Defaults.preTag,
+    String postTag = _Defaults.postTag,
+    bool inverted = false,
+  ]) {
+    final highlightResult = json['_highlightResult'] as Map<String, dynamic>;
+    final highlighted = highlightResult[attribute] as String;
+    return HighlightedString.of(
+      highlighted,
+      preTag: preTag,
+      postTag: postTag,
+      inverted: inverted,
+    );
   }
 }
 
 /// Highlighted string as a list of tokens.
 class HighlightedString {
-  HighlightedString._(this.original, this.tokens);
+  HighlightedString._(this.original, this.tokens,);
 
-  factory HighlightedString.of(String string,
-          {String preTag = _Defaults.preTag,
-          String postTag = _Defaults.postTag,
-          bool inverted = false}) =>
+  factory HighlightedString.of(
+    String string, {
+    String preTag = _Defaults.preTag,
+    String postTag = _Defaults.postTag,
+    bool inverted = false,
+  }) =>
       _highlightTokenizer(string, preTag, postTag, inverted);
 
   final String original;
@@ -39,24 +47,27 @@ class HighlightedString {
   int get hashCode => original.hashCode ^ tokens.hashCode;
 
   @override
-  String toString() {
-    return 'HighlightedString{original: $original, tokens: $tokens}';
-  }
+  String toString() =>
+      'HighlightedString{original: $original, tokens: $tokens}';
 }
 
 /// Creates a [HighlightedString] from a highlighted string.
 HighlightedString _highlightTokenizer(
-    String string, String preTag, String postTag, bool inverted) {
-  List<HighlightToken> tokens = [];
+  String string,
+  String preTag,
+  String postTag,
+  bool inverted,
+) {
+  final tokens = <HighlightToken>[];
 
-  final re = RegExp("$preTag(\\w+)$postTag");
+  final re = RegExp('$preTag(\\w+)$postTag');
   final matches = re.allMatches(string).toList();
 
   void append(String string, bool isHighlighted) {
     tokens.add(HighlightToken._(string, isHighlighted));
   }
 
-  int prev = 0;
+  var prev = 0;
   for (final match in matches) {
     if (prev != match.start) {
       append(string.substring(prev, match.start), inverted);
@@ -90,12 +101,11 @@ class HighlightToken {
   int get hashCode => content.hashCode ^ highlighted.hashCode;
 
   @override
-  String toString() {
-    return 'HighlightToken{content: $content, highlighted: $highlighted}';
-  }
+  String toString() =>
+      'HighlightToken{content: $content, highlighted: $highlighted}';
 }
 
 class _Defaults {
-  static const preTag = "<em>";
-  static const postTag = "</em>";
+  static const preTag = '<em>';
+  static const postTag = '</em>';
 }

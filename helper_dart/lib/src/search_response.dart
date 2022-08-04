@@ -1,9 +1,7 @@
 /// Search operation response.
 class SearchResponse {
   SearchResponse(this.raw)
-      : hits = (raw['hits'] as List<dynamic>? ?? [])
-            .map((hit) => Hit.from(hit))
-            .toList();
+      : hits = (raw['hits'] as List<Map>? ?? []).map(Hit.from).toList();
 
   /// Raw search response
   final Map<String, dynamic> raw;
@@ -11,31 +9,33 @@ class SearchResponse {
   /// Search hits list
   final List<Hit> hits;
 
-  String get params => raw['params'];
+  String get params => raw['params'] as String;
 
-  String? get queryID => raw['queryID'];
+  String? get queryID => raw['queryID'] as String?;
 
-  String get query => raw['query'];
+  String get query => raw['query'] as String;
 
-  int get hitsPerPage => raw['hitsPerPage'] ?? 0;
+  int get hitsPerPage => raw['hitsPerPage'] as int? ?? 0;
 
-  int get length => raw['length'] ?? 0;
+  int get length => raw['length'] as int? ?? 0;
 
-  int get nbHits => raw['nbHits'] ?? 0;
+  int get nbHits => raw['nbHits'] as int? ?? 0;
 
-  int get nbPages => raw['nbPages'] ?? 0;
+  int get nbPages => raw['nbPages'] as int? ?? 0;
 
-  int get offset => raw['offset'] ?? 0;
+  int get offset => raw['offset'] as int? ?? 0;
 
-  int get page => raw['page'] ?? 0;
+  int get page => raw['page'] as int? ?? 0;
 
-  Map<String, dynamic> get facets => raw['facets'] ?? {};
+  Map<String, dynamic> get facets =>
+      raw['facets'] as Map<String, dynamic>? ?? {};
 
-  Map<String, dynamic> get facetsStats => raw['facets_stats'] ?? {};
+  Map<String, dynamic> get facetsStats =>
+      raw['facets_stats'] as Map<String, dynamic>? ?? {};
 
-  bool get exhaustiveNbHits => raw['exhaustiveNbHits'];
+  bool get exhaustiveNbHits => raw['exhaustiveNbHits'] as bool;
 
-  int get processingTimeMS => raw['processingTimeMS'] ?? 0;
+  int get processingTimeMS => raw['processingTimeMS'] as int? ?? 0;
 
   @override
   bool operator ==(Object other) =>
@@ -48,9 +48,7 @@ class SearchResponse {
   int get hashCode => raw.hashCode;
 
   @override
-  String toString() {
-    return 'SearchResponse{raw: $raw}';
-  }
+  String toString() => 'SearchResponse{raw: $raw}';
 }
 
 /// Represents search hit result
@@ -74,7 +72,5 @@ class Hit {
   int get hashCode => json.hashCode;
 
   @override
-  String toString() {
-    return 'Hit{json: $json}';
-  }
+  String toString() => 'Hit{json: $json}';
 }

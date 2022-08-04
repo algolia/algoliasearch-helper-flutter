@@ -2,14 +2,15 @@ import 'filter_group.dart';
 
 /// Representation of search state.
 class SearchState {
-  const SearchState(
-      {required this.indexName,
-      this.query,
-      this.page,
-      this.hitsPerPage,
-      this.facets,
-      this.filterGroups,
-      this.ruleContexts});
+  const SearchState({
+    required this.indexName,
+    this.query,
+    this.page,
+    this.hitsPerPage,
+    this.facets,
+    this.filterGroups,
+    this.ruleContexts,
+  });
 
   /// Index name
   final String indexName;
@@ -33,23 +34,24 @@ class SearchState {
   final List<String>? ruleContexts;
 
   /// Make a copy of the search state.
-  SearchState copyWith(
-      {String? indexName,
-      String? query,
-      int? page,
-      int? hitsPerPage,
-      List<String>? facets,
-      Set<FilterGroup>? filterGroups,
-      List<String>? ruleContexts}) {
-    return SearchState(
+  SearchState copyWith({
+    String? indexName,
+    String? query,
+    int? page,
+    int? hitsPerPage,
+    List<String>? facets,
+    Set<FilterGroup>? filterGroups,
+    List<String>? ruleContexts,
+  }) =>
+      SearchState(
         indexName: indexName ?? this.indexName,
         query: query ?? this.query,
         page: page ?? this.page,
         hitsPerPage: hitsPerPage ?? this.hitsPerPage,
         facets: facets ?? this.facets,
         filterGroups: filterGroups ?? this.filterGroups,
-        ruleContexts: ruleContexts ?? this.ruleContexts);
-  }
+        ruleContexts: ruleContexts ?? this.ruleContexts,
+      );
 
   @override
   bool operator ==(Object other) =>
@@ -75,7 +77,13 @@ class SearchState {
       ruleContexts.hashCode;
 
   @override
-  String toString() {
-    return 'SearchState{indexName: $indexName, query: $query, page: $page, hitsPerPage: $hitsPerPage, facets: $facets, filterGroups: $filterGroups, ruleContexts: $ruleContexts}';
-  }
+  String toString() => 'SearchState{'
+      'indexName: $indexName,'
+      ' query: $query,'
+      ' page: $page,'
+      ' hitsPerPage: $hitsPerPage,'
+      ' facets: $facets,'
+      ' filterGroups: $filterGroups,'
+      ' ruleContexts: $ruleContexts'
+      '}';
 }

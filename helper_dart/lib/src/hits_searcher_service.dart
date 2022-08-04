@@ -12,44 +12,42 @@ class HitsSearchService {
 
   final Algolia client;
   final bool disjunctiveFacetingEnabled;
-  final _logger = Logger("HitsSearchService");
+  final _logger = Logger('HitsSearchService');
 
   /// Run search query using [state] and get a search result.
-  Future<SearchResponse> search(SearchState state) {
-    return disjunctiveFacetingEnabled
-        ? singleQuerySearch(state)
-        : disjunctiveSearch(state);
-  }
+  Future<SearchResponse> search(SearchState state) => disjunctiveFacetingEnabled
+      ? singleQuerySearch(state)
+      : disjunctiveSearch(state);
 
   /// Build a single search request using [state] and get a search result.
   Future<SearchResponse> singleQuerySearch(SearchState state) async {
-    _logger.fine("Start search: $state");
+    _logger.fine('Start search: $state');
     try {
       final response = await client.queryOf(state).getObjects();
-      _logger.fine("Search response : $response");
+      _logger.fine('Search response : $response');
       return response.toSearchResponse();
     } catch (exception) {
-      _logger.severe("Search exception thrown: $exception");
-      throw launderException(exception);
+      _logger.severe('Search exception thrown: $exception');
+      throw _launderException(exception);
     }
   }
 
   /// Build multiple search requests using [state] and get a search result.
   Future<SearchResponse> disjunctiveSearch(SearchState state) async {
-    _logger.fine("Start disjunctive search: $state");
+    _logger.fine('Start disjunctive search: $state');
     try {
       final responses = await client.multipleQueriesOf(state).getObjects();
-      _logger.fine("Search responses: $responses");
+      _logger.fine('Search responses: $responses');
       return responses.toSearchResponse();
     } catch (exception) {
-      _logger.severe("Search exception thrown: $exception");
-      throw launderException(exception);
+      _logger.severe('Search exception thrown: $exception');
+      throw _launderException(exception);
     }
   }
 
   /// Coerce an [AlgoliaError] to a [SearchError].
-  Exception launderException(error) =>
-      error is AlgoliaError ? error.toSearchError() : error;
+  Exception _launderException(error) =>
+      error is AlgoliaError ? error.toSearchError() : Exception(error);
 }
 
 /// Extensions over [Algolia] client.
@@ -75,9 +73,7 @@ extension AlgoliaExt on Algolia {
 
 /// Extensions over [AlgoliaQuerySnapshot].
 extension AlgoliaQuerySnapshotExt on AlgoliaQuerySnapshot {
-  SearchResponse toSearchResponse() {
-    return SearchResponse((toMap()));
-  }
+  SearchResponse toSearchResponse() => SearchResponse(toMap());
 }
 
 /// Extensions over a list of [AlgoliaQuerySnapshot].
@@ -90,7 +86,5 @@ extension ListAlgoliaQuerySnapshotExt on List<AlgoliaQuerySnapshot> {
 
 /// Extensions over [AlgoliaError].
 extension AlgoliaErrorExt on AlgoliaError {
-  SearchError toSearchError() {
-    return SearchError(error, statusCode);
-  }
+  SearchError toSearchError() => SearchError(error, statusCode);
 }

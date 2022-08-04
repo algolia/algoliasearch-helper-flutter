@@ -12,7 +12,5 @@ class SearchError extends AlgoliaException {
   final int statusCode;
 
   @override
-  String toString() {
-    return 'SearchError{error: $error, statusCode: $statusCode}';
-  }
+  String toString() => 'SearchError{error: $error, statusCode: $statusCode}';
 }
