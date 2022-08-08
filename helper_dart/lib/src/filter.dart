@@ -84,7 +84,7 @@ class FilterTag implements Filter {
   const FilterTag._(this.value, [this.isNegated = false]);
 
   @override
-  final String attribute = '_tag';
+  final String attribute = '_tags';
   @override
   final bool isNegated;
   final String value;
