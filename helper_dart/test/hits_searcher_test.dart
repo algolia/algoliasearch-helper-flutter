@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:algolia_helper_dart/algolia.dart';
 import 'package:algolia_helper_dart/src/hits_searcher_service.dart';
 import 'package:mockito/annotations.dart';
@@ -44,7 +46,6 @@ void main() {
       final searcher = HitsSearcher.build(
         searchService,
         const SearchState(indexName: 'myIndex'),
-        const Duration(microseconds: 100),
       );
 
       await expectLater(searcher.responses, emits(initial)); // initial response
@@ -55,7 +56,6 @@ void main() {
       final searcher = HitsSearcher.build(
         searchService,
         const SearchState(indexName: 'myIndex'),
-        const Duration(microseconds: 100),
       );
 
       when(searchService.search(any)).thenAnswer(
@@ -64,12 +64,10 @@ void main() {
           return SearchResponse({'query': state.query});
         },
       );
-      const query = 'phone';
+      const query = 'cat';
       searcher.query(query);
 
-      final matcher = isA<SearchResponse>()
-          .having((res) => res.query, 'query', matches(query));
-      await expectLater(searcher.responses, emits(matcher));
+      await expectLater(searcher.responses, emits(matchesQuery('cat')));
     });
 
     test('Should emit error after failure', () async {
@@ -79,14 +77,82 @@ void main() {
       final searcher = HitsSearcher.build(
         searchService,
         const SearchState(indexName: 'myIndex'),
-        const Duration(microseconds: 100),
       );
 
       when(searchService.search(any))
           .thenAnswer((Invocation inv) async => throw SearchError({}, 500));
-      searcher.query('phone');
+      searcher.query('cat');
 
       await expectLater(searcher.responses, emitsError(isA<SearchError>()));
     });
+
+    test('Should debounce search state', () async {
+      final searchService = MockHitsSearchService();
+      when(searchService.search(any)).thenAnswer(
+        (Invocation inv) async {
+          final state = inv.positionalArguments[0] as SearchState;
+          return SearchResponse({'query': state.query});
+        },
+      );
+
+      final searcher = HitsSearcher.build(
+        searchService,
+        const SearchState(indexName: 'myIndex'),
+      );
+
+      unawaited(
+        expectLater(
+          searcher.responses,
+          emitsInOrder([emits(matchesQuery('cat'))]),
+        ),
+      );
+
+      searcher
+        ..query('c')
+        ..query('ca')
+        ..query('cat')
+        ..dispose();
+    });
+
+    test('Should not debounce search state', () async {
+      final searchService = MockHitsSearchService();
+      when(searchService.search(any)).thenAnswer(
+        (Invocation inv) async {
+          final state = inv.positionalArguments[0] as SearchState;
+          return SearchResponse({'query': state.query});
+        },
+      );
+
+      final searcher = HitsSearcher.build(
+        searchService,
+        const SearchState(indexName: 'myIndex'),
+      );
+
+      unawaited(
+        expectLater(
+          searcher.responses,
+          emitsInOrder([
+            emits(matchesQuery('c')),
+            emits(matchesQuery('ca')),
+            emits(matchesQuery('cat'))
+          ]),
+        ),
+      );
+
+      searcher.query('c');
+      await delay();
+      searcher.query('ca');
+      await delay();
+      searcher.query('cat');
+      await delay();
+      searcher.dispose();
+    });
   });
 }
+
+/// Return future with a delay
+Future delay() => Future.delayed(const Duration(milliseconds: 500), () {});
+
+/// Matches a [SearchResponse] with a given [query].
+TypeMatcher<SearchResponse> matchesQuery(String query) =>
+    isA<SearchResponse>().having((res) => res.query, 'query', matches(query));

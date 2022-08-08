@@ -24,7 +24,7 @@ class HitsSearcher {
     required String apiKey,
     required String indexName,
     bool disjunctiveFacetingEnabled = false,
-    Duration debounce = const Duration(milliseconds: 100),
+    Duration debounce = _defaultDebounce,
   }) =>
       HitsSearcher.create(
         applicationID: applicationID,
@@ -41,7 +41,7 @@ class HitsSearcher {
     required String apiKey,
     required SearchState state,
     bool disjunctiveFacetingEnabled = false,
-    Duration debounce = const Duration(milliseconds: 100),
+    Duration debounce = _defaultDebounce,
   }) {
     final client = Algolia.init(applicationId: applicationID, apiKey: apiKey);
     final service = HitsSearchService(client, disjunctiveFacetingEnabled);
@@ -52,9 +52,9 @@ class HitsSearcher {
   @visibleForTesting
   HitsSearcher.build(
     HitsSearchService searchService,
-    SearchState state,
-    Duration debounce,
-  ) : this._(searchService, BehaviorSubject.seeded(state), debounce);
+    SearchState state, [
+    Duration debounce = _defaultDebounce,
+  ]) : this._(searchService, BehaviorSubject.seeded(state), debounce);
 
   /// HitsSearcher's private constructor
   HitsSearcher._(this.searchService, this._state, Duration debounce)
@@ -62,6 +62,9 @@ class HitsSearcher {
             .debounceTime(debounce)
             .distinct()
             .asyncMap(searchService.search);
+
+  /// Default debounce period
+  static const _defaultDebounce = Duration(milliseconds: 100);
 
   /// Inner Algolia API client.
   /// TODO: should be private
