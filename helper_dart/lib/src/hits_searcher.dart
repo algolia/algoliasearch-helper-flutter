@@ -63,9 +63,6 @@ class HitsSearcher {
             .distinct()
             .asyncMap(searchService.search);
 
-  /// Default debounce period
-  static const _defaultDebounce = Duration(milliseconds: 100);
-
   /// Search state stream
   final BehaviorSubject<SearchState> _state;
 
@@ -102,6 +99,9 @@ class HitsSearcher {
     _state.close();
   }
 }
+
+/// Default debounce period
+const _defaultDebounce = Duration(milliseconds: 100);
 
 /// Extensions over [HitsSearcher]
 extension SearcherExt on HitsSearcher {
