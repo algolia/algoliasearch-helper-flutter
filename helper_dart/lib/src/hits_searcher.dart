@@ -66,10 +66,6 @@ class HitsSearcher {
   /// Default debounce period
   static const _defaultDebounce = Duration(milliseconds: 100);
 
-  /// Inner Algolia API client.
-  /// TODO: should be private
-  Algolia get client => searchService.client;
-
   /// Search state stream
   final BehaviorSubject<SearchState> _state;
 
