@@ -59,18 +59,34 @@ void main() {
       );
 
       when(searchService.search(any)).thenAnswer(
-        (Invocation invoke) async {
-          final state = invoke.positionalArguments.first as SearchState;
+        (Invocation inv) async {
+          final state = inv.positionalArguments[0] as SearchState;
           return SearchResponse({'query': state.query});
         },
       );
-
       const query = 'phone';
       searcher.query(query);
 
       final matcher = isA<SearchResponse>()
           .having((res) => res.query, 'query', matches(query));
       await expectLater(searcher.responses, emits(matcher));
+    });
+
+    test('Should emit error after failure', () async {
+      final searchService = MockHitsSearchService();
+      when(searchService.search(any))
+          .thenAnswer((_) async => SearchResponse(const {}));
+      final searcher = HitsSearcher.build(
+        searchService,
+        const SearchState(indexName: 'myIndex'),
+        const Duration(microseconds: 100),
+      );
+
+      when(searchService.search(any))
+          .thenAnswer((Invocation inv) async => throw SearchError({}, 500));
+      searcher.query('phone');
+
+      await expectLater(searcher.responses, emitsError(isA<SearchError>()));
     });
   });
 }
