@@ -1,6 +1,11 @@
 import 'package:algolia_helper_dart/algolia.dart';
+import 'package:algolia_helper_dart/src/hits_searcher_service.dart';
+import 'package:mockito/annotations.dart';
 import 'package:test/test.dart';
 
+import 'hits_searcher_test.mocks.dart';
+
+@GenerateMocks([HitsSearchService])
 void main() {
   test('Successful search operation', () async {
     final helper = HitsSearcher.create(
@@ -25,5 +30,14 @@ void main() {
       indexName: 'instant_search',
     )..query('apple');
     await expectLater(helper.responses, emitsError(isA<SearchError>()));
+  });
+
+  test('Should update response', () {
+    final searchService = MockHitsSearchService();
+    final searcher = HitsSearcher.build(
+      searchService,
+      const SearchState(indexName: 'myIndex'),
+      const Duration(microseconds: 100),
+    );
   });
 }

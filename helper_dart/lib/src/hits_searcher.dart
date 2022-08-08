@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:algolia/algolia.dart';
 import 'package:logging/logging.dart';
+import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'filter_state.dart';
@@ -44,10 +45,11 @@ class HitsSearcher {
   }) {
     final client = Algolia.init(applicationId: applicationID, apiKey: apiKey);
     final service = HitsSearchService(client, disjunctiveFacetingEnabled);
-    return HitsSearcher._(service, state, debounce);
+    return HitsSearcher.build(service, state, debounce);
   }
 
-  HitsSearcher._(this.searchService, SearchState state, Duration debounce) {
+  @visibleForTesting
+  HitsSearcher.build(this.searchService, SearchState state, Duration debounce) {
     _state = BehaviorSubject<SearchState>.seeded(state);
     responses = _state.stream
         .debounceTime(debounce)
