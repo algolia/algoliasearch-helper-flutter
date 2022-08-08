@@ -16,8 +16,8 @@ class HitsSearchService {
 
   /// Run search query using [state] and get a search result.
   Future<SearchResponse> search(SearchState state) => disjunctiveFacetingEnabled
-      ? singleQuerySearch(state)
-      : disjunctiveSearch(state);
+      ? disjunctiveSearch(state)
+      : singleQuerySearch(state);
 
   /// Build a single search request using [state] and get a search result.
   Future<SearchResponse> singleQuerySearch(SearchState state) async {
