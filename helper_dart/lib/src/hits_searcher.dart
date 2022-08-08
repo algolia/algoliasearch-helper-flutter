@@ -48,24 +48,30 @@ class HitsSearcher {
     return HitsSearcher.build(service, state, debounce);
   }
 
+  /// HitSearcher's constructor, for internal and test use only.
   @visibleForTesting
-  HitsSearcher.build(this.searchService, SearchState state, Duration debounce) {
-    _state = BehaviorSubject<SearchState>.seeded(state);
-    responses = _state.stream
-        .debounceTime(debounce)
-        .distinct()
-        .asyncMap(searchService.search);
-  }
+  HitsSearcher.build(
+    HitsSearchService searchService,
+    SearchState state,
+    Duration debounce,
+  ) : this._(searchService, BehaviorSubject.seeded(state), debounce);
+
+  /// HitsSearcher's private constructor
+  HitsSearcher._(this.searchService, this._state, Duration debounce)
+      : responses = _state.stream
+            .debounceTime(debounce)
+            .distinct()
+            .asyncMap(searchService.search);
 
   /// Inner Algolia API client.
   /// TODO: should be private
   Algolia get client => searchService.client;
 
   /// Search state stream
-  late BehaviorSubject<SearchState> _state;
+  final BehaviorSubject<SearchState> _state;
 
   /// Search results stream
-  late Stream<SearchResponse> responses;
+  final Stream<SearchResponse> responses;
 
   /// Service handling search requests
   final HitsSearchService searchService;
