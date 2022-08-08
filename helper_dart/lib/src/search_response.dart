@@ -1,13 +1,12 @@
 /// Search operation response.
 class SearchResponse {
-  SearchResponse(this.raw)
-      : hits = (raw['hits'] as List<Map>? ?? []).map(Hit.from).toList();
+  SearchResponse(this.raw) : hits = Hit._fromList(raw['hits']);
 
   /// Raw search response
   final Map<String, dynamic> raw;
 
   /// Search hits list
-  final List<Hit> hits;
+  final Iterable<Hit> hits;
 
   String get params => raw['params'] as String;
 
@@ -58,6 +57,12 @@ class Hit {
   factory Hit.from(Map hit) {
     final raw = Map<String, dynamic>.from(hit);
     return Hit(raw);
+  }
+
+  static Iterable<Hit> _fromList(data) {
+    final hits = data as List?;
+    if (hits == null) return const [];
+    return List<Map>.from(hits).map(Hit.from).toList();
   }
 
   /// Hit raw json as map

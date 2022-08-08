@@ -26,6 +26,8 @@ extension MapExt<K, E> on Map<K, E> {
 extension ListExt<T> on List<T> {
   /// Get unmodifiable copy of this list.
   List<T> unmodifiable() => List<T>.unmodifiable(this);
+
+  List<R> toTypedList<R>() => this != null ? List<R>.from(this) : [];
 }
 
 /// Extension over [Set]
