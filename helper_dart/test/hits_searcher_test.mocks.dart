@@ -3,11 +3,11 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i5;
+import 'dart:async' as _i4;
 
 import 'package:algolia/algolia.dart' as _i2;
-import 'package:algolia_helper_dart/src/hits_searcher_service.dart' as _i4;
-import 'package:algolia_helper_dart/src/search_response.dart' as _i3;
+import 'package:algolia_helper_dart/src/hits_searcher_service.dart' as _i3;
+import 'package:algolia_helper_dart/src/search_response.dart' as _i5;
 import 'package:algolia_helper_dart/src/search_state.dart' as _i6;
 import 'package:mockito/mockito.dart' as _i1;
 
@@ -27,16 +27,10 @@ class _FakeAlgolia_0 extends _i1.SmartFake implements _i2.Algolia {
       : super(parent, parentInvocation);
 }
 
-class _FakeSearchResponse_1 extends _i1.SmartFake
-    implements _i3.SearchResponse {
-  _FakeSearchResponse_1(Object parent, Invocation parentInvocation)
-      : super(parent, parentInvocation);
-}
-
 /// A class which mocks [HitsSearchService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockHitsSearchService extends _i1.Mock implements _i4.HitsSearchService {
+class MockHitsSearchService extends _i1.Mock implements _i3.HitsSearchService {
   MockHitsSearchService() {
     _i1.throwOnMissingStub(this);
   }
@@ -50,24 +44,8 @@ class MockHitsSearchService extends _i1.Mock implements _i4.HitsSearchService {
       (super.noSuchMethod(Invocation.getter(#disjunctiveFacetingEnabled),
           returnValue: false) as bool);
   @override
-  _i5.Future<_i3.SearchResponse> search(_i6.SearchState? state) =>
+  _i4.Stream<_i5.SearchResponse> search(_i6.SearchState? state) =>
       (super.noSuchMethod(Invocation.method(#search, [state]),
-              returnValue: _i5.Future<_i3.SearchResponse>.value(
-                  _FakeSearchResponse_1(
-                      this, Invocation.method(#search, [state]))))
-          as _i5.Future<_i3.SearchResponse>);
-  @override
-  _i5.Future<_i3.SearchResponse> singleQuerySearch(_i6.SearchState? state) =>
-      (super.noSuchMethod(Invocation.method(#singleQuerySearch, [state]),
-              returnValue: _i5.Future<_i3.SearchResponse>.value(
-                  _FakeSearchResponse_1(
-                      this, Invocation.method(#singleQuerySearch, [state]))))
-          as _i5.Future<_i3.SearchResponse>);
-  @override
-  _i5.Future<_i3.SearchResponse> disjunctiveSearch(_i6.SearchState? state) =>
-      (super.noSuchMethod(Invocation.method(#disjunctiveSearch, [state]),
-              returnValue: _i5.Future<_i3.SearchResponse>.value(
-                  _FakeSearchResponse_1(
-                      this, Invocation.method(#disjunctiveSearch, [state]))))
-          as _i5.Future<_i3.SearchResponse>);
+              returnValue: _i4.Stream<_i5.SearchResponse>.empty())
+          as _i4.Stream<_i5.SearchResponse>);
 }

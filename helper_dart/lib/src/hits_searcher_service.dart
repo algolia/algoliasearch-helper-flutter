@@ -14,13 +14,18 @@ class HitsSearchService {
   final bool disjunctiveFacetingEnabled;
   final _logger = Logger('HitsSearchService');
 
+  /// Search responses as a stream.
+  Stream<SearchResponse> search(SearchState state) =>
+      Stream.fromFuture(_search(state));
+
   /// Run search query using [state] and get a search result.
-  Future<SearchResponse> search(SearchState state) => disjunctiveFacetingEnabled
-      ? disjunctiveSearch(state)
-      : singleQuerySearch(state);
+  Future<SearchResponse> _search(SearchState state) =>
+      disjunctiveFacetingEnabled
+          ? _disjunctiveSearch(state)
+          : _singleQuerySearch(state);
 
   /// Build a single search request using [state] and get a search result.
-  Future<SearchResponse> singleQuerySearch(SearchState state) async {
+  Future<SearchResponse> _singleQuerySearch(SearchState state) async {
     _logger.fine('Start search: $state');
     try {
       final response = await client.queryOf(state).getObjects();
@@ -33,7 +38,7 @@ class HitsSearchService {
   }
 
   /// Build multiple search requests using [state] and get a search result.
-  Future<SearchResponse> disjunctiveSearch(SearchState state) async {
+  Future<SearchResponse> _disjunctiveSearch(SearchState state) async {
     _logger.fine('Start disjunctive search: $state');
     try {
       final responses = await client.multipleQueriesOf(state).getObjects();

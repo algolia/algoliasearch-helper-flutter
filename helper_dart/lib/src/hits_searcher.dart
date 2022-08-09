@@ -61,7 +61,7 @@ class HitsSearcher {
       : responses = _state.stream
             .debounceTime(debounce)
             .distinct()
-            .asyncMap(searchService.search);
+            .switchMap(searchService.search);
 
   /// Search state stream
   final BehaviorSubject<SearchState> _state;

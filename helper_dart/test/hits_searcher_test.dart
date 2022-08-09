@@ -41,7 +41,7 @@ void main() {
     test('Should emit initial response', () async {
       final searchService = MockHitsSearchService();
       final initial = SearchResponse(const {});
-      when(searchService.search(any)).thenAnswer((_) async => initial);
+      when(searchService.search(any)).thenAnswer((_) => Stream.value(initial));
 
       final searcher = HitsSearcher.build(
         searchService,
@@ -59,9 +59,9 @@ void main() {
       );
 
       when(searchService.search(any)).thenAnswer(
-        (Invocation inv) async {
+        (Invocation inv) {
           final state = inv.positionalArguments[0] as SearchState;
-          return SearchResponse({'query': state.query});
+          return Stream.value(SearchResponse({'query': state.query}));
         },
       );
       const query = 'cat';
@@ -73,14 +73,14 @@ void main() {
     test('Should emit error after failure', () async {
       final searchService = MockHitsSearchService();
       when(searchService.search(any))
-          .thenAnswer((_) async => SearchResponse(const {}));
+          .thenAnswer((_) => Stream.value(SearchResponse({})));
       final searcher = HitsSearcher.build(
         searchService,
         const SearchState(indexName: 'myIndex'),
       );
 
       when(searchService.search(any))
-          .thenAnswer((Invocation inv) async => throw SearchError({}, 500));
+          .thenAnswer((Invocation inv) => Stream.error(SearchError({}, 500)));
       searcher.query('cat');
 
       await expectLater(searcher.responses, emitsError(isA<SearchError>()));
@@ -89,9 +89,9 @@ void main() {
     test('Should debounce search state', () async {
       final searchService = MockHitsSearchService();
       when(searchService.search(any)).thenAnswer(
-        (Invocation inv) async {
+        (Invocation inv) {
           final state = inv.positionalArguments[0] as SearchState;
-          return SearchResponse({'query': state.query});
+          return Stream.value(SearchResponse({'query': state.query}));
         },
       );
 
@@ -114,12 +114,12 @@ void main() {
         ..dispose();
     });
 
-    test('Should not debounce search state', () async {
+    test("Shouldn't debounce search state", () async {
       final searchService = MockHitsSearchService();
       when(searchService.search(any)).thenAnswer(
-        (Invocation inv) async {
+        (Invocation inv) {
           final state = inv.positionalArguments[0] as SearchState;
-          return SearchResponse({'query': state.query});
+          return Stream.value(SearchResponse({'query': state.query}));
         },
       );
 
@@ -147,11 +147,45 @@ void main() {
       await delay();
       searcher.dispose();
     });
+
+    test('Should discard old requests', () async {
+      final searchService = MockHitsSearchService();
+      when(searchService.search(any)).thenAnswer(
+        (Invocation inv) async* {
+          final state = inv.positionalArguments[0] as SearchState;
+          await delay();
+          yield SearchResponse({'query': state.query});
+        },
+      );
+
+      final searcher = HitsSearcher.build(
+        searchService,
+        const SearchState(indexName: 'myIndex'),
+      );
+
+      unawaited(
+        expectLater(
+          searcher.responses,
+          emitsInOrder([
+            emits(matchesQuery('cat'))
+          ]),
+        ),
+      );
+
+      searcher.query('c');
+      await delay(200);
+      searcher.query('ca');
+      await delay(200);
+      searcher.query('cat');
+      await delay(200);
+      searcher.dispose();
+    });
   });
 }
 
 /// Return future with a delay
-Future delay() => Future.delayed(const Duration(milliseconds: 500), () {});
+Future delay([int millis = 500]) =>
+    Future.delayed(Duration(milliseconds: millis), () {});
 
 /// Matches a [SearchResponse] with a given [query].
 TypeMatcher<SearchResponse> matchesQuery(String query) =>

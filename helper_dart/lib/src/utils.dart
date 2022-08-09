@@ -26,12 +26,15 @@ extension MapExt<K, E> on Map<K, E> {
 extension ListExt<T> on List<T> {
   /// Get unmodifiable copy of this list.
   List<T> unmodifiable() => List<T>.unmodifiable(this);
-
-  List<R> toTypedList<R>() => this != null ? List<R>.from(this) : [];
 }
 
 /// Extension over [Set]
 extension SetExt<T> on Set<T> {
   /// Get unmodifiable copy of this set.
   Set<T> unmodifiable() => Set<T>.unmodifiable(this);
+}
+
+extension FutureExt<T> on Future<T> {
+  /// Convert a future to a stream
+  Stream<T> toStream() => Stream.fromFuture(this);
 }
