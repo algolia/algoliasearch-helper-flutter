@@ -2,17 +2,19 @@ import 'package:algolia/algolia.dart';
 import 'package:logging/logging.dart';
 
 import 'exception.dart';
+import 'logger.dart';
 import 'search_response.dart';
 import 'search_state.dart';
 import 'utils.dart';
 
 /// Service handling search requests.
 class HitsSearchService {
-  HitsSearchService(this.client, this.disjunctiveFacetingEnabled);
+  HitsSearchService(this.client, this.disjunctiveFacetingEnabled)
+      : _log = defaultLogger;
 
   final Algolia client;
   final bool disjunctiveFacetingEnabled;
-  final _logger = Logger('HitsSearchService');
+  final Logger _log;
 
   /// Search responses as a stream.
   Stream<SearchResponse> search(SearchState state) =>
@@ -26,26 +28,26 @@ class HitsSearchService {
 
   /// Build a single search request using [state] and get a search result.
   Future<SearchResponse> _singleQuerySearch(SearchState state) async {
-    _logger.fine('Start search: $state');
+    _log.fine('Start search: $state');
     try {
       final response = await client.queryOf(state).getObjects();
-      _logger.fine('Search response : $response');
+      _log.fine('Search response : $response');
       return response.toSearchResponse();
     } catch (exception) {
-      _logger.severe('Search exception thrown: $exception');
+      _log.severe('Search exception thrown: $exception');
       throw _launderException(exception);
     }
   }
 
   /// Build multiple search requests using [state] and get a search result.
   Future<SearchResponse> _disjunctiveSearch(SearchState state) async {
-    _logger.fine('Start disjunctive search: $state');
+    _log.fine('Start disjunctive search: $state');
     try {
       final responses = await client.multipleQueriesOf(state).getObjects();
-      _logger.fine('Search responses: $responses');
+      _log.fine('Search responses: $responses');
       return responses.toSearchResponse();
     } catch (exception) {
-      _logger.severe('Search exception thrown: $exception');
+      _log.severe('Search exception thrown: $exception');
       throw _launderException(exception);
     }
   }

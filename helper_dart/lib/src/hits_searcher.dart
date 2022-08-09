@@ -7,6 +7,7 @@ import 'package:rxdart/rxdart.dart';
 
 import 'filter_state.dart';
 import 'hits_searcher_service.dart';
+import 'logger.dart';
 import 'search_response.dart';
 import 'search_state.dart';
 
@@ -61,7 +62,8 @@ class HitsSearcher {
       : responses = _state.stream
             .debounceTime(debounce)
             .distinct()
-            .switchMap(searchService.search);
+            .switchMap(searchService.search),
+        _log = defaultLogger;
 
   /// Search state stream
   final BehaviorSubject<SearchState> _state;
@@ -73,7 +75,7 @@ class HitsSearcher {
   final HitsSearchService searchService;
 
   /// Events logger
-  final _logger = Logger('HitsSearcher');
+  final Logger _log;
 
   /// Set query string.
   void query(String query) {
@@ -89,13 +91,13 @@ class HitsSearcher {
   void _updateState(SearchState Function(SearchState state) apply) {
     final current = _state.value;
     final newState = apply(current);
-    _logger.config('State updated from $current to $newState');
+    _log.config('State updated from $current to $newState');
     _state.sink.add(newState);
   }
 
   /// Dispose of underlying resources.
   void dispose() {
-    _logger.fine('helper is disposed');
+    _log.fine('helper is disposed');
     _state.close();
   }
 }
