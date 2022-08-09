@@ -28,13 +28,13 @@ class HitsSearchService {
 
   /// Build a single search request using [state] and get a search result.
   Future<SearchResponse> _singleQuerySearch(SearchState state) async {
-    _log.fine('Start search: $state');
+    _log.fine('Run search with state: $state');
     try {
       final response = await client.queryOf(state).getObjects();
-      _log.fine('Search response : $response');
+      _log.fine('Search response: $response');
       return response.toSearchResponse();
     } catch (exception) {
-      _log.severe('Search exception thrown: $exception');
+      _log.severe('Search exception: $exception');
       throw _launderException(exception);
     }
   }

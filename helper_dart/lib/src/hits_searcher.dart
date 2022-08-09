@@ -91,7 +91,6 @@ class HitsSearcher {
   void _updateState(SearchState Function(SearchState state) apply) {
     final current = _state.value;
     final newState = apply(current);
-    _log.config('State updated from $current to $newState');
     _state.sink.add(newState);
   }
 
