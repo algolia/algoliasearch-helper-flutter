@@ -33,8 +33,3 @@ extension SetExt<T> on Set<T> {
   /// Get unmodifiable copy of this set.
   Set<T> unmodifiable() => Set<T>.unmodifiable(this);
 }
-
-extension FutureExt<T> on Future<T> {
-  /// Convert a future to a stream
-  Stream<T> toStream() => Stream.fromFuture(this);
-}

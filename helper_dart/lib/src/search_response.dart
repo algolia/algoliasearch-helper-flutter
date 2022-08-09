@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
 /// Search operation response.
 class SearchResponse {
+  @internal
   SearchResponse(this.raw) : hits = Hit._fromList(raw['hits']);
 
   /// Raw search response
@@ -54,7 +57,7 @@ class SearchResponse {
 class Hit {
   Hit(this.json);
 
-  factory Hit.from(Map hit) {
+  factory Hit._from(Map hit) {
     final raw = Map<String, dynamic>.from(hit);
     return Hit(raw);
   }
@@ -62,7 +65,7 @@ class Hit {
   static Iterable<Hit> _fromList(data) {
     final hits = data as List?;
     if (hits == null) return const [];
-    return List<Map>.from(hits).map(Hit.from).toList();
+    return List<Map>.from(hits).map(Hit._from).toList();
   }
 
   /// Hit raw json as map
