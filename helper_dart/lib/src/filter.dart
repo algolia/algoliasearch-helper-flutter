@@ -1,3 +1,5 @@
+import '../algolia.dart';
+
 /// Represents a search filter
 class Filter {
   const Filter._(this.attribute, this.isNegated);
@@ -76,6 +78,20 @@ class FilterFacet implements Filter {
       ' value: $value,'
       ' score: $score'
       '}';
+
+  /// Make a copy of the facet filter.
+  FilterFacet copyWith({
+    String? attribute,
+    dynamic value,
+    bool? isNegated,
+    int? score,
+  }) =>
+      Filter.facet(
+        attribute ?? this.attribute,
+        value ?? this.value,
+        isNegated ?? this.isNegated,
+        score ?? this.score,
+      );
 }
 
 /// A [FilterTag] filters on a specific [value].
@@ -107,6 +123,16 @@ class FilterTag implements Filter {
       ' isNegated: $isNegated,'
       ' value: $value'
       '}';
+
+  /// Make a copy of the tag filter.
+  FilterTag copyWith({
+    String? value,
+    bool? isNegated,
+  }) =>
+      Filter.tag(
+        value ?? this.value,
+        isNegated ?? this.isNegated,
+      );
 }
 
 /// A [FilterNumeric] filters on a numeric [value].
@@ -140,6 +166,18 @@ class FilterNumeric implements Filter {
     final value = NumericRange._(lowerBound, upperBound);
     return FilterNumeric._(attribute, value, isNegated);
   }
+
+  /// Make a copy of the numeric filter.
+  FilterNumeric copyWith({
+    String? attribute,
+    NumericValue? value,
+    bool? isNegated,
+  }) =>
+      FilterNumeric._(
+        attribute ?? this.attribute,
+        value ?? this.value,
+        isNegated ?? this.isNegated,
+      );
 }
 
 /// Represents a filter numeric value.
@@ -203,4 +241,16 @@ class HierarchicalFilter {
       ' path: $path,'
       ' filter: $filter'
       '}';
+
+  /// Make a copy of the numeric filter.
+  HierarchicalFilter copyWith({
+    List<String>? attributes,
+    List<FilterFacet>? path,
+    FilterFacet? filter,
+  }) =>
+      HierarchicalFilter(
+        attributes ?? this.attributes,
+        path ?? this.path,
+        filter ?? this.filter,
+      );
 }
