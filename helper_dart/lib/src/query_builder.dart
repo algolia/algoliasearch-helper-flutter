@@ -6,7 +6,7 @@ class QueryBuilder {
 
   final SearchState searchState;
   final Set<String> disjunctiveFacets;
-  final List<FilterGroup> filterGroups;
+  final Set<FilterGroup> filterGroups;
   final List<String> hierarchicalAttributes;
   final List<HierarchicalFilter> hierarchicalFilters;
 
@@ -29,9 +29,9 @@ class QueryBuilder {
   List<SearchState> build() {
     final queries = <SearchState>[];
     queries.add(searchState);
-    final disjunctiveFacetingQueries = buildDisjunctiveFacetingQueries();
+    final disjunctiveFacetingQueries = buildDisjunctiveFacetingQueries(searchState, filterGroups, disjunctiveFacets);
     queries.addAll(disjunctiveFacetingQueries);
-    final hierarchicalFacetingQueries = buildHierarchicalFacetingQueries();
+    final hierarchicalFacetingQueries = buildHierarchicalFacetingQueries(searchState, filterGroups, hierarchicalAttributes, hierarchicalFilters);
     queries.addAll(hierarchicalFacetingQueries);
     return queries;
   }
@@ -41,7 +41,7 @@ class QueryBuilder {
   }
 
   SearchState disjunctiveFacetingQuery(SearchState query, String attribute, Set<FilterGroup> filterGroups) {
-    final updatedFilterGroups = Set.from(dropDisjunctiveFilters(filterGroups, attribute));
+    final updatedFilterGroups = droppingDisjunctiveFilters(filterGroups, attribute);
     var output = query.copyWith(
         facets: [attribute],
         filterGroups: updatedFilterGroups,
@@ -53,15 +53,18 @@ class QueryBuilder {
     return output;
   }
 
-  Iterable<Set<FilterGroup>> dropDisjunctiveFilters(Set<FilterGroup> filterGroups, String attribute) {
-    final output = Set<FilterGroup>.from(filterGroups);
-    return output.map((group) => {
-      if (group.groupID.operator != FilterOperator.or) {
-        return group;
-      }
-      group.filters.retainWhere((filter) => filter.attribute != attribute);
-      return group;
-    });
+  Set<FilterGroup> droppingDisjunctiveFilters(Set<FilterGroup> filterGroups, String attribute) {
+    return {};
+    // final output = Set<FilterGroup>.from(filterGroups);
+    // return output.map((group) => {
+    //   if (group.groupID.operator != FilterOperator.or) {
+    //     return group;
+    //   }
+    //   group.filters.retainWhere((filter) => {
+    //
+    //   });
+    //   return group;
+    // });
   }
 
   List<SearchState> buildHierarchicalFacetingQueries(SearchState query, Set<FilterGroup> filterGroups, List<String> hierarchicalAttributes, List<HierarchicalFilter> hierarchicalFilters) {
