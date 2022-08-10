@@ -43,25 +43,79 @@ abstract class FilterGroup<T> {
 
   final FilterGroupID groupID;
   final Set<T> filters;
+
+  FilterGroup<T> copyWith(FilterGroupID? groupID, Set<T>? filters);
 }
 
 /// Facets filter group
 class FacetFilterGroup extends FilterGroup<FilterFacet> {
   FacetFilterGroup(super.groupID, super.filters);
+
+  /// Make a copy of the facet filters group.
+  @override
+  FilterGroup<FilterFacet> copyWith(FilterGroupID? groupID, Set<FilterFacet>? filters) => FacetFilterGroup(
+          groupID ?? this.groupID,
+          filters ?? Set.from(this.filters.map((f) => f.copyWith())),
+        );
+
+  @override
+  String toString() => 'FacetFilterGroup{'
+      ' id: $groupID,'
+      ' filters: $filters'
+      '}';
 }
 
 /// Tags filter group
 class TagFilterGroup extends FilterGroup<FilterTag> {
-  TagFilterGroup(super.groupIDr, super.filters);
+  TagFilterGroup(super.groupID, super.filters);
+
+  /// Make a copy of the tag filters group.
+  @override
+  FilterGroup<FilterTag> copyWith(FilterGroupID? groupID, Set<FilterTag>? filters) => TagFilterGroup(
+          groupID ?? this.groupID,
+          filters ?? Set.from(this.filters.map((f) => f.copyWith())),
+        );
+
+  @override
+  String toString() => 'TagFilterGroup{'
+      ' id: $groupID,'
+      ' filters: $filters'
+      '}';
 }
 
 /// Numeric facets filter group
 class NumericFilterGroup extends FilterGroup<FilterNumeric> {
   NumericFilterGroup(super.groupID, super.filters);
+
+  /// Make a copy of the numeric filters group.
+  @override
+  FilterGroup<FilterNumeric> copyWith(FilterGroupID? groupID, Set<FilterNumeric>? filters) => NumericFilterGroup(
+          groupID ?? this.groupID,
+          filters ?? Set.from(this.filters.map((f) => f.copyWith())),
+        );
+
+  @override
+  String toString() => 'NumericFilterGroup{'
+      ' id: $groupID,'
+      ' filters: $filters'
+      '}';
 }
 
 /// Hierarchical filter group
 class HierarchicalFilterGroup extends FilterGroup<HierarchicalFilter> {
   HierarchicalFilterGroup(String name, Set<HierarchicalFilter> filters)
       : super(FilterGroupID(name), filters);
+
+  /// Make a copy of the hierarchical filters group.
+  @override
+  FilterGroup<HierarchicalFilter> copyWith(FilterGroupID? groupID, Set<HierarchicalFilter>? filters) => HierarchicalFilterGroup(
+      groupID?.name ?? this.groupID.name,
+      filters ?? Set.from(this.filters.map((f) => f.copyWith())),
+    );
+
+  @override
+  String toString() => 'HierarchicalFilterGroup{'
+      ' id: $groupID,'
+      ' filters: $filters'
+      '}';
 }

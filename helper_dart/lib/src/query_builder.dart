@@ -41,8 +41,8 @@ class QueryBuilder {
   }
 
   SearchState disjunctiveFacetingQuery(SearchState query, String attribute, Set<FilterGroup> filterGroups) {
-    final updatedFilterGroups = droppingDisjunctiveFilters(filterGroups, attribute);
-    var output = query.copyWith(
+    final updatedFilterGroups = droppingDisjunctiveFiltersForAttribute(filterGroups, attribute);
+    return query.copyWith(
         facets: [attribute],
         filterGroups: updatedFilterGroups,
         attributesToRetrieve: [],
@@ -50,21 +50,21 @@ class QueryBuilder {
         hitsPerPage: 0,
         analytics: false,
     );
-    return output;
   }
 
-  Set<FilterGroup> droppingDisjunctiveFilters(Set<FilterGroup> filterGroups, String attribute) {
-    return {};
-    // final output = Set<FilterGroup>.from(filterGroups);
-    // return output.map((group) => {
-    //   if (group.groupID.operator != FilterOperator.or) {
-    //     return group;
-    //   }
-    //   group.filters.retainWhere((filter) => {
-    //
-    //   });
-    //   return group;
-    // });
+  Set<FilterGroup> droppingDisjunctiveFiltersForAttribute(Set<FilterGroup> filterGroups, String attribute) {
+    final outputFilterGroups = filterGroups.map((group) => group.copyWith(group.groupID, group.filters));
+    outputFilterGroups
+        .where((group) => group.groupID.operator == FilterOperator.or)
+        .forEach((group) {
+          group.filters.retainWhere((filter) {
+            if (!(filter is FilterFacet)) {
+              return true;
+            }
+            return (filter as FilterFacet).attribute != attribute;
+          });
+        });
+    return Set.from(outputFilterGroups);
   }
 
   List<SearchState> buildHierarchicalFacetingQueries(SearchState query, Set<FilterGroup> filterGroups, List<String> hierarchicalAttributes, List<HierarchicalFilter> hierarchicalFilters) {
@@ -74,6 +74,5 @@ class QueryBuilder {
   SearchResponse aggregate(List<SearchResponse> responses) {
     return responses.first;
   }
-
 
 }

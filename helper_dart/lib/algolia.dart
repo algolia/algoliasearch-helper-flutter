@@ -12,3 +12,4 @@ export 'src/highlighting.dart';
 export 'src/hits_searcher.dart';
 export 'src/search_response.dart';
 export 'src/search_state.dart';
+export 'src/query_builder.dart';
