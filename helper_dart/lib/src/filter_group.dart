@@ -45,6 +45,7 @@ abstract class FilterGroup<T> {
   final Set<T> filters;
 
   FilterGroup<T> copyWith(FilterGroupID? groupID, Set<T>? filters);
+  FilterGroup<T> copy();
 }
 
 /// Facets filter group
@@ -55,8 +56,14 @@ class FacetFilterGroup extends FilterGroup<FilterFacet> {
   @override
   FilterGroup<FilterFacet> copyWith(FilterGroupID? groupID, Set<FilterFacet>? filters) => FacetFilterGroup(
           groupID ?? this.groupID,
-          filters ?? Set.from(this.filters.map((f) => f.copyWith())),
+          filters ?? this.filters.map((f) => f.copyWith()).toSet(),
         );
+
+  @override
+  FilterGroup<FilterFacet> copy() => FacetFilterGroup(
+      FilterGroupID(groupID.name, groupID.operator),
+      filters.map((f) => f.copyWith()).toSet(),
+    );
 
   @override
   String toString() => 'FacetFilterGroup{'
@@ -73,8 +80,14 @@ class TagFilterGroup extends FilterGroup<FilterTag> {
   @override
   FilterGroup<FilterTag> copyWith(FilterGroupID? groupID, Set<FilterTag>? filters) => TagFilterGroup(
           groupID ?? this.groupID,
-          filters ?? Set.from(this.filters.map((f) => f.copyWith())),
+          filters ?? this.filters.map((f) => f.copyWith()).toSet(),
         );
+
+  @override
+  FilterGroup<FilterTag> copy() => TagFilterGroup(
+      FilterGroupID(groupID.name, groupID.operator),
+      filters.map((f) => f.copyWith()).toSet(),
+    );
 
   @override
   String toString() => 'TagFilterGroup{'
@@ -91,8 +104,14 @@ class NumericFilterGroup extends FilterGroup<FilterNumeric> {
   @override
   FilterGroup<FilterNumeric> copyWith(FilterGroupID? groupID, Set<FilterNumeric>? filters) => NumericFilterGroup(
           groupID ?? this.groupID,
-          filters ?? Set.from(this.filters.map((f) => f.copyWith())),
+          filters ?? this.filters.map((f) => f.copyWith()).toSet(),
         );
+
+  @override
+  FilterGroup<FilterNumeric> copy() => NumericFilterGroup(
+      FilterGroupID(groupID.name, groupID.operator),
+      filters.map((f) => f.copyWith()).toSet(),
+    );
 
   @override
   String toString() => 'NumericFilterGroup{'
@@ -110,7 +129,13 @@ class HierarchicalFilterGroup extends FilterGroup<HierarchicalFilter> {
   @override
   FilterGroup<HierarchicalFilter> copyWith(FilterGroupID? groupID, Set<HierarchicalFilter>? filters) => HierarchicalFilterGroup(
       groupID?.name ?? this.groupID.name,
-      filters ?? Set.from(this.filters.map((f) => f.copyWith())),
+      filters ?? this.filters.map((f) => f.copyWith()).toSet(),
+    );
+
+  @override
+  FilterGroup<HierarchicalFilter> copy() => HierarchicalFilterGroup(
+      groupID.name,
+      filters.map((f) => f.copyWith()).toSet(),
     );
 
   @override

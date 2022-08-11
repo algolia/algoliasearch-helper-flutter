@@ -1,9 +1,11 @@
+import 'dart:math';
+
 import 'package:algolia_helper_dart/algolia.dart';
 import 'package:test/test.dart';
 
 void main() {
   test('QueryBuilder generate disjunctive faceting queries', () {
-    final query = SearchState(indexName: "index", query: "phone");
+    final query = SearchState(indexName: 'index', query: 'phone');
     final queryBuilder = QueryBuilder(query, {}, { 'price', 'color' }, [], []);
     final queries = queryBuilder.build();
     final disjunctiveFacetingQueries = queries.skip(1);
@@ -11,19 +13,18 @@ void main() {
     for (final query in disjunctiveFacetingQueries) {
       expect(query.facets?.length, 1);
     }
-    // final p = disjunctiveFacetingQueries.map ((q) => q.facets?.toList()).expand((element) => element);
   });
 
   test('QueryBuilder generate disjunctive faceting queries with filters', () {
 
-    final query = SearchState(indexName: "index", query: "phone");
-    final Set<FilterGroup> filterGroups = {
+    const query = SearchState(indexName: 'index', query: 'phone');
+    final filterGroups = <FilterGroup>{
       FacetFilterGroup(
           FilterGroupID.groupOr('g1'),
           {
-            Filter.facet ('price', 100),
+            Filter.facet('price', 100),
             Filter.facet('color', 'green'),
-            Filter.facet('size', "44")
+            Filter.facet('size', '44'),
           }),
       FacetFilterGroup(
           FilterGroupID.groupOr('g2'),
@@ -33,27 +34,27 @@ void main() {
       FacetFilterGroup(
           FilterGroupID.and('g3'),
           {
-            Filter.facet ('color', 'red'),
+            Filter.facet('brand', 'samsung'),
+            Filter.facet('color', 'red'),
             Filter.facet('promo', true),
             Filter.facet('rating', 4.2),
           })
     };
-    final queryBuilder = QueryBuilder(query, filterGroups, { 'price', 'color', 'brand' }, [], []);
+    final disjunctiveFacets = { 'price', 'color', 'brand' };
+    final queryBuilder = QueryBuilder(query, filterGroups, disjunctiveFacets, [], []);
     final queries = queryBuilder.build();
     expect(queries.length, 4);
     final disjunctiveFacetingQueries = queries.skip(1);
-    print(queries.first);
-    print(disjunctiveFacetingQueries);
-    expect(disjunctiveFacetingQueries.length, 3);
-    print(queries.map((e) => e.facets));
-    for (final query in queries) {
-      print(query.facets);
-      for (final filterGroup in query.filterGroups ?? {}) {
-        print(filterGroup.groupID);
-        for (final filter in filterGroup.filters) {
-          print(filter);
-        }
-      }
+    for (final query in disjunctiveFacetingQueries) {
+      final facet = query.facets!.first;
+      final keptFacets = disjunctiveFacets.toSet();
+      keptFacets.remove(facet);
+      final group1 = query.filterGroups?.firstWhere((g) => g.groupID.name == 'g1') as FacetFilterGroup;
+      final group2 = query.filterGroups?.firstWhere((g) => g.groupID.name == 'g2') as FacetFilterGroup;
+      final group3 = query.filterGroups?.firstWhere((g) => g.groupID.name == 'g3') as FacetFilterGroup;
+      expect(group1.filters.map((f) => f.attribute).contains(facet), false);
+      expect(group2.filters.length, 1);
+      expect(group3.filters.length, 4);
     }
   });
 }

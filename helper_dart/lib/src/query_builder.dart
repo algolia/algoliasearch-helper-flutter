@@ -36,9 +36,10 @@ class QueryBuilder {
     return queries;
   }
 
-  Iterable<SearchState> buildDisjunctiveFacetingQueries(SearchState query, Set<FilterGroup> filterGroups, Set<String> disjunctiveFacets) {
-    return disjunctiveFacets.map((facet) => disjunctiveFacetingQuery(query, facet, filterGroups));
-  }
+  Iterable<SearchState> buildDisjunctiveFacetingQueries(SearchState query, Set<FilterGroup> filterGroups, Set<String> disjunctiveFacets) => disjunctiveFacets.map((facet) {
+      final filterGroupsCopy = filterGroups.map((group) => group.copy()).toSet();
+      return disjunctiveFacetingQuery(query, facet, filterGroupsCopy);
+  });
 
   SearchState disjunctiveFacetingQuery(SearchState query, String attribute, Set<FilterGroup> filterGroups) {
     final updatedFilterGroups = droppingDisjunctiveFiltersForAttribute(filterGroups, attribute);
@@ -53,18 +54,13 @@ class QueryBuilder {
   }
 
   Set<FilterGroup> droppingDisjunctiveFiltersForAttribute(Set<FilterGroup> filterGroups, String attribute) {
-    final outputFilterGroups = filterGroups.map((group) => group.copyWith(group.groupID, group.filters));
-    outputFilterGroups
-        .where((group) => group.groupID.operator == FilterOperator.or)
-        .forEach((group) {
-          group.filters.retainWhere((filter) {
-            if (!(filter is FilterFacet)) {
-              return true;
-            }
-            return (filter as FilterFacet).attribute != attribute;
-          });
-        });
-    return Set.from(outputFilterGroups);
+    for (final filterGroup in filterGroups) {
+      if (filterGroup.groupID.operator != FilterOperator.or) {
+        continue;
+      }
+      filterGroup.filters.removeWhere((element) => (element as FilterFacet).attribute == attribute);
+    }
+    return filterGroups;
   }
 
   List<SearchState> buildHierarchicalFacetingQueries(SearchState query, Set<FilterGroup> filterGroups, List<String> hierarchicalAttributes, List<HierarchicalFilter> hierarchicalFilters) {
