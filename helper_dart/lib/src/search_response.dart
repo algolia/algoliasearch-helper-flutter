@@ -2,14 +2,20 @@ import 'package:meta/meta.dart';
 
 /// Search operation response.
 class SearchResponse {
-  @internal
-  SearchResponse(this.raw) : hits = Hit._fromList(raw['hits']);
+  SearchResponse(this.raw):
+    hits = Hit._fromList(raw['hits']),
+    disjunctiveFacets = {},
+    hierarchicalFacets = {};
 
   /// Raw search response
   final Map<String, dynamic> raw;
 
   /// Search hits list
   final Iterable<Hit> hits;
+
+  Map<String, Map<String, int>> disjunctiveFacets;
+
+  Map<String, Map<String, int>> hierarchicalFacets;
 
   String get params => raw['params'] as String;
 
@@ -29,11 +35,11 @@ class SearchResponse {
 
   int get page => raw['page'] as int? ?? 0;
 
-  Map<String, dynamic> get facets =>
-      raw['facets'] as Map<String, dynamic>? ?? {};
+  Map<String, Map<String, int>> get facets =>
+      raw['facets'] as Map<String, Map<String, int>>? ?? {};
 
-  Map<String, dynamic> get facetsStats =>
-      raw['facets_stats'] as Map<String, dynamic>? ?? {};
+  Map<String, Map<String, int>> get facetsStats =>
+      raw['facets_stats'] as Map<String, Map<String, int>>? ?? {};
 
   bool get exhaustiveNbHits => raw['exhaustiveNbHits'] as bool;
 
