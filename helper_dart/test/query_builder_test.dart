@@ -7,7 +7,7 @@ import 'package:test/test.dart';
 void main() {
   test('QueryBuilder generate disjunctive faceting queries', () {
     final query = SearchState(indexName: 'index', query: 'phone');
-    final queryBuilder = QueryBuilder(query, {}, { 'price', 'color' }, null);
+    final queryBuilder = QueryBuilder(query, { 'price', 'color' }, null);
     final queries = queryBuilder.build();
     final disjunctiveFacetingQueries = queries.skip(1);
     expect(disjunctiveFacetingQueries.length, 2);
@@ -41,7 +41,7 @@ void main() {
     };
     final query = SearchState(indexName: 'index', query: 'phone', filterGroups: filterGroups);
     final disjunctiveFacets = { 'price', 'color', 'brand' };
-    final queryBuilder = QueryBuilder(query, filterGroups, disjunctiveFacets, null);
+    final queryBuilder = QueryBuilder(query, disjunctiveFacets, null);
     final queries = queryBuilder.build();
     expect(queries.length, 4);
 
@@ -102,7 +102,7 @@ void main() {
     final filterGroups = <FilterGroup>{ colorGroup, hierarchicalGroup };
 
     final query = SearchState(indexName: 'index', query: 'phone', filterGroups: filterGroups);
-    final queryBuilder = QueryBuilder(query, filterGroups, {}, hierarchicalFilter);
+    final queryBuilder = QueryBuilder(query,  {}, hierarchicalFilter);
     final queries = queryBuilder.build();
 
     queries.asMap().forEach((index, query) {
@@ -186,7 +186,7 @@ void main() {
       }
     };
 
-    final queryBuilder = QueryBuilder(query, {}, disjunctiveFacets, null);
+    final queryBuilder = QueryBuilder(query, disjunctiveFacets, null);
 
     final aggregatedResponse = queryBuilder.aggregate([
       mainResponse,
