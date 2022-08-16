@@ -5,7 +5,7 @@ import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('QueryBuilder generate disjunctive faceting queries', () {
+  test('test disjunctive faceting queries generation', () {
     final query = SearchState(indexName: 'index', query: 'phone');
     final queryBuilder = QueryBuilder(query, { 'price', 'color' }, []);
     final queries = queryBuilder.build();
@@ -16,7 +16,7 @@ void main() {
     }
   });
 
-  test('QueryBuilder generate disjunctive faceting queries with filters', () {
+  test('test disjunctive faceting queries generation with filters', () {
     final filterGroups = <FilterGroup>{
       FacetFilterGroup(
           FilterGroupID.groupOr('g1'),
@@ -87,7 +87,7 @@ void main() {
     }
   });
   
-  test('generate hierarchical faceting queries', () {
+  test('test hierarchical faceting queries generation', () {
     const lvl0 = 'category.lvl0';
     const lvl1= 'category.lvl1';
     const lvl2 = 'category.lvl2';
@@ -153,7 +153,7 @@ void main() {
     });
   });
 
-  test('merge disjunctive facets responses', () {
+  test('test disjunctive & hierarchical responses merging', () {
 
     final query = SearchState(indexName: 'index', query: 'phone');
     final disjunctiveFacets = { 'color', 'brand', 'size' };
@@ -185,13 +185,84 @@ void main() {
       }
     };
 
-    final queryBuilder = QueryBuilder(query, disjunctiveFacets, []);
+    final hierarchicalResponse1 = SearchResponse({});
+    hierarchicalResponse1.raw['facets'] = {
+      'categoryl.lvl0': {
+        'home': 25,
+        'electronics': 35,
+        'clothes': 45,
+      }
+    };
+
+    final hierarchicalResponse2 = SearchResponse({});
+    hierarchicalResponse2.raw['facets'] = {
+      'category.lvl1': {
+        'home > kitchen': 10,
+        'home > bedroom': 15,
+        'electronics > portable': 28,
+        'electronics > appliance': 7,
+        'clothes > men': 12,
+        'clothes > women': 33,
+      }
+    };
+
+    final hierarchicalResponse3 = SearchResponse({});
+    hierarchicalResponse3.raw['facets'] = {
+      'category.lvl2': {
+        'home > kitchen > accessories': 10,
+        'home > bedroom > furniture': 15,
+        'electronics > portable > smartphones': 20,
+        'electronics > portable > laptops': 8,
+        'electronics > appliance > major': 7,
+        'clothes > men > shirts': 12,
+        'clothes > women > dresses': 10,
+        'clothes > women > jeans': 23,
+      }
+    };
+
+    final hierarchicalResponse4 = SearchResponse({});
+    hierarchicalResponse4.raw['facets'] = {
+      'category.lvl3': {
+        'home > kitchen > accessories > tableware': 10,
+        'home > bedroom > furniture > beds': 10,
+        'home > bedroom > furniture > others': 5,
+        'electronics > portable > smartphones > ios': 8,
+        'electronics > portable > smartphones > android': 12,
+        'electronics > portable > laptops > gaming': 3,
+        'electronics > portable > laptops > office': 5,
+        'electronics > appliance > major > fridges': 5,
+        'electronics > appliance > major > washing machines': 2,
+        'clothes > men > shirts > casual': 6,
+        'clothes > men > shirts > formal': 6,
+        'clothes > women > dresses > casual': 7,
+        'clothes > women > dresses > formal': 3,
+        'clothes > women > jeans > regular': 9,
+        'clothes > women > jeans > slim': 14,
+      }
+    };
+
+    final hierarchicalFilter = HierarchicalFilter(
+        ['category.lvl0', 'category.lvl1', 'category.lvl2', 'category.lvl3'],
+        [
+          Filter.facet('category.lvl0', 'a'),
+          Filter.facet('category.lvl1', 'a > b'),
+          Filter.facet('category.lvl2', 'a > b > c')
+        ],
+        Filter.facet('category.lvl2', 'a > b > c')
+    );
+
+    final queryBuilder = QueryBuilder(query, disjunctiveFacets, [hierarchicalFilter]);
 
     final aggregatedResponse = queryBuilder.merge([
       mainResponse,
       disjunctiveResponse1,
       disjunctiveResponse2,
-      disjunctiveResponse3]);
+      disjunctiveResponse3,
+      hierarchicalResponse1,
+      hierarchicalResponse2,
+      hierarchicalResponse3,
+      hierarchicalResponse4,
+    ]);
 
     expect(aggregatedResponse.disjunctiveFacets, {
       'color': {
@@ -208,6 +279,48 @@ void main() {
         's': 15,
         'm': 20,
         'l': 25,
+      }
+    });
+    expect(aggregatedResponse.hierarchicalFacets, {
+      'categoryl.lvl0': {
+        'home': 25,
+        'electronics': 35,
+        'clothes': 45,
+      },
+      'category.lvl1': {
+        'home > kitchen': 10,
+        'home > bedroom': 15,
+        'electronics > portable': 28,
+        'electronics > appliance': 7,
+        'clothes > men': 12,
+        'clothes > women': 33,
+      },
+      'category.lvl2': {
+        'home > kitchen > accessories': 10,
+        'home > bedroom > furniture': 15,
+        'electronics > portable > smartphones': 20,
+        'electronics > portable > laptops': 8,
+        'electronics > appliance > major': 7,
+        'clothes > men > shirts': 12,
+        'clothes > women > dresses': 10,
+        'clothes > women > jeans': 23,
+      },
+      'category.lvl3': {
+        'home > kitchen > accessories > tableware': 10,
+        'home > bedroom > furniture > beds': 10,
+        'home > bedroom > furniture > others': 5,
+        'electronics > portable > smartphones > ios': 8,
+        'electronics > portable > smartphones > android': 12,
+        'electronics > portable > laptops > gaming': 3,
+        'electronics > portable > laptops > office': 5,
+        'electronics > appliance > major > fridges': 5,
+        'electronics > appliance > major > washing machines': 2,
+        'clothes > men > shirts > casual': 6,
+        'clothes > men > shirts > formal': 6,
+        'clothes > women > dresses > casual': 7,
+        'clothes > women > dresses > formal': 3,
+        'clothes > women > jeans > regular': 9,
+        'clothes > women > jeans > slim': 14,
       }
     });
 
