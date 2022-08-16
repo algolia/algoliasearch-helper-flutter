@@ -52,13 +52,7 @@ class QueryBuilder {
   /// Merge search responses for generated queries regrouping
   /// the disjunctive and hierarchical facets information into a single response
   SearchResponse merge(List<SearchResponse> responses) {
-    if (responses.isEmpty) {
-      // error
-    }
-
-    if (responses.length != totalQueriesCount) {
-      // error
-    }
+    assert(responses.length != totalQueriesCount);
 
     final aggregatedResponse = responses.removeAt(0);
     final disjunctiveFacetingResponses =
