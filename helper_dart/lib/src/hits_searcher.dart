@@ -2,10 +2,12 @@ import 'dart:async';
 
 import 'package:algolia/algolia.dart';
 import 'package:logging/logging.dart';
+import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'filter_state.dart';
 import 'hits_searcher_service.dart';
+import 'logger.dart';
 import 'search_response.dart';
 import 'search_state.dart';
 
@@ -23,7 +25,7 @@ class HitsSearcher {
     required String apiKey,
     required String indexName,
     bool disjunctiveFacetingEnabled = false,
-    Duration debounce = const Duration(milliseconds: 100),
+    Duration debounce = _defaultDebounce,
   }) =>
       HitsSearcher.create(
         applicationID: applicationID,
@@ -40,36 +42,40 @@ class HitsSearcher {
     required String apiKey,
     required SearchState state,
     bool disjunctiveFacetingEnabled = false,
-    Duration debounce = const Duration(milliseconds: 100),
+    Duration debounce = _defaultDebounce,
   }) {
     final client = Algolia.init(applicationId: applicationID, apiKey: apiKey);
     final service = HitsSearchService(client, disjunctiveFacetingEnabled);
-    return HitsSearcher._(service, state, debounce);
+    return HitsSearcher.build(service, state, debounce);
   }
 
-  HitsSearcher._(this.searchService, SearchState state, Duration debounce) {
-    _state = BehaviorSubject<SearchState>.seeded(state);
-    responses = _state.stream
-        .debounceTime(debounce)
-        .distinct()
-        .asyncMap(searchService.search);
-  }
+  /// HitSearcher's constructor, for internal and test use only.
+  @visibleForTesting
+  HitsSearcher.build(
+    HitsSearchService searchService,
+    SearchState state, [
+    Duration debounce = _defaultDebounce,
+  ]) : this._(searchService, BehaviorSubject.seeded(state), debounce);
 
-  /// Inner Algolia API client.
-  /// TODO: should be private
-  Algolia get client => searchService.client;
+  /// HitsSearcher's private constructor
+  HitsSearcher._(this.searchService, this._state, Duration debounce)
+      : responses = _state.stream
+            .debounceTime(debounce)
+            .distinct()
+            .switchMap(searchService.search),
+        _log = defaultLogger;
 
   /// Search state stream
-  late BehaviorSubject<SearchState> _state;
+  final BehaviorSubject<SearchState> _state;
 
   /// Search results stream
-  late Stream<SearchResponse> responses;
+  final Stream<SearchResponse> responses;
 
   /// Service handling search requests
   final HitsSearchService searchService;
 
   /// Events logger
-  final _logger = Logger('HitsSearcher');
+  final Logger _log;
 
   /// Set query string.
   void query(String query) {
@@ -85,16 +91,18 @@ class HitsSearcher {
   void _updateState(SearchState Function(SearchState state) apply) {
     final current = _state.value;
     final newState = apply(current);
-    _logger.config('State updated from $current to $newState');
     _state.sink.add(newState);
   }
 
   /// Dispose of underlying resources.
   void dispose() {
-    _logger.fine('helper is disposed');
+    _log.fine('helper is disposed');
     _state.close();
   }
 }
+
+/// Default debounce period
+const _defaultDebounce = Duration(milliseconds: 100);
 
 /// Extensions over [HitsSearcher]
 extension SearcherExt on HitsSearcher {
