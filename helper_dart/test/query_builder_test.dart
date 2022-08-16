@@ -6,8 +6,8 @@ import 'package:test/test.dart';
 
 void main() {
   test('test disjunctive faceting queries generation', () {
-    final query = SearchState(indexName: 'index', query: 'phone');
-    final queryBuilder = QueryBuilder(query, { 'price', 'color' }, []);
+    final query = SearchState(indexName: 'index', query: 'phone', disjunctiveFacets: { 'price', 'color' });
+    final queryBuilder = QueryBuilder(query);
     final queries = queryBuilder.build();
     final disjunctiveFacetingQueries = queries.skip(1);
     expect(disjunctiveFacetingQueries.length, 2);
@@ -39,9 +39,8 @@ void main() {
             Filter.facet('rating', 4.2),
           })
     };
-    final query = SearchState(indexName: 'index', query: 'phone', filterGroups: filterGroups);
-    final disjunctiveFacets = { 'price', 'color', 'brand' };
-    final queryBuilder = QueryBuilder(query, disjunctiveFacets, []);
+    final query = SearchState(indexName: 'index', query: 'phone', disjunctiveFacets: { 'price', 'color', 'brand' }, filterGroups: filterGroups);
+    final queryBuilder = QueryBuilder(query);
     final queries = queryBuilder.build();
     expect(queries.length, 4);
 
@@ -76,8 +75,6 @@ void main() {
     final disjunctiveFacetingQueries = queries.skip(1);
     for (final query in disjunctiveFacetingQueries) {
       final facet = query.facets!.first;
-      final keptFacets = disjunctiveFacets.toSet();
-      keptFacets.remove(facet);
       final group1 = query.filterGroups?.firstWhere((g) => g.groupID.name == 'g1') as FacetFilterGroup;
       final group2 = query.filterGroups?.firstWhere((g) => g.groupID.name == 'g2') as FacetFilterGroup;
       final group3 = query.filterGroups?.firstWhere((g) => g.groupID.name == 'g3') as FacetFilterGroup;
@@ -102,7 +99,7 @@ void main() {
     final filterGroups = <FilterGroup>{ colorGroup, hierarchicalGroup };
 
     final query = SearchState(indexName: 'index', query: 'phone', filterGroups: filterGroups);
-    final queryBuilder = QueryBuilder(query,  {}, [hierarchicalFilter]);
+    final queryBuilder = QueryBuilder(query);
     final queries = queryBuilder.build();
 
     queries.asMap().forEach((index, query) {
@@ -155,8 +152,17 @@ void main() {
 
   test('test disjunctive & hierarchical responses merging', () {
 
-    final query = SearchState(indexName: 'index', query: 'phone');
-    final disjunctiveFacets = { 'color', 'brand', 'size' };
+    final hierarchicalFilter = HierarchicalFilter(
+        ['category.lvl0', 'category.lvl1', 'category.lvl2', 'category.lvl3'],
+        [
+          Filter.facet('category.lvl0', 'a'),
+          Filter.facet('category.lvl1', 'a > b'),
+          Filter.facet('category.lvl2', 'a > b > c')
+        ],
+        Filter.facet('category.lvl2', 'a > b > c')
+    );
+
+    final query = SearchState(indexName: 'index', query: 'phone', disjunctiveFacets: { 'color', 'brand', 'size' }, filterGroups: { HierarchicalFilterGroup('category', {hierarchicalFilter}) });
 
     final mainResponse = SearchResponse({});
 
@@ -241,17 +247,7 @@ void main() {
       }
     };
 
-    final hierarchicalFilter = HierarchicalFilter(
-        ['category.lvl0', 'category.lvl1', 'category.lvl2', 'category.lvl3'],
-        [
-          Filter.facet('category.lvl0', 'a'),
-          Filter.facet('category.lvl1', 'a > b'),
-          Filter.facet('category.lvl2', 'a > b > c')
-        ],
-        Filter.facet('category.lvl2', 'a > b > c')
-    );
-
-    final queryBuilder = QueryBuilder(query, disjunctiveFacets, [hierarchicalFilter]);
+    final queryBuilder = QueryBuilder(query);
 
     final aggregatedResponse = queryBuilder.merge([
       mainResponse,

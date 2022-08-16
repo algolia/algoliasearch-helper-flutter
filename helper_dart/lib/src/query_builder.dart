@@ -6,19 +6,20 @@ import 'utils.dart';
 /// Transform single query into multiple requests for disjunctive/hierarchical faceting
 /// Merges multiple search responses into a single one
 class QueryBuilder {
-
   final SearchState searchState;
-  final Set<String> disjunctiveFacets;
-  final List<HierarchicalFilter> hierarchicalFilters;
 
   /// Number of search result queries
   int get resultQueriesCount => 1;
 
   /// Number of generated disjunctive queries for given hierarchical filters list
-  int get disjunctiveQueriesCount => disjunctiveFacets.length;
+  int get disjunctiveQueriesCount => searchState.disjunctiveFacets?.length ?? 0;
 
   /// Number of generated hierarchical queries for given hierarchical filters list
   int get hierarchicalQueriesCount {
+    final hierarchicalFilters = searchState.filterGroups
+        ?.map((g) => (g as HierarchicalFilterGroup?)?.filters ?? {})
+        .expand((filters) => filters) ??
+        [];
     if (hierarchicalFilters.isEmpty) {
       return 0;
     }
@@ -36,29 +37,26 @@ class QueryBuilder {
 
   QueryBuilder(
     this.searchState,
-    this.disjunctiveFacets,
-    this.hierarchicalFilters,
   );
 
   /// Build all the required queries for search, disjunctive and hierarchical faceting
   List<SearchState> build() => <SearchState>[
         searchState,
-        ..._buildDisjunctiveFacetingQueries(searchState, disjunctiveFacets),
-        ...hierarchicalFilters
-            .map((filter) => _buildHierarchicalFacetingQueries(searchState, filter))
-            .expand((element) => element)
+        ..._buildDisjunctiveFacetingQueries(searchState),
+        ..._buildHierarchicalFacetingQueries(searchState),
       ];
 
   /// Merge search responses for generated queries regrouping
   /// the disjunctive and hierarchical facets information into a single response
   SearchResponse merge(List<SearchResponse> responses) {
-    assert(responses.length == totalQueriesCount, 'number of responses (${responses.length}) not matches with number of requests (${totalQueriesCount})');
+    assert(responses.length == totalQueriesCount,
+        'number of responses (${responses.length}) not matches with number of requests (${totalQueriesCount})');
 
     final aggregatedResponse = responses.removeAt(0);
     final disjunctiveFacetingResponses =
-    responses.sublist(0, disjunctiveQueriesCount);
+        responses.sublist(0, disjunctiveQueriesCount);
     final hierarchicalFacetingResponses =
-    responses.sublist(disjunctiveQueriesCount, totalQueriesCount - 1);
+        responses.sublist(disjunctiveQueriesCount, totalQueriesCount - 1);
 
     for (final response in disjunctiveFacetingResponses) {
       aggregatedResponse.disjunctiveFacets.addAll(response.facets);
@@ -75,11 +73,8 @@ class QueryBuilder {
   Set<FilterGroup> _copyFilterGroups() =>
       searchState.filterGroups?.map((group) => group.copy()).toSet() ?? {};
 
-  Iterable<SearchState> _buildDisjunctiveFacetingQueries(
-    SearchState query,
-    Set<String> disjunctiveFacets,
-  ) =>
-      disjunctiveFacets.map((facet) {
+  Iterable<SearchState> _buildDisjunctiveFacetingQueries(SearchState query) =>
+      query.disjunctiveFacets?.map((facet) {
         final filterGroupsCopy = _copyFilterGroups();
         for (final filterGroup in filterGroupsCopy) {
           if (filterGroup.groupID.operator != FilterOperator.or) {
@@ -96,49 +91,66 @@ class QueryBuilder {
           hitsPerPage: 0,
           analytics: false,
         );
-      });
+      }) ??
+      [];
 
-  List<SearchState> _buildHierarchicalFacetingQueries(
-    SearchState query,
-    HierarchicalFilter hierarchicalFilter,
-  ) {
-    if (hierarchicalFilter.path.isEmpty) {
-      return [];
-    }
+  List<SearchState> _buildHierarchicalFacetingQueries(SearchState query) {
+    final hierarchicalFilters = query.filterGroups
+            ?.map((group) {
+              if (group is HierarchicalFilterGroup?) {
+                return (group as HierarchicalFilterGroup)?.filters.toList() ?? [];
+              } else {
+                return <HierarchicalFilter>[];
+              }
+            })
+            .expand((filters) => filters) ??
+        [];
 
-    final hierarchicalPath = <FilterFacet?>[null, ...hierarchicalFilter.path];
+    final queries = <SearchState>[];
 
-    return IterableZip([hierarchicalFilter.attributes, hierarchicalPath])
-        .map((pairs) {
-      final facet = pairs[0] as String;
-      final pathFilter = pairs[1] as FilterFacet?;
-
-      final filterGroupsCopy = _copyFilterGroups()
-        ..forEach((filterGroup) {
-          if (filterGroup.groupID.operator == FilterOperator.and) {
-            filterGroup.filters
-                .removeWhere((filter) => filter == hierarchicalFilter);
-          }
-        });
-
-      if (pathFilter != null) {
-        filterGroupsCopy.add(FacetFilterGroup(
-          FilterGroupID.and('_hierarchical'),
-          {pathFilter},
-        ));
+    for (final hierarchicalFilter in hierarchicalFilters) {
+      if (hierarchicalFilter.path.isEmpty) {
+        return [];
       }
 
-      filterGroupsCopy.removeWhere((group) => group.filters.isEmpty);
+      final hierarchicalPath = <FilterFacet?>[
+        null,
+        ...hierarchicalFilter.path
+      ];
 
-      return query.copyWith(
-        facets: [facet],
-        filterGroups: filterGroupsCopy,
-        attributesToRetrieve: [],
-        attributesToHighlight: [],
-        hitsPerPage: 0,
-        analytics: false,
-      );
-    }).toList();
+      final queriesForFilter = IterableZip([hierarchicalFilter.attributes, hierarchicalPath])
+          .map((pairs) {
+        final facet = pairs[0] as String;
+        final pathFilter = pairs[1] as FilterFacet?;
+
+        final filterGroupsCopy = _copyFilterGroups()
+          ..forEach((filterGroup) {
+            if (filterGroup.groupID.operator == FilterOperator.and) {
+              filterGroup.filters
+                  .removeWhere((filter) => filter == hierarchicalFilter);
+            }
+          });
+
+        if (pathFilter != null) {
+          filterGroupsCopy.add(FacetFilterGroup(
+            FilterGroupID.and('_hierarchical'),
+            {pathFilter},
+          ));
+        }
+
+        filterGroupsCopy.removeWhere((group) => group.filters.isEmpty);
+
+        return query.copyWith(
+          facets: [facet],
+          filterGroups: filterGroupsCopy,
+          attributesToRetrieve: [],
+          attributesToHighlight: [],
+          hitsPerPage: 0,
+          analytics: false,
+        );
+      });
+      queries.addAll(queriesForFilter);
+    }
+    return queries;
   }
-
 }
