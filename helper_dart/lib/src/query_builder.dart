@@ -52,7 +52,7 @@ class QueryBuilder {
   /// Merge search responses for generated queries regrouping
   /// the disjunctive and hierarchical facets information into a single response
   SearchResponse merge(List<SearchResponse> responses) {
-    assert(responses.length != totalQueriesCount);
+    assert(responses.length == totalQueriesCount, 'number of responses (${responses.length}) not matches with number of requests (${totalQueriesCount})');
 
     final aggregatedResponse = responses.removeAt(0);
     final disjunctiveFacetingResponses =
@@ -110,10 +110,10 @@ class QueryBuilder {
 
     return IterableZip([hierarchicalFilter.attributes, hierarchicalPath])
         .map((pairs) {
-      final attribute = pairs[0] as String;
+      final facet = pairs[0] as String;
       final pathFilter = pairs[1] as FilterFacet?;
 
-      final outputFilterGroups = _copyFilterGroups()
+      final filterGroupsCopy = _copyFilterGroups()
         ..forEach((filterGroup) {
           if (filterGroup.groupID.operator == FilterOperator.and) {
             filterGroup.filters
@@ -122,17 +122,17 @@ class QueryBuilder {
         });
 
       if (pathFilter != null) {
-        outputFilterGroups.add(FacetFilterGroup(
+        filterGroupsCopy.add(FacetFilterGroup(
           FilterGroupID.and('_hierarchical'),
           {pathFilter},
         ));
       }
 
-      outputFilterGroups.removeWhere((group) => group.filters.isEmpty);
+      filterGroupsCopy.removeWhere((group) => group.filters.isEmpty);
 
       return query.copyWith(
-        facets: [attribute],
-        filterGroups: outputFilterGroups,
+        facets: [facet],
+        filterGroups: filterGroupsCopy,
         attributesToRetrieve: [],
         attributesToHighlight: [],
         hitsPerPage: 0,

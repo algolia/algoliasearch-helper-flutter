@@ -153,7 +153,7 @@ void main() {
     });
   });
 
-  test('aggregate disjunctive facets responses', () {
+  test('merge disjunctive facets responses', () {
 
     final query = SearchState(indexName: 'index', query: 'phone');
     final disjunctiveFacets = { 'color', 'brand', 'size' };
@@ -187,7 +187,7 @@ void main() {
 
     final queryBuilder = QueryBuilder(query, disjunctiveFacets, []);
 
-    final aggregatedResponse = queryBuilder.aggregate([
+    final aggregatedResponse = queryBuilder.merge([
       mainResponse,
       disjunctiveResponse1,
       disjunctiveResponse2,
