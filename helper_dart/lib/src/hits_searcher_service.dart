@@ -80,7 +80,7 @@ extension AlgoliaExt on Algolia {
   AlgoliaMultiIndexesReference multipleQueriesOf(SearchState state) =>
       multipleQueries
         ..addQueries(
-            QueryBuilder(state).build().map((e) => queryOf(e)).toList());
+            QueryBuilder(state).build().map(queryOf).toList(),);
 }
 
 /// Extensions over [AlgoliaQuerySnapshot].
@@ -91,7 +91,7 @@ extension AlgoliaQuerySnapshotExt on AlgoliaQuerySnapshot {
 /// Extensions over a list of [AlgoliaQuerySnapshot].
 extension ListAlgoliaQuerySnapshotExt on List<AlgoliaQuerySnapshot> {
   SearchResponse toSearchResponseFor(SearchState state) =>
-      QueryBuilder(state).merge(this.map((e) => e.toSearchResponse()).toList());
+      QueryBuilder(state).merge(map((e) => e.toSearchResponse()).toList());
 }
 
 /// Extensions over [AlgoliaError].

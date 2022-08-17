@@ -1,12 +1,10 @@
-import 'dart:math';
 
 import 'package:algolia_helper_dart/algolia.dart';
-import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 
 void main() {
   test('test disjunctive faceting queries generation', () {
-    final query = SearchState(indexName: 'index', query: 'phone', disjunctiveFacets: { 'price', 'color' });
+    const query = SearchState(indexName: 'index', query: 'phone', disjunctiveFacets: { 'price', 'color' });
     final queryBuilder = QueryBuilder(query);
     final queries = queryBuilder.build();
     final disjunctiveFacetingQueries = queries.skip(1);
@@ -94,7 +92,7 @@ void main() {
     final path = [Filter.facet(lvl0, 'a'), Filter.facet(lvl1, 'a > b'), Filter.facet(lvl2, 'a > b > c')];
     final hierarchicalFilter = HierarchicalFilter(attributes, path, Filter.facet(lvl2, 'a > b > c'));
 
-    final colorGroup = FacetFilterGroup(FilterGroupID('color', FilterOperator.and), { Filter.facet('color', 'red') });
+    final colorGroup = FacetFilterGroup(FilterGroupID('color'), { Filter.facet('color', 'red') });
     final hierarchicalGroup = HierarchicalFilterGroup('h', { hierarchicalFilter });
     final filterGroups = <FilterGroup>{ colorGroup, hierarchicalGroup };
 
@@ -113,34 +111,34 @@ void main() {
         case 1:
           expect(query.facets, [lvl0]);
           expect(query.filterGroups!.length, 1);
-          expect(query.filterGroups!.first.groupID, FilterGroupID('color', FilterOperator.and));
+          expect(query.filterGroups!.first.groupID, FilterGroupID('color'));
           expect(query.filterGroups!.first.filters, { Filter.facet('color', 'red') });
           break;
 
         case 2:
           expect(query.facets, [lvl1]);
           expect(query.filterGroups!.length, 2);
-          expect(query.filterGroups!.first.groupID, FilterGroupID('color', FilterOperator.and));
+          expect(query.filterGroups!.first.groupID, FilterGroupID('color'));
           expect(query.filterGroups!.first.filters, { Filter.facet('color', 'red') });
-          expect(query.filterGroups!.last.groupID, FilterGroupID('_hierarchical', FilterOperator.and));
+          expect(query.filterGroups!.last.groupID, FilterGroupID('_hierarchical'));
           expect(query.filterGroups!.last.filters, { Filter.facet(lvl0, 'a') });
           break;
 
         case 3:
           expect(query.facets, [lvl2]);
           expect(query.filterGroups!.length, 2);
-          expect(query.filterGroups!.first.groupID, FilterGroupID('color', FilterOperator.and));
+          expect(query.filterGroups!.first.groupID, FilterGroupID('color'));
           expect(query.filterGroups!.first.filters, { Filter.facet('color', 'red') });
-          expect(query.filterGroups!.last.groupID, FilterGroupID('_hierarchical', FilterOperator.and));
+          expect(query.filterGroups!.last.groupID, FilterGroupID('_hierarchical'));
           expect(query.filterGroups!.last.filters, { Filter.facet(lvl1, 'a > b') });
           break;
 
         case 4:
           expect(query.facets, [lvl3]);
           expect(query.filterGroups!.length, 2);
-          expect(query.filterGroups!.first.groupID, FilterGroupID('color', FilterOperator.and));
+          expect(query.filterGroups!.first.groupID, FilterGroupID('color'));
           expect(query.filterGroups!.first.filters, { Filter.facet('color', 'red') });
-          expect(query.filterGroups!.last.groupID, FilterGroupID('_hierarchical', FilterOperator.and));
+          expect(query.filterGroups!.last.groupID, FilterGroupID('_hierarchical'));
           expect(query.filterGroups!.last.filters, { Filter.facet(lvl2, 'a > b > c') });
           break;
 
@@ -159,7 +157,7 @@ void main() {
           Filter.facet('category.lvl1', 'a > b'),
           Filter.facet('category.lvl2', 'a > b > c')
         ],
-        Filter.facet('category.lvl2', 'a > b > c')
+        Filter.facet('category.lvl2', 'a > b > c'),
     );
 
     final query = SearchState(indexName: 'index', query: 'phone', disjunctiveFacets: { 'color', 'brand', 'size' }, filterGroups: { HierarchicalFilterGroup('category', {hierarchicalFilter}) });

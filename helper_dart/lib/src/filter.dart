@@ -1,4 +1,3 @@
-import '../algolia.dart';
 
 /// Represents a search filter
 class Filter {

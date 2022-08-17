@@ -1,7 +1,6 @@
-import '../algolia.dart';
 import 'package:collection/collection.dart';
 
-import 'utils.dart';
+import '../algolia.dart';
 
 /// Transform single query into multiple requests for disjunctive/hierarchical faceting
 /// Merges multiple search responses into a single one
@@ -50,7 +49,7 @@ class QueryBuilder {
   /// the disjunctive and hierarchical facets information into a single response
   SearchResponse merge(List<SearchResponse> responses) {
     assert(responses.length == totalQueriesCount,
-        'number of responses (${responses.length}) not matches with number of requests (${totalQueriesCount})');
+        'number of responses (${responses.length}) not matches with number of requests ($totalQueriesCount)',);
 
     final aggregatedResponse = responses.removeAt(0);
     final disjunctiveFacetingResponses =
@@ -81,7 +80,7 @@ class QueryBuilder {
             continue;
           }
           filterGroup.filters.removeWhere(
-              (element) => (element as FilterFacet).attribute == facet);
+              (element) => (element as FilterFacet).attribute == facet,);
         }
         return query.copyWith(
           facets: [facet],
@@ -98,7 +97,7 @@ class QueryBuilder {
     final hierarchicalFilters = query.filterGroups
             ?.map((group) {
               if (group is HierarchicalFilterGroup?) {
-                return (group as HierarchicalFilterGroup)?.filters.toList() ?? [];
+                return (group as HierarchicalFilterGroup).filters.toList() ?? [];
               } else {
                 return <HierarchicalFilter>[];
               }
@@ -135,7 +134,7 @@ class QueryBuilder {
           filterGroupsCopy.add(FacetFilterGroup(
             FilterGroupID.and('_hierarchical'),
             {pathFilter},
-          ));
+          ),);
         }
 
         filterGroupsCopy.removeWhere((group) => group.filters.isEmpty);
