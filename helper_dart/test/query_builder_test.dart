@@ -1,10 +1,14 @@
-
 import 'package:algolia_helper_dart/algolia.dart';
+import 'package:algolia_helper_dart/src/query_builder.dart';
 import 'package:test/test.dart';
 
 void main() {
   test('test disjunctive faceting queries generation', () {
-    const query = SearchState(indexName: 'index', query: 'phone', disjunctiveFacets: { 'price', 'color' });
+    const query = SearchState(
+      indexName: 'index',
+      query: 'phone',
+      disjunctiveFacets: {'price', 'color'},
+    );
     final queryBuilder = QueryBuilder(query);
     final queries = queryBuilder.build();
     final disjunctiveFacetingQueries = queries.skip(1);
@@ -16,28 +20,27 @@ void main() {
 
   test('test disjunctive faceting queries generation with filters', () {
     final filterGroups = <FilterGroup>{
-      FacetFilterGroup(
-          FilterGroupID.groupOr('g1'),
-          {
-            Filter.facet('price', 100),
-            Filter.facet('color', 'green'),
-            Filter.facet('size', '44'),
-          }),
-      FacetFilterGroup(
-          FilterGroupID.groupOr('g2'),
-          {
-            Filter.facet ('type', 'phone'),
-          }),
-      FacetFilterGroup(
-          FilterGroupID.and('g3'),
-          {
-            Filter.facet('brand', 'samsung'),
-            Filter.facet('color', 'red'),
-            Filter.facet('promo', true),
-            Filter.facet('rating', 4.2),
-          })
+      FacetFilterGroup(FilterGroupID.groupOr('g1'), {
+        Filter.facet('price', 100),
+        Filter.facet('color', 'green'),
+        Filter.facet('size', '44'),
+      }),
+      FacetFilterGroup(FilterGroupID.groupOr('g2'), {
+        Filter.facet('type', 'phone'),
+      }),
+      FacetFilterGroup(FilterGroupID.and('g3'), {
+        Filter.facet('brand', 'samsung'),
+        Filter.facet('color', 'red'),
+        Filter.facet('promo', true),
+        Filter.facet('rating', 4.2),
+      })
     };
-    final query = SearchState(indexName: 'index', query: 'phone', disjunctiveFacets: { 'price', 'color', 'brand' }, filterGroups: filterGroups);
+    final query = SearchState(
+      indexName: 'index',
+      query: 'phone',
+      disjunctiveFacets: {'price', 'color', 'brand'},
+      filterGroups: filterGroups,
+    );
     final queryBuilder = QueryBuilder(query);
     final queries = queryBuilder.build();
     expect(queries.length, 4);
@@ -52,17 +55,35 @@ void main() {
 
         case 1:
           expect(query.facets, ['price']);
-          expect(query.filterGroups!.first.filters.map((f) => f.attribute).contains('price'), false);
+          expect(
+            query.filterGroups!.first.filters
+                .whereType<Filter>()
+                .map((f) => f.attribute)
+                .contains('price'),
+            false,
+          );
           break;
 
         case 2:
           expect(query.facets, ['color']);
-          expect(query.filterGroups!.first.filters.map((f) => f.attribute).contains('color'), false);
+          expect(
+            query.filterGroups!.first.filters
+                .whereType<Filter>()
+                .map((f) => f.attribute)
+                .contains('color'),
+            false,
+          );
           break;
 
         case 3:
           expect(query.facets, ['brand']);
-          expect(query.filterGroups!.first.filters.map((f) => f.attribute).contains('brand'), false);
+          expect(
+            query.filterGroups!.first.filters
+                .whereType<Filter>()
+                .map((f) => f.attribute)
+                .contains('brand'),
+            false,
+          );
           break;
 
         default:
@@ -73,30 +94,46 @@ void main() {
     final disjunctiveFacetingQueries = queries.skip(1);
     for (final query in disjunctiveFacetingQueries) {
       final facet = query.facets!.first;
-      final group1 = query.filterGroups?.firstWhere((g) => g.groupID.name == 'g1') as FacetFilterGroup;
-      final group2 = query.filterGroups?.firstWhere((g) => g.groupID.name == 'g2') as FacetFilterGroup;
-      final group3 = query.filterGroups?.firstWhere((g) => g.groupID.name == 'g3') as FacetFilterGroup;
+      final group1 = query.filterGroups
+          ?.firstWhere((g) => g.groupID.name == 'g1') as FacetFilterGroup;
+      final group2 = query.filterGroups
+          ?.firstWhere((g) => g.groupID.name == 'g2') as FacetFilterGroup;
+      final group3 = query.filterGroups
+          ?.firstWhere((g) => g.groupID.name == 'g3') as FacetFilterGroup;
       expect(group1.filters.map((f) => f.attribute).contains(facet), false);
       expect(group2.filters.length, 1);
       expect(group3.filters.length, 4);
     }
   });
-  
+
   test('test hierarchical faceting queries generation', () {
     const lvl0 = 'category.lvl0';
-    const lvl1= 'category.lvl1';
+    const lvl1 = 'category.lvl1';
     const lvl2 = 'category.lvl2';
     const lvl3 = 'category.lvl3';
 
     final attributes = [lvl0, lvl1, lvl2, lvl3];
-    final path = [Filter.facet(lvl0, 'a'), Filter.facet(lvl1, 'a > b'), Filter.facet(lvl2, 'a > b > c')];
-    final hierarchicalFilter = HierarchicalFilter(attributes, path, Filter.facet(lvl2, 'a > b > c'));
+    final path = [
+      Filter.facet(lvl0, 'a'),
+      Filter.facet(lvl1, 'a > b'),
+      Filter.facet(lvl2, 'a > b > c')
+    ];
+    final hierarchicalFilter =
+        HierarchicalFilter(attributes, path, Filter.facet(lvl2, 'a > b > c'));
 
-    final colorGroup = FacetFilterGroup(FilterGroupID('color'), { Filter.facet('color', 'red') });
-    final hierarchicalGroup = HierarchicalFilterGroup('h', { hierarchicalFilter });
-    final filterGroups = <FilterGroup>{ colorGroup, hierarchicalGroup };
+    final colorGroup = FacetFilterGroup(
+      const FilterGroupID('color'),
+      {Filter.facet('color', 'red')},
+    );
+    final hierarchicalGroup =
+        HierarchicalFilterGroup('h', {hierarchicalFilter});
+    final filterGroups = <FilterGroup>{colorGroup, hierarchicalGroup};
 
-    final query = SearchState(indexName: 'index', query: 'phone', filterGroups: filterGroups);
+    final query = SearchState(
+      indexName: 'index',
+      query: 'phone',
+      filterGroups: filterGroups,
+    );
     final queryBuilder = QueryBuilder(query);
     final queries = queryBuilder.build();
 
@@ -111,35 +148,74 @@ void main() {
         case 1:
           expect(query.facets, [lvl0]);
           expect(query.filterGroups!.length, 1);
-          expect(query.filterGroups!.first.groupID, FilterGroupID('color'));
-          expect(query.filterGroups!.first.filters, { Filter.facet('color', 'red') });
+          expect(
+            query.filterGroups!.first.groupID,
+            const FilterGroupID('color'),
+          );
+          expect(
+            query.filterGroups!.first.filters,
+            {Filter.facet('color', 'red')},
+          );
           break;
 
         case 2:
           expect(query.facets, [lvl1]);
           expect(query.filterGroups!.length, 2);
-          expect(query.filterGroups!.first.groupID, FilterGroupID('color'));
-          expect(query.filterGroups!.first.filters, { Filter.facet('color', 'red') });
-          expect(query.filterGroups!.last.groupID, FilterGroupID('_hierarchical'));
-          expect(query.filterGroups!.last.filters, { Filter.facet(lvl0, 'a') });
+          expect(
+            query.filterGroups!.first.groupID,
+            const FilterGroupID('color'),
+          );
+          expect(
+            query.filterGroups!.first.filters,
+            {Filter.facet('color', 'red')},
+          );
+          expect(
+            query.filterGroups!.last.groupID,
+            const FilterGroupID('_hierarchical'),
+          );
+          expect(query.filterGroups!.last.filters, {Filter.facet(lvl0, 'a')});
           break;
 
         case 3:
           expect(query.facets, [lvl2]);
           expect(query.filterGroups!.length, 2);
-          expect(query.filterGroups!.first.groupID, FilterGroupID('color'));
-          expect(query.filterGroups!.first.filters, { Filter.facet('color', 'red') });
-          expect(query.filterGroups!.last.groupID, FilterGroupID('_hierarchical'));
-          expect(query.filterGroups!.last.filters, { Filter.facet(lvl1, 'a > b') });
+          expect(
+            query.filterGroups!.first.groupID,
+            const FilterGroupID('color'),
+          );
+          expect(
+            query.filterGroups!.first.filters,
+            {Filter.facet('color', 'red')},
+          );
+          expect(
+            query.filterGroups!.last.groupID,
+            const FilterGroupID('_hierarchical'),
+          );
+          expect(
+            query.filterGroups!.last.filters,
+            {Filter.facet(lvl1, 'a > b')},
+          );
           break;
 
         case 4:
           expect(query.facets, [lvl3]);
           expect(query.filterGroups!.length, 2);
-          expect(query.filterGroups!.first.groupID, FilterGroupID('color'));
-          expect(query.filterGroups!.first.filters, { Filter.facet('color', 'red') });
-          expect(query.filterGroups!.last.groupID, FilterGroupID('_hierarchical'));
-          expect(query.filterGroups!.last.filters, { Filter.facet(lvl2, 'a > b > c') });
+          expect(
+            query.filterGroups!.first.groupID,
+            const FilterGroupID('color'),
+          );
+          expect(
+            query.filterGroups!.first.filters,
+            {Filter.facet('color', 'red')},
+          );
+          expect(
+            query.filterGroups!.last.groupID,
+            const FilterGroupID('_hierarchical'),
+          );
+          expect(
+            query.filterGroups!.last.filters,
+            {Filter.facet(lvl2, 'a > b > c')},
+          );
           break;
 
         default:
@@ -149,18 +225,24 @@ void main() {
   });
 
   test('test disjunctive & hierarchical responses merging', () {
-
     final hierarchicalFilter = HierarchicalFilter(
-        ['category.lvl0', 'category.lvl1', 'category.lvl2', 'category.lvl3'],
-        [
-          Filter.facet('category.lvl0', 'a'),
-          Filter.facet('category.lvl1', 'a > b'),
-          Filter.facet('category.lvl2', 'a > b > c')
-        ],
-        Filter.facet('category.lvl2', 'a > b > c'),
+      ['category.lvl0', 'category.lvl1', 'category.lvl2', 'category.lvl3'],
+      [
+        Filter.facet('category.lvl0', 'a'),
+        Filter.facet('category.lvl1', 'a > b'),
+        Filter.facet('category.lvl2', 'a > b > c')
+      ],
+      Filter.facet('category.lvl2', 'a > b > c'),
     );
 
-    final query = SearchState(indexName: 'index', query: 'phone', disjunctiveFacets: { 'color', 'brand', 'size' }, filterGroups: { HierarchicalFilterGroup('category', {hierarchicalFilter}) });
+    final query = SearchState(
+      indexName: 'index',
+      query: 'phone',
+      disjunctiveFacets: {'color', 'brand', 'size'},
+      filterGroups: {
+        HierarchicalFilterGroup('category', {hierarchicalFilter})
+      },
+    );
 
     final mainResponse = SearchResponse({});
 
@@ -174,11 +256,7 @@ void main() {
     };
     final disjunctiveResponse2 = SearchResponse({});
     disjunctiveResponse2.raw['facets'] = {
-      'brand': {
-        'sony': 10,
-        'apple': 20,
-        'samsung': 30
-      }
+      'brand': {'sony': 10, 'apple': 20, 'samsung': 30}
     };
     final disjunctiveResponse3 = SearchResponse({});
     disjunctiveResponse3.raw['facets'] = {
@@ -264,11 +342,7 @@ void main() {
         'green': 2,
         'blue': 3,
       },
-      'brand': {
-        'sony': 10,
-        'apple': 20,
-        'samsung': 30
-      },
+      'brand': {'sony': 10, 'apple': 20, 'samsung': 30},
       'size': {
         's': 15,
         'm': 20,
@@ -317,6 +391,5 @@ void main() {
         'clothes > women > jeans > slim': 14,
       }
     });
-
   });
 }

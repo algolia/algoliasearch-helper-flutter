@@ -72,7 +72,8 @@ class SearchState {
         disjunctiveFacets: disjunctiveFacets ?? this.disjunctiveFacets,
         filterGroups: filterGroups ?? this.filterGroups,
         attributesToRetrieve: attributesToRetrieve ?? this.attributesToRetrieve,
-        attributesToHighlight: attributesToHighlight ?? this.attributesToHighlight,
+        attributesToHighlight:
+            attributesToHighlight ?? this.attributesToHighlight,
         analytics: analytics ?? this.analytics,
         ruleContexts: ruleContexts ?? this.ruleContexts,
       );

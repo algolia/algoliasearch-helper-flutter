@@ -2,10 +2,11 @@ import 'package:meta/meta.dart';
 
 /// Search operation response.
 class SearchResponse {
-  SearchResponse(this.raw):
-    hits = Hit._fromList(raw['hits']),
-    disjunctiveFacets = {},
-    hierarchicalFacets = {};
+  @internal
+  SearchResponse(this.raw)
+      : hits = Hit._fromList(raw['hits']),
+        disjunctiveFacets = {},
+        hierarchicalFacets = {};
 
   /// Raw search response
   final Map<String, dynamic> raw;

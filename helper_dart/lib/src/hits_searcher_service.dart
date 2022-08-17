@@ -1,9 +1,9 @@
 import 'package:algolia/algolia.dart';
 import 'package:logging/logging.dart';
 
-import '../algolia.dart';
 import 'exception.dart';
 import 'logger.dart';
+import 'query_builder.dart';
 import 'search_response.dart';
 import 'search_state.dart';
 import 'utils.dart';
@@ -48,7 +48,7 @@ class HitsSearchService {
       final queries = queryBuilder.build().map(client.queryOf).toList();
       final responses =
           await client.multipleQueries.addQueries(queries).getObjects();
-      _logger.fine('Search responses: $responses');
+      _log.fine('Search responses: $responses');
       return queryBuilder
           .merge(responses.map((r) => r.toSearchResponse()).toList());
     } catch (exception) {
@@ -80,7 +80,8 @@ extension AlgoliaExt on Algolia {
   AlgoliaMultiIndexesReference multipleQueriesOf(SearchState state) =>
       multipleQueries
         ..addQueries(
-            QueryBuilder(state).build().map(queryOf).toList(),);
+          QueryBuilder(state).build().map(queryOf).toList(),
+        );
 }
 
 /// Extensions over [AlgoliaQuerySnapshot].

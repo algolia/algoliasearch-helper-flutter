@@ -1,4 +1,3 @@
-
 /// Represents a search filter
 class Filter {
   const Filter._(this.attribute, this.isNegated);
@@ -28,7 +27,7 @@ class Filter {
   ]) =>
       FilterNumeric.comparison(attribute, operator, number, isNegated);
 
-  /// Creates [FilterNumeric] instance as numeric comparison.
+  /// Creates [FilterNumeric] instance as numeric range.
   static FilterNumeric range(
     String attribute,
     num lowerBound,
