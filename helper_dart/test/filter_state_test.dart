@@ -94,4 +94,97 @@ void main() {
       groupAndB: {numeric}
     });
   });
+
+  test('Remove filters', () {
+    final filterState = FilterState()
+      ..add(groupAndA, [facetA, facetB])
+      ..remove(groupAndA, [facetA]);
+
+    final snapshot = filterState.snapshot();
+    expect(snapshot.facetGroups, {
+      groupAndA: {facetB}
+    });
+  });
+
+  test('Remove filter from empty', () {
+    final filterState = FilterState()..remove(groupAndA, [facetA]);
+
+    final snapshot = filterState.snapshot();
+    expect(snapshot.facetGroups.isEmpty, true);
+    expect(snapshot.numericGroups.isEmpty, true);
+    expect(snapshot.tagGroups.isEmpty, true);
+  });
+
+  test('Remove non-existing filter', () {
+    final filterState = FilterState()
+      ..add(groupAndA, [facetA])
+      ..remove(groupAndA, [facetB]);
+
+    final snapshot = filterState.snapshot();
+    expect(snapshot.facetGroups, {
+      groupAndA: {facetA}
+    });
+  });
+
+  test('Clear filter group', () {
+    final filterState = FilterState()
+      ..add(groupAndA, [facetA])
+      ..add(groupAndB, [facetA])
+      ..clear([groupAndB]);
+
+    final snapshot = filterState.snapshot();
+    expect(snapshot.facetGroups, {
+      groupAndA: {facetA}
+    });
+  });
+
+  test('Clear all filter groups', () {
+    final filterState = FilterState()
+      ..add(groupAndA, [facetA])
+      ..add(groupAndB, [facetB])
+      ..add(groupAndA, [numeric])
+      ..add(groupAndA, [tag])
+      ..clear();
+
+    final snapshot = filterState.snapshot();
+    expect(snapshot.facetGroups.isEmpty, true);
+    expect(snapshot.numericGroups.isEmpty, true);
+    expect(snapshot.tagGroups.isEmpty, true);
+  });
+
+  test('Clear one filter group', () {
+    final filterState = FilterState()
+      ..add(groupAndA, [facetA])
+      ..add(groupAndB, [facetB])
+      ..add(groupAndA, [numeric])
+      ..add(groupAndA, [tag])
+      ..clear([groupAndB]);
+
+    final snapshot = filterState.snapshot();
+    expect(snapshot.facetGroups, {
+      groupAndA: {facetA}
+    });
+    expect(snapshot.numericGroups, {
+      groupAndA: {numeric}
+    });
+    expect(snapshot.tagGroups, {
+      groupAndA: {tag}
+    });
+  });
+
+  test('Clear all except one filter group', () {
+    final filterState = FilterState()
+      ..add(groupAndA, [facetA])
+      ..add(groupAndB, [facetB])
+      ..add(groupAndA, [numeric])
+      ..add(groupAndA, [tag])
+      ..clearExcept([groupAndB]);
+
+    final snapshot = filterState.snapshot();
+    expect(snapshot.facetGroups, {
+      groupAndB: {facetB}
+    });
+    expect(snapshot.numericGroups.isEmpty, true);
+    expect(snapshot.tagGroups.isEmpty, true);
+  });
 }

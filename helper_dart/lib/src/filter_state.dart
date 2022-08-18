@@ -44,7 +44,7 @@ class FilterState {
     _modify((it) => it.removeHierarchical(attribute));
   }
 
-  void clear(Iterable<FilterGroupID> groupIDs) {
+  void clear([Iterable<FilterGroupID>? groupIDs]) {
     _modify((it) => it.clear(groupIDs));
   }
 
