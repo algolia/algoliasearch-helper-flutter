@@ -20,12 +20,12 @@ void main() {
 
   test('test disjunctive faceting queries generation with filters', () {
     final filterGroups = <FilterGroup>{
-      FacetFilterGroup(FilterGroupID.groupOr('g1'), {
+      FacetFilterGroup(FilterGroupID.or('g1'), {
         Filter.facet('price', 100),
         Filter.facet('color', 'green'),
         Filter.facet('size', '44'),
       }),
-      FacetFilterGroup(FilterGroupID.groupOr('g2'), {
+      FacetFilterGroup(FilterGroupID.or('g2'), {
         Filter.facet('type', 'phone'),
       }),
       FacetFilterGroup(FilterGroupID.and('g3'), {

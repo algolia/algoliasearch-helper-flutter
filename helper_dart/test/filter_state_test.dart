@@ -4,9 +4,9 @@ import 'package:test/test.dart';
 void main() {
   const attributeA = 'nameA';
   const attributeB = 'nameB';
-  const groupAndA = FilterGroupID(attributeA);
-  const groupAndB = FilterGroupID(attributeB);
-  const groupOrA = FilterGroupID(attributeA, FilterOperator.or);
+  final groupAndA = FilterGroupID.and(attributeA);
+  final groupAndB = FilterGroupID.and(attributeB);
+  final groupOrA = FilterGroupID.or(attributeA);
   final facetA = Filter.facet(attributeA, 0);
   final facetB = Filter.facet(attributeB, 0);
   final tag = Filter.tag('0');
@@ -186,5 +186,18 @@ void main() {
     });
     expect(snapshot.numericGroups.isEmpty, true);
     expect(snapshot.tagGroups.isEmpty, true);
+  });
+
+  test('Filter state to filter groups', () {
+    final filterState = FilterState()
+      ..add(groupAndA, [facetA])
+      ..add(groupAndB, [facetB]);
+
+    final snapshot = filterState.snapshot();
+    final filterGroups = snapshot.toFilterGroups();
+    expect(filterGroups, {
+      FilterGroup.facet(attributeA, {facetA}),
+      FilterGroup.facet(attributeB, {facetB}),
+    });
   });
 }
