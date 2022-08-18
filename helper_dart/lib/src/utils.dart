@@ -1,3 +1,5 @@
+import 'package:collection/collection.dart';
+
 /// Extensions over Object class.
 extension ObjectExt<T> on T {
   /// Calls the specified function [action] with `this` as its argument and
@@ -33,3 +35,6 @@ extension SetExt<T> on Set<T> {
   /// Get unmodifiable copy of this set.
   Set<T> unmodifiable() => Set<T>.unmodifiable(this);
 }
+
+final setEq = const SetEquality().equals;
+final listEq = const ListEquality().equals;

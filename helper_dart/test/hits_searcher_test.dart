@@ -179,6 +179,45 @@ void main() {
       searcher.dispose();
     });
   });
+
+  test('FilterState connect HitsSearcher', () async {
+    final searchService = MockHitsSearchService();
+    when(searchService.search(any)).thenAnswer(
+      (Invocation inv) {
+        final state = inv.positionalArguments[0] as SearchState;
+        return Stream.value(SearchResponse({'query': state.query}));
+      },
+    );
+
+    const initSearchState = SearchState(indexName: 'myIndex');
+    final searcher = HitsSearcher.build(
+      searchService,
+      initSearchState,
+    );
+
+    final groupColors = FilterGroupID.and('colors');
+    final facetColorRed = Filter.facet('color', 'red');
+    final filterState = FilterState()..add(groupColors, {facetColorRed});
+
+    searcher.connectFilterState(filterState);
+    await delay();
+
+    //unawaited(
+    //  expectLater(
+    //    searcher.searchStates,
+    //    emitsThrough([
+    //      initSearchState.copyWith(
+    //        filterGroups: {
+    //          FacetFilterGroup(groupColors, {facetColorRed})
+    //        },
+    //      )
+    //    ]),
+    //  ),
+    //);
+
+    await delay(200);
+    searcher.dispose();
+  });
 }
 
 /// Return future with a delay

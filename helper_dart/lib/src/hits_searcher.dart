@@ -80,6 +80,9 @@ class HitsSearcher {
     _updateState((state) => state.copyWith(query: query));
   }
 
+  /// Get current [SearchState].
+  SearchState snapshot() => _state.value;
+
   /// Apply search state configuration.
   void applyState(SearchState Function(SearchState state) config) {
     _updateState((state) => config(state));
@@ -107,8 +110,17 @@ extension SearcherExt on HitsSearcher {
   /// Creates a connection between [HitsSearcher] and [FilterState].
   StreamSubscription connectFilterState(FilterState filterState) =>
       filterState.filters.listen(
-        (filters) => applyState(
-          (state) => state.copyWith(filterGroups: filters.toFilterGroups()),
-        ),
+        (filters) {
+          print('--- FILTERS ');
+          print(filters);
+          applyState(
+            (state) {
+              print('--- APPLY STATE');
+              print(state);
+              print(filters.toFilterGroups());
+              return state.copyWith(filterGroups: filters.toFilterGroups());
+            },
+          );
+        },
       );
 }
