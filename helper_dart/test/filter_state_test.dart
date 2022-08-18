@@ -43,4 +43,55 @@ void main() {
     expect(filters.getTagFilters(groupAndA), {tag});
     expect(filters.getTagFilters(groupOrA), {tag});
   });
+
+  test('Add to same group', () {
+    final filterState = FilterState()
+      ..add(groupAndA, [facetA])
+      ..add(groupAndA, [facetB]);
+
+    final snapshot = filterState.snapshot();
+    expect(snapshot.getGroups(), {
+      groupAndA: {facetA, facetB}
+    });
+  });
+
+  test('Add to different groups', () {
+    final filterState = FilterState()
+      ..add(groupAndA, [facetA])
+      ..add(groupAndB, [facetA]);
+
+    final snapshot = filterState.snapshot();
+    expect(snapshot.getGroups(), {
+      groupAndA: {facetA},
+      groupAndB: {facetA}
+    });
+  });
+
+  test('Add different types to the same group', () {
+    final filterState = FilterState()
+      ..add(groupAndA, [facetA])
+      ..add(groupAndA, [numeric]);
+
+    final snapshot = filterState.snapshot();
+    expect(snapshot.facetGroups, {
+      groupAndA: {facetA}
+    });
+    expect(snapshot.numericGroups, {
+      groupAndA: {numeric}
+    });
+  });
+
+  test('Add different types to different groups', () {
+    final filterState = FilterState()
+      ..add(groupAndA, [facetA])
+      ..add(groupAndB, [numeric]);
+
+    final snapshot = filterState.snapshot();
+    expect(snapshot.facetGroups, {
+      groupAndA: {facetA}
+    });
+    expect(snapshot.numericGroups, {
+      groupAndB: {numeric}
+    });
+  });
 }
