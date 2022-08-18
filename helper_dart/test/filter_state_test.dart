@@ -2,6 +2,16 @@ import 'package:algolia_helper_dart/algolia.dart';
 import 'package:test/test.dart';
 
 void main() {
+  const attributeA = 'nameA';
+  const attributeB = 'nameB';
+  const groupAndA = FilterGroupID(attributeA);
+  const groupAndB = FilterGroupID(attributeB);
+  const groupOrA = FilterGroupID(attributeA, FilterOperator.or);
+  final facetA = Filter.facet(attributeA, 0);
+  final facetB = Filter.facet(attributeB, 0);
+  final tag = Filter.tag('0');
+  final numeric = Filter.range(attributeA, 0, 10);
+
   test('FilterState add facet', () {
     final filterState = FilterState();
 
@@ -17,5 +27,20 @@ void main() {
     expect(snapshot.tagGroups.isEmpty, true);
     expect(snapshot.numericGroups.isEmpty, true);
     expect(snapshot.hierarchicalGroups.isEmpty, true);
+  });
+
+  test('FilterState constructor', () {
+    final map = {
+      groupAndA: {facetA, tag, numeric},
+      groupOrA: {facetB, tag, numeric},
+    };
+    final filterState = FilterState()..set(map);
+    final filters = filterState.snapshot();
+    expect(filters.getFacetFilters(groupAndA), {facetA});
+    expect(filters.getFacetFilters(groupOrA), {facetB});
+    expect(filters.getNumericFilters(groupAndA), {numeric});
+    expect(filters.getNumericFilters(groupOrA), {numeric});
+    expect(filters.getTagFilters(groupAndA), {tag});
+    expect(filters.getTagFilters(groupOrA), {tag});
   });
 }

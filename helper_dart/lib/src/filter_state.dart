@@ -4,11 +4,15 @@ import 'filter.dart';
 import 'filter_group.dart';
 import 'utils.dart';
 
+/// [FilterState] holds one or several filters, organized in groups.
+/// [filters] streams filters changes of added or removed filters,
+/// which will be applied to searches performed by the connected Searcher.
 class FilterState {
+  /// Filters groups stream (facet, tag, numeric and hierarchical).
   Stream<Filters> get filters => _filters.stream.distinct();
 
   final BehaviorSubject<_ImmutableFilters> _filters =
-      BehaviorSubject.seeded(_ImmutableFilters._());
+      BehaviorSubject.seeded(_ImmutableFilters());
 
   void add(FilterGroupID groupID, Iterable<Filter> filters) {
     _modify((it) => it.add(groupID, filters));
@@ -170,7 +174,7 @@ typedef FilterGroupMap<T> = Map<FilterGroupID, Set<T>>;
 
 /// Immutable filters implementation.
 class _ImmutableFilters extends Filters {
-  _ImmutableFilters._({
+  _ImmutableFilters({
     Map<FilterGroupID, Set<FilterFacet>> facetGroups = const {},
     Map<FilterGroupID, Set<FilterTag>> tagGroups = const {},
     Map<FilterGroupID, Set<FilterNumeric>> numericGroups = const {},
@@ -178,27 +182,31 @@ class _ImmutableFilters extends Filters {
   }) : super._(facetGroups, tagGroups, numericGroups, hierarchicalGroups);
 
   _ImmutableFilters add(FilterGroupID groupID, Iterable<Filter> filters) {
+    var current = this;
     for (final filter in filters) {
       switch (filter.runtimeType) {
         case FilterFacet:
-          return copyWith(
+          current = current.copyWith(
             facetGroups: facetGroups.add(groupID, filter as FilterFacet),
           );
+          break;
         case FilterTag:
-          return copyWith(
+          current = current.copyWith(
             tagGroups: tagGroups.add(groupID, filter as FilterTag),
           );
+          break;
         case FilterNumeric:
-          return copyWith(
+          current = current.copyWith(
             numericGroups: numericGroups.add(groupID, filter as FilterNumeric),
           );
+          break;
       }
     }
-    return this;
+    return current;
   }
 
   _ImmutableFilters set(Map<FilterGroupID, Set<Filter>> map) {
-    var filters = _ImmutableFilters._();
+    var filters = _ImmutableFilters();
     for (final entry in map.entries) {
       filters = filters.add(entry.key, entry.value);
     }
@@ -249,8 +257,8 @@ class _ImmutableFilters extends Filters {
   }
 
   _ImmutableFilters clear([Iterable<FilterGroupID>? groupIDs]) {
-    if (groupIDs == null || groupIDs.isEmpty) return _ImmutableFilters._();
-    return _ImmutableFilters._(
+    if (groupIDs == null || groupIDs.isEmpty) return _ImmutableFilters();
+    return _ImmutableFilters(
       facetGroups: facetGroups.deleteGroups(groupIDs),
       numericGroups: numericGroups.deleteGroups(groupIDs),
       tagGroups: tagGroups.deleteGroups(groupIDs),
@@ -258,8 +266,8 @@ class _ImmutableFilters extends Filters {
   }
 
   _ImmutableFilters clearExcept(Iterable<FilterGroupID> groupIDs) {
-    if (groupIDs.isEmpty) return _ImmutableFilters._();
-    return _ImmutableFilters._(
+    if (groupIDs.isEmpty) return _ImmutableFilters();
+    return _ImmutableFilters(
       facetGroups: facetGroups.deleteGroupsExcept(groupIDs),
       numericGroups: numericGroups.deleteGroupsExcept(groupIDs),
       tagGroups: tagGroups.deleteGroupsExcept(groupIDs),
@@ -273,7 +281,7 @@ class _ImmutableFilters extends Filters {
     Map<FilterGroupID, Set<FilterNumeric>>? numericGroups,
     Map<String, HierarchicalFilter>? hierarchicalGroups,
   }) =>
-      _ImmutableFilters._(
+      _ImmutableFilters(
         facetGroups: facetGroups ?? this.facetGroups,
         tagGroups: tagGroups ?? this.tagGroups,
         numericGroups: numericGroups ?? this.numericGroups,
