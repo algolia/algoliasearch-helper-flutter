@@ -202,12 +202,21 @@ void main() {
   });
 
   test('Filter state check contains', () {
-    final filterState = FilterState()
-      ..add(groupAndA, [facetA]);
+    final filterState = FilterState()..add(groupAndA, [facetA]);
 
     final snapshot = filterState.snapshot();
     expect(snapshot.contains(groupAndA, facetA), true);
     expect(snapshot.contains(groupAndA, facetB), false);
     expect(snapshot.contains(groupAndB, facetA), false);
+  });
+
+  test('Filter toggle', () {
+    final filterState = FilterState()..toggle(groupAndA, facetA);
+    expect(filterState.snapshot().facetGroups, {
+      groupAndA: {facetA}
+    });
+
+    filterState.toggle(groupAndA, facetA);
+    expect(filterState.snapshot().facetGroups.isEmpty, true);
   });
 }
