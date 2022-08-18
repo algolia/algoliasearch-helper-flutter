@@ -219,4 +219,15 @@ void main() {
     filterState.toggle(groupAndA, facetA);
     expect(filterState.snapshot().facetGroups.isEmpty, true);
   });
+
+  test('Get filters', () {
+    final filterState = FilterState()
+      ..add(groupAndA, [facetA])
+      ..add(groupAndB, [facetB])
+      ..add(groupAndA, [numeric])
+      ..add(groupAndA, [tag]);
+
+    final snapshot = filterState.snapshot();
+    expect(snapshot.getFilters(), {facetA, facetB, numeric, tag});
+  });
 }
