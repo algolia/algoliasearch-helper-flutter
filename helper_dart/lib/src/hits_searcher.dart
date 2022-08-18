@@ -110,17 +110,8 @@ extension SearcherExt on HitsSearcher {
   /// Creates a connection between [HitsSearcher] and [FilterState].
   StreamSubscription connectFilterState(FilterState filterState) =>
       filterState.filters.listen(
-        (filters) {
-          print('--- FILTERS ');
-          print(filters);
-          applyState(
-            (state) {
-              print('--- APPLY STATE');
-              print(state);
-              print(filters.toFilterGroups());
-              return state.copyWith(filterGroups: filters.toFilterGroups());
-            },
-          );
-        },
+        (filters) => applyState(
+          (state) => state.copyWith(filterGroups: filters.toFilterGroups()),
+        ),
       );
 }
