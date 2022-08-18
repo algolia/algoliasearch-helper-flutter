@@ -200,4 +200,14 @@ void main() {
       FilterGroup.facet(attributeB, {facetB}),
     });
   });
+
+  test('Filter state check contains', () {
+    final filterState = FilterState()
+      ..add(groupAndA, [facetA]);
+
+    final snapshot = filterState.snapshot();
+    expect(snapshot.contains(groupAndA, facetA), true);
+    expect(snapshot.contains(groupAndA, facetB), false);
+    expect(snapshot.contains(groupAndB, facetA), false);
+  });
 }
