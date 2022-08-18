@@ -35,7 +35,8 @@ class QueryBuilder {
           .expand((filterGroup) => filterGroup.filters) ??
       [];
 
-  /// TODO: documentation
+  /// Number of generated hierarchical queries for given hierarchical
+  /// filter
   int _getHierarchicalQueriesCount(HierarchicalFilter filter) {
     if (filter.attributes.length == filter.path.length) {
       return filter.attributes.length;
@@ -83,7 +84,8 @@ class QueryBuilder {
     return aggregatedResponse;
   }
 
-  /// TODO: documentation
+  /// Build additional queries to fetch correct facets count values
+  /// for disjunctive facets
   Iterable<SearchState> _buildDisjunctiveFacetingQueries(SearchState query) =>
       query.disjunctiveFacets?.map((facet) {
         final filterGroupsCopy = _copyFilterGroups();
@@ -108,7 +110,8 @@ class QueryBuilder {
   Set<FilterGroup> _copyFilterGroups() =>
       Set.from(searchState.filterGroups ?? {});
 
-  /// TODO: documentation
+  /// Build additional queries to fetch correct facets count values
+  /// for hierarchical facets
   List<SearchState> _buildHierarchicalFacetingQueries(SearchState query) {
     final hierarchicalFilters = query.filterGroups
             ?.whereType<HierarchicalFilterGroup>()
@@ -126,7 +129,7 @@ class QueryBuilder {
         (pair) {
           final facet = pair[0] as String;
           final pathFilter = pair[1] as FilterFacet?;
-          return _stateFilterOf(facet, pathFilter, hierarchicalFilter, query);
+          return _hierarchicalQueryOf(facet, pathFilter, hierarchicalFilter, query);
         },
       );
       queries.addAll(queriesForFilter);
@@ -134,8 +137,9 @@ class QueryBuilder {
     return queries;
   }
 
-  /// TODO: documentation
-  SearchState _stateFilterOf(
+  /// Build query to fetch correct facets count values
+  /// for hierarchical faceting for a given facet & path filter couple
+  SearchState _hierarchicalQueryOf(
     String facet,
     FilterFacet? pathFilter,
     HierarchicalFilter hierarchicalFilter,
