@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 
 import 'filter.dart';
+import 'utils.dart';
 
 /// Identifier of a filter group.
 /// The group name is for access purpose only, won't be used for the actual
@@ -89,10 +90,10 @@ abstract class FilterGroup<T> {
       other is FilterGroup &&
           runtimeType == other.runtimeType &&
           groupID == other.groupID &&
-          const SetEquality().equals(filters, other.filters);
+          filters.equals(other.filters);
 
   @override
-  int get hashCode => groupID.hashCode ^ filters.hashCode;
+  int get hashCode => groupID.hashCode ^ filters.hashing();
 }
 
 /// Facets filter group

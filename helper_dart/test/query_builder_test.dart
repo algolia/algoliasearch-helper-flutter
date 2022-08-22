@@ -147,7 +147,7 @@ void main() {
 
         case 1:
           expect(query.facets, [lvl0]);
-          expect(query.filterGroups!.length, 1);
+          expect(query.filterGroups!.length, 2);
           expect(
             query.filterGroups!.first.groupID,
             const FilterGroupID('color'),

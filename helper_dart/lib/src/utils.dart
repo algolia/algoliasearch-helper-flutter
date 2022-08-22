@@ -24,10 +24,32 @@ extension MapExt<K, E> on Map<K, E> {
   Map<K, E> unmodifiable() => Map<K, E>.unmodifiable(this);
 }
 
+/// Extension over [Map]
+extension MapNullableExt<K, E> on Map<K, E>? {
+  static const _mapEquality = MapEquality();
+
+  /// Uses [ListEquality] to calculate equality.
+  bool equals(Map? other) => _mapEquality.equals(this, other);
+
+  /// Uses [ListEquality] to calculate hashcode.
+  int hashing() => _mapEquality.hash(this);
+}
+
 /// Extension over [List]
 extension ListExt<T> on List<T> {
   /// Get unmodifiable copy of this list.
   List<T> unmodifiable() => List<T>.unmodifiable(this);
+}
+
+/// Extension over [List]
+extension ListNullableExt<T> on List<T>? {
+  static const _listEquality = ListEquality();
+
+  /// Uses [ListEquality] to calculate equality.
+  bool equals(List? other) => _listEquality.equals(this, other);
+
+  /// Uses [ListEquality] to calculate hashcode.
+  int hashing() => _listEquality.hash(this);
 }
 
 /// Extension over [Set]
@@ -36,5 +58,13 @@ extension SetExt<T> on Set<T> {
   Set<T> unmodifiable() => Set<T>.unmodifiable(this);
 }
 
-final setEq = const SetEquality().equals;
-final listEq = const ListEquality().equals;
+/// Extension over [Set]
+extension SetNullabkeExt<T> on Set<T>? {
+  static const _setEquality = SetEquality();
+
+  /// Uses [SetEquality] to calculate equality.
+  bool equals(Set? other) => _setEquality.equals(this, other);
+
+  /// Uses [SetEquality] to calculate hashcode.
+  int hashing() => _setEquality.hash(this);
+}

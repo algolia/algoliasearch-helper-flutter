@@ -176,14 +176,13 @@ void main() {
     searcher.connectFilterState(filterState);
     await delay();
 
-    expect(
-      searcher.snapshot(),
-      initSearchState.copyWith(
+    final updated = initSearchState.copyWith(
         filterGroups: {
           FacetFilterGroup(groupColors, {facetColorRed})
         },
-      ),
-    );
+      );
+    final snapshot = searcher.snapshot();
+    expect(snapshot, updated);
 
     searcher.dispose();
   });

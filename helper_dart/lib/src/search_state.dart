@@ -1,5 +1,3 @@
-import 'package:collection/collection.dart';
-
 import 'filter_group.dart';
 import 'utils.dart';
 
@@ -90,13 +88,13 @@ class SearchState {
           query == other.query &&
           page == other.page &&
           hitsPerPage == other.hitsPerPage &&
-          listEq(facets, other.facets) &&
-          setEq(disjunctiveFacets, other.disjunctiveFacets) &&
-          const SetEquality().equals(filterGroups, other.filterGroups) &&
-          listEq(attributesToRetrieve, other.attributesToRetrieve) &&
-          listEq(attributesToHighlight, other.attributesToHighlight) &&
+          facets.equals(other.facets) &&
+          disjunctiveFacets.equals(other.disjunctiveFacets) &&
+          filterGroups.equals(other.filterGroups) &&
+          attributesToRetrieve.equals(other.attributesToRetrieve) &&
+          attributesToHighlight.equals(other.attributesToHighlight) &&
           analytics == other.analytics &&
-          listEq(ruleContexts, other.ruleContexts);
+          ruleContexts == other.ruleContexts;
 
   @override
   int get hashCode =>
@@ -104,11 +102,11 @@ class SearchState {
       query.hashCode ^
       page.hashCode ^
       hitsPerPage.hashCode ^
-      facets.hashCode ^
-      disjunctiveFacets.hashCode ^
-      filterGroups.hashCode ^
-      attributesToRetrieve.hashCode ^
-      attributesToHighlight.hashCode ^
+      facets.hashing() ^
+      disjunctiveFacets.hashing() ^
+      filterGroups.hashing() ^
+      attributesToRetrieve.hashing() ^
+      attributesToHighlight.hashing() ^
       analytics.hashCode ^
       ruleContexts.hashCode;
 
