@@ -177,10 +177,10 @@ void main() {
     await delay();
 
     final updated = initSearchState.copyWith(
-        filterGroups: {
-          FacetFilterGroup(groupColors, {facetColorRed})
-        },
-      );
+      filterGroups: {
+        FacetFilterGroup(groupColors, {facetColorRed})
+      },
+    );
     final snapshot = searcher.snapshot();
     expect(snapshot, updated);
 
