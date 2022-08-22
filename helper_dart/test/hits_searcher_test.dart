@@ -166,9 +166,7 @@ void main() {
       unawaited(
         expectLater(
           searcher.responses,
-          emitsInOrder([
-            emits(matchesQuery('cat'))
-          ]),
+          emitsInOrder([emits(matchesQuery('cat'))]),
         ),
       );
 
