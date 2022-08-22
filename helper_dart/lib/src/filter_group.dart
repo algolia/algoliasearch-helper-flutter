@@ -1,5 +1,3 @@
-import 'package:collection/collection.dart';
-
 import 'filter.dart';
 import 'utils.dart';
 

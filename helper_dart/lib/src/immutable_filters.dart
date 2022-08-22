@@ -100,7 +100,7 @@ class ImmutableFilters extends Filters {
   /// Clears [groupIDs].
   /// If none provided, all filters will be cleared.
   ImmutableFilters clear([Iterable<FilterGroupID>? groupIDs]) {
-    if (groupIDs == null || groupIDs.isEmpty) return ImmutableFilters();
+    if (groupIDs == null || groupIDs.isEmpty) return const ImmutableFilters();
     return ImmutableFilters(
       facetGroups: facetGroups.deleteGroups(groupIDs),
       numericGroups: numericGroups.deleteGroups(groupIDs),
