@@ -1,3 +1,14 @@
 sdk:
   - stable
 
+stages:
+  - analyze_and_format:
+      - group:
+          - format
+          - analyze: --fatal-infos .
+  - unit_test:
+      - test:
+
+cache:
+  directories:
+    - .dart_tool/build

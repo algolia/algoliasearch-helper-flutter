@@ -129,7 +129,12 @@ class QueryBuilder {
         (pair) {
           final facet = pair[0] as String;
           final pathFilter = pair[1] as FilterFacet?;
-          return _hierarchicalQueryOf(facet, pathFilter, hierarchicalFilter, query);
+          return _hierarchicalQueryOf(
+            facet,
+            pathFilter,
+            hierarchicalFilter,
+            query,
+          );
         },
       );
       queries.addAll(queriesForFilter);
