@@ -3,6 +3,7 @@ import 'package:logging/logging.dart';
 
 import 'exception.dart';
 import 'logger.dart';
+import 'query_builder.dart';
 import 'search_response.dart';
 import 'search_state.dart';
 import 'utils.dart';
@@ -43,9 +44,13 @@ class HitsSearchService {
   Future<SearchResponse> _disjunctiveSearch(SearchState state) async {
     _log.fine('Start disjunctive search: $state');
     try {
-      final responses = await client.multipleQueriesOf(state).getObjects();
+      final queryBuilder = QueryBuilder(state);
+      final queries = queryBuilder.build().map(client.queryOf).toList();
+      final responses =
+          await client.multipleQueries.addQueries(queries).getObjects();
       _log.fine('Search responses: $responses');
-      return responses.toSearchResponse();
+      return queryBuilder
+          .merge(responses.map((r) => r.toSearchResponse()).toList());
     } catch (exception) {
       _log.severe('Search exception thrown: $exception');
       throw _launderException(exception);
@@ -72,10 +77,11 @@ extension AlgoliaExt on Algolia {
   }
 
   /// Create multiple queries from search
-  AlgoliaMultiIndexesReference multipleQueriesOf(SearchState state) {
-    /// TODO: Builds multiple search queries based on state.
-    throw UnimplementedError();
-  }
+  AlgoliaMultiIndexesReference multipleQueriesOf(SearchState state) =>
+      multipleQueries
+        ..addQueries(
+          QueryBuilder(state).build().map(queryOf).toList(),
+        );
 }
 
 /// Extensions over [AlgoliaQuerySnapshot].
@@ -85,10 +91,8 @@ extension AlgoliaQuerySnapshotExt on AlgoliaQuerySnapshot {
 
 /// Extensions over a list of [AlgoliaQuerySnapshot].
 extension ListAlgoliaQuerySnapshotExt on List<AlgoliaQuerySnapshot> {
-  SearchResponse toSearchResponse() {
-    // TODO: convert list of search response to a single search response
-    throw UnimplementedError();
-  }
+  SearchResponse toSearchResponseFor(SearchState state) =>
+      QueryBuilder(state).merge(map((e) => e.toSearchResponse()).toList());
 }
 
 /// Extensions over [AlgoliaError].

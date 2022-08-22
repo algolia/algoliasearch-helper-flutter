@@ -22,7 +22,10 @@ extension Highlightable on Hit {
 
 /// Highlighted string as a list of tokens.
 class HighlightedString {
-  HighlightedString._(this.original, this.tokens,);
+  HighlightedString._(
+    this.original,
+    this.tokens,
+  );
 
   factory HighlightedString.of(
     String string, {

@@ -19,12 +19,11 @@ import 'search_state.dart';
 /// 2. State changes are debounced
 class HitsSearcher {
   /// HitsSearcher's factory.
-  /// TODO: default to true when disjunctive faceting is implemented
   factory HitsSearcher({
     required String applicationID,
     required String apiKey,
     required String indexName,
-    bool disjunctiveFacetingEnabled = false,
+    bool disjunctiveFacetingEnabled = true,
     Duration debounce = _defaultDebounce,
   }) =>
       HitsSearcher.create(
@@ -36,12 +35,11 @@ class HitsSearcher {
       );
 
   /// HitsSearcher's factory.
-  /// TODO: default to true when disjunctive faceting is implemented
   factory HitsSearcher.create({
     required String applicationID,
     required String apiKey,
     required SearchState state,
-    bool disjunctiveFacetingEnabled = false,
+    bool disjunctiveFacetingEnabled = true,
     Duration debounce = _defaultDebounce,
   }) {
     final client = Algolia.init(applicationId: applicationID, apiKey: apiKey);

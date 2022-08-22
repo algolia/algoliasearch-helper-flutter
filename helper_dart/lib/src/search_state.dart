@@ -8,7 +8,11 @@ class SearchState {
     this.page,
     this.hitsPerPage,
     this.facets,
+    this.disjunctiveFacets,
     this.filterGroups,
+    this.attributesToRetrieve,
+    this.attributesToHighlight,
+    this.analytics,
     this.ruleContexts,
   });
 
@@ -27,8 +31,20 @@ class SearchState {
   /// Search facets list
   final List<String>? facets;
 
+  /// Disjunctive facets list
+  final Set<String>? disjunctiveFacets;
+
   /// Set of filter groups
   final Set<FilterGroup>? filterGroups;
+
+  /// List of attributes to retrieve
+  final List<String>? attributesToRetrieve;
+
+  /// List of attributes to highlight
+  final List<String>? attributesToHighlight;
+
+  /// Whether the current query will be taken into account in the Analytics
+  final bool? analytics;
 
   /// Search rule contexts
   final List<String>? ruleContexts;
@@ -40,7 +56,11 @@ class SearchState {
     int? page,
     int? hitsPerPage,
     List<String>? facets,
+    Set<String>? disjunctiveFacets,
     Set<FilterGroup>? filterGroups,
+    List<String>? attributesToRetrieve,
+    List<String>? attributesToHighlight,
+    bool? analytics,
     List<String>? ruleContexts,
   }) =>
       SearchState(
@@ -49,7 +69,12 @@ class SearchState {
         page: page ?? this.page,
         hitsPerPage: hitsPerPage ?? this.hitsPerPage,
         facets: facets ?? this.facets,
+        disjunctiveFacets: disjunctiveFacets ?? this.disjunctiveFacets,
         filterGroups: filterGroups ?? this.filterGroups,
+        attributesToRetrieve: attributesToRetrieve ?? this.attributesToRetrieve,
+        attributesToHighlight:
+            attributesToHighlight ?? this.attributesToHighlight,
+        analytics: analytics ?? this.analytics,
         ruleContexts: ruleContexts ?? this.ruleContexts,
       );
 
@@ -63,7 +88,11 @@ class SearchState {
           page == other.page &&
           hitsPerPage == other.hitsPerPage &&
           facets == other.facets &&
+          disjunctiveFacets == other.disjunctiveFacets &&
           filterGroups == other.filterGroups &&
+          attributesToRetrieve == other.attributesToRetrieve &&
+          attributesToHighlight == other.attributesToHighlight &&
+          analytics == other.analytics &&
           ruleContexts == other.ruleContexts;
 
   @override
@@ -73,7 +102,11 @@ class SearchState {
       page.hashCode ^
       hitsPerPage.hashCode ^
       facets.hashCode ^
+      disjunctiveFacets.hashCode ^
       filterGroups.hashCode ^
+      attributesToRetrieve.hashCode ^
+      attributesToHighlight.hashCode ^
+      analytics.hashCode ^
       ruleContexts.hashCode;
 
   @override
@@ -83,7 +116,11 @@ class SearchState {
       ' page: $page,'
       ' hitsPerPage: $hitsPerPage,'
       ' facets: $facets,'
+      ' disjunctiveFacets: $disjunctiveFacets,'
       ' filterGroups: $filterGroups,'
+      ' attributesToRetrieve: $attributesToRetrieve,'
+      ' attributesToHighlight: $attributesToHighlight,'
+      ' analytics: $analytics,'
       ' ruleContexts: $ruleContexts'
       '}';
 }
