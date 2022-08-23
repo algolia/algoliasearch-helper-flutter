@@ -112,7 +112,8 @@ class FilterConverter {
     switch (value.runtimeType) {
       case String:
         return _escape(value as String);
-      case num:
+      case int:
+      case double:
       case bool:
         return value.toString();
       default:
