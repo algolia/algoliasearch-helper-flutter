@@ -12,8 +12,8 @@ class FilterGroupConverter {
   /// Converts [FilterGroup] to its SQL-like [String] representation.
   /// Returns `null` if the list is empty.
   String? toSQL(Set<FilterGroup<Filter>> filterGroups) {
-    if (filterGroups.isEmpty) return null;
     final groups = filterGroups.whereNot((element) => element.isEmpty);
+    if (groups.isEmpty) return null;
     return groups.joinToString(
       separator: ' AND ',
       transform: (group) => group.joinToString(
@@ -24,6 +24,10 @@ class FilterGroupConverter {
       ),
     );
   }
+
+  /// Same as [toSQL], but removes quotes for readability purposes.
+  String? toSQLUnquoted(Set<FilterGroup<Filter>> filterGroups) =>
+      toSQL(filterGroups)?.replaceAll('\"', '');
 
   /// Get separator string (i.e. AND/OR) of a [group].
   String _separatorOf(FilterGroup group) {

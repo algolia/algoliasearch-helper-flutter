@@ -88,13 +88,9 @@ extension IterableExt<T> on Iterable<T> {
     var count = 0;
     for (final element in this) {
       if (++count > 1) buffer.write(separator);
-      if (limit < 0 || count <= limit) {
-        final string =
-            transform != null ? transform(element) : element.toString();
-        buffer.write(string);
-      } else {
-        break;
-      }
+      if (limit >= 0 && count > limit) break;
+      final str = transform != null ? transform(element) : element.toString();
+      buffer.write(str);
     }
     if (limit >= 0 && count > limit) buffer.write(truncated);
     buffer.write(postfix);
