@@ -7,6 +7,7 @@ library algolia_helper_dart;
 export 'src/exception.dart';
 export 'src/filter.dart';
 export 'src/filter_group.dart';
+export 'src/filter_group_builder.dart';
 export 'src/filter_state.dart';
 export 'src/filters.dart';
 export 'src/highlighting.dart';

@@ -1,5 +1,5 @@
 import 'package:algolia_helper_dart/algolia.dart';
-import 'package:algolia_helper_dart/src/filter_builder.dart';
+import 'package:algolia_helper_dart/src/filter_group_builder.dart';
 import 'package:algolia_helper_dart/src/filter_group_converter.dart';
 import 'package:test/test.dart';
 
