@@ -92,4 +92,28 @@ void main() {
     expect(converter.toSQL(filter), '_tags:\"valueA\"');
     expect(converter.toSQL(filter.not()), 'NOT _tags:\"valueA\"');
   });
+
+  test('Filter Group SQL', () {
+    final filterGroups = {
+      FilterGroup.numeric('groupA', {
+        Filter.range(
+          'attributeA',
+          lowerBound: 0,
+          upperBound: 10,
+          isNegated: true,
+        )
+      })
+    };
+    const converter = FilterGroupConverter();
+    expect(converter.toSQL(filterGroups), '(NOT \"attributeA\":0 TO 10)');
+  });
+
+  test('Numeric operator symbols', () {
+    expect(NumericOperator.less.operator, '<');
+    expect(NumericOperator.lessOrEquals.operator, '<=');
+    expect(NumericOperator.equals.operator, '=');
+    expect(NumericOperator.notEquals.operator, '!=');
+    expect(NumericOperator.greaterOrEquals.operator, '>=');
+    expect(NumericOperator.greater.operator, '>');
+  });
 }
