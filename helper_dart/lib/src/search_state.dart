@@ -5,16 +5,27 @@ import 'utils.dart';
 class SearchState {
   const SearchState({
     required this.indexName,
-    this.query,
-    this.page,
-    this.hitsPerPage,
-    this.facets,
-    this.disjunctiveFacets,
-    this.filterGroups,
-    this.attributesToRetrieve,
-    this.attributesToHighlight,
     this.analytics,
+    this.attributesToHighlight,
+    this.attributesToRetrieve,
+    this.attributesToSnippet,
+    this.disjunctiveFacets,
+    this.facetFilters,
+    this.facets,
+    this.filterGroups,
+    this.highlightPostTag,
+    this.highlightPreTag,
+    this.hitsPerPage,
+    this.maxFacetHits,
+    this.maxValuesPerFacet,
+    this.numericFilters,
+    this.optionalFilters,
+    this.page,
+    this.query,
     this.ruleContexts,
+    this.sumOrFiltersScore,
+    this.tagFilters,
+    this.userToken,
   });
 
   /// Index name
@@ -38,45 +49,107 @@ class SearchState {
   /// Set of filter groups
   final Set<FilterGroup>? filterGroups;
 
-  /// List of attributes to retrieve
-  final List<String>? attributesToRetrieve;
-
-  /// List of attributes to highlight
-  final List<String>? attributesToHighlight;
-
-  /// Whether the current query will be taken into account in the Analytics
-  final bool? analytics;
-
   /// Search rule contexts
   final List<String>? ruleContexts;
 
+  /// Filter hits by facet value.
+  final List<String>? facetFilters;
+
+  /// List of attributes to highlight.
+  final List<String>? attributesToHighlight;
+
+  /// Gives control over which attributes to retrieve and which not to retrieve.
+  final List<String>? attributesToRetrieve;
+
+  /// List of attributes to snippet,
+  /// with an optional maximum number of words
+  /// to snippet.
+  final List<String>? attributesToSnippet;
+
+  /// The HTML name to insert after the highlighted parts in all highlight
+  /// and snippet results.
+  final String? highlightPostTag;
+
+  /// The HTML name to insert before the highlighted parts in all highlight
+  /// and snippet results.
+  final String? highlightPreTag;
+
+  /// Maximum number of facet hits to return during a search for facet values.
+  final int? maxFacetHits;
+
+  /// Maximum number of facet values to return for each facet during a regular
+  /// search.
+  final int? maxValuesPerFacet;
+
+  /// Filter on numeric attributes.
+  final List<String>? numericFilters;
+
+  /// Create filters for ranking purposes,
+  /// where records that match the filter
+  /// are ranked highest.
+  final List<String>? optionalFilters;
+
+  /// Determines how to calculate the total score for filtering.
+  final bool? sumOrFiltersScore;
+
+  /// Filter hits by tags.
+  final List<String>? tagFilters;
+
+  /// Associates a certain user token with the current search.
+  final String? userToken;
+
+  /// Whether the current query will be taken into account in the Analytics.
+  final bool? analytics;
+
   /// Make a copy of the search state.
   SearchState copyWith({
+    List<String>? attributesToHighlight,
+    List<String>? attributesToRetrieve,
+    List<String>? attributesToSnippet,
+    List<String>? facetFilters,
+    List<String>? facets,
+    List<String>? numericFilters,
+    List<String>? optionalFilters,
+    List<String>? ruleContexts,
+    List<String>? tagFilters,
+    Set<FilterGroup>? filterGroups,
+    Set<String>? disjunctiveFacets,
+    String? highlightPostTag,
+    String? highlightPreTag,
     String? indexName,
     String? query,
-    int? page,
-    int? hitsPerPage,
-    List<String>? facets,
-    Set<String>? disjunctiveFacets,
-    Set<FilterGroup>? filterGroups,
-    List<String>? attributesToRetrieve,
-    List<String>? attributesToHighlight,
+    String? userToken,
     bool? analytics,
-    List<String>? ruleContexts,
+    bool? sumOrFiltersScore,
+    int? hitsPerPage,
+    int? maxFacetHits,
+    int? maxValuesPerFacet,
+    int? page,
   }) =>
       SearchState(
-        indexName: indexName ?? this.indexName,
-        query: query ?? this.query,
-        page: page ?? this.page,
-        hitsPerPage: hitsPerPage ?? this.hitsPerPage,
-        facets: facets ?? this.facets,
-        disjunctiveFacets: disjunctiveFacets ?? this.disjunctiveFacets,
-        filterGroups: filterGroups ?? this.filterGroups,
-        attributesToRetrieve: attributesToRetrieve ?? this.attributesToRetrieve,
+        analytics: analytics ?? this.analytics,
         attributesToHighlight:
             attributesToHighlight ?? this.attributesToHighlight,
-        analytics: analytics ?? this.analytics,
+        attributesToRetrieve: attributesToRetrieve ?? this.attributesToRetrieve,
+        attributesToSnippet: attributesToSnippet ?? this.attributesToSnippet,
+        disjunctiveFacets: disjunctiveFacets ?? this.disjunctiveFacets,
+        facetFilters: facetFilters ?? this.facetFilters,
+        facets: facets ?? this.facets,
+        filterGroups: filterGroups ?? this.filterGroups,
+        highlightPostTag: highlightPostTag ?? this.highlightPostTag,
+        highlightPreTag: highlightPreTag ?? this.highlightPreTag,
+        hitsPerPage: hitsPerPage ?? this.hitsPerPage,
+        indexName: indexName ?? this.indexName,
+        maxFacetHits: maxFacetHits ?? this.maxFacetHits,
+        maxValuesPerFacet: maxValuesPerFacet ?? this.maxValuesPerFacet,
+        numericFilters: numericFilters ?? this.numericFilters,
+        optionalFilters: optionalFilters ?? this.optionalFilters,
+        page: page ?? this.page,
+        query: query ?? this.query,
         ruleContexts: ruleContexts ?? this.ruleContexts,
+        sumOrFiltersScore: sumOrFiltersScore ?? this.sumOrFiltersScore,
+        tagFilters: tagFilters ?? this.tagFilters,
+        userToken: userToken ?? this.userToken,
       );
 
   @override
@@ -91,10 +164,21 @@ class SearchState {
           facets.equals(other.facets) &&
           disjunctiveFacets.equals(other.disjunctiveFacets) &&
           filterGroups.equals(other.filterGroups) &&
-          attributesToRetrieve.equals(other.attributesToRetrieve) &&
+          ruleContexts.equals(other.ruleContexts) &&
+          facetFilters.equals(other.facetFilters) &&
           attributesToHighlight.equals(other.attributesToHighlight) &&
+          attributesToRetrieve.equals(other.attributesToRetrieve) &&
+          attributesToSnippet.equals(other.attributesToSnippet) &&
+          highlightPostTag == other.highlightPostTag &&
+          highlightPreTag == other.highlightPreTag &&
+          maxFacetHits == other.maxFacetHits &&
+          maxValuesPerFacet == other.maxValuesPerFacet &&
+          numericFilters.equals(other.numericFilters) &&
+          optionalFilters.equals(other.optionalFilters) &&
+          sumOrFiltersScore == other.sumOrFiltersScore &&
+          tagFilters.equals(other.tagFilters) &&
           analytics == other.analytics &&
-          ruleContexts == other.ruleContexts;
+          userToken == other.userToken;
 
   @override
   int get hashCode =>
@@ -105,23 +189,44 @@ class SearchState {
       facets.hashing() ^
       disjunctiveFacets.hashing() ^
       filterGroups.hashing() ^
-      attributesToRetrieve.hashing() ^
+      ruleContexts.hashing() ^
+      facetFilters.hashing() ^
       attributesToHighlight.hashing() ^
+      attributesToRetrieve.hashing() ^
+      attributesToSnippet.hashing() ^
+      highlightPostTag.hashCode ^
+      highlightPreTag.hashCode ^
+      maxFacetHits.hashCode ^
+      maxValuesPerFacet.hashCode ^
+      numericFilters.hashing() ^
+      optionalFilters.hashing() ^
+      sumOrFiltersScore.hashCode ^
+      tagFilters.hashing() ^
       analytics.hashCode ^
-      ruleContexts.hashCode;
+      userToken.hashCode;
 
   @override
   String toString() => 'SearchState{'
-      'indexName: $indexName,'
-      ' query: $query,'
-      ' page: $page,'
-      ' hitsPerPage: $hitsPerPage,'
-      ' facets: $facets,'
-      ' disjunctiveFacets: $disjunctiveFacets,'
-      ' filterGroups: $filterGroups,'
-      ' attributesToRetrieve: $attributesToRetrieve,'
-      ' attributesToHighlight: $attributesToHighlight,'
-      ' analytics: $analytics,'
-      ' ruleContexts: $ruleContexts'
-      '}';
+      'indexName: $indexName, '
+      'query: $query, '
+      'analytics: $analytics, '
+      'attributesToHighlight: $attributesToHighlight, '
+      'attributesToRetrieve: $attributesToRetrieve, '
+      'attributesToSnippet: $attributesToSnippet, '
+      'disjunctiveFacets: $disjunctiveFacets, '
+      'facetFilters: $facetFilters, '
+      'facets: $facets, '
+      'filterGroups: $filterGroups, '
+      'highlightPostTag: $highlightPostTag, '
+      'highlightPreTag: $highlightPreTag, '
+      'hitsPerPage: $hitsPerPage, '
+      'maxFacetHits: $maxFacetHits, '
+      'maxValuesPerFacet: $maxValuesPerFacet, '
+      'numericFilters: $numericFilters, '
+      'optionalFilters: $optionalFilters, '
+      'page: $page, '
+      'ruleContexts: $ruleContexts, '
+      'sumOrFiltersScore: $sumOrFiltersScore, '
+      'tagFilters: $tagFilters, '
+      'userToken: $userToken}';
 }
