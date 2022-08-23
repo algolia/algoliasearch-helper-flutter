@@ -76,7 +76,6 @@ extension AlgoliaExt on Algolia {
         ?.let((it) => query = query.setAttributesToSnippet(it));
     state.facetFilters?.let((it) => query = query.setFacetFilters(it));
     state.facets?.let((it) => query = query.setFacets(it));
-    state.facets?.let((it) => query = query.setFacets(it));
     state.highlightPostTag?.let((it) => query = query.setHighlightPostTag(it));
     state.highlightPreTag?.let((it) => query = query.setHighlightPreTag(it));
     state.hitsPerPage?.let((it) => query = query.setHitsPerPage(it));
@@ -86,16 +85,13 @@ extension AlgoliaExt on Algolia {
     state.numericFilters?.let((it) => query = query.setNumericFilters(it));
     state.optionalFilters?.let((it) => query = query.setOptionalFilters(it));
     state.page?.let((it) => query = query.setPage(it));
-    state.page?.let((it) => query = query.setPage(it));
     state.query?.let((it) => query = query.query(it));
-    state.query?.let((it) => query = query.query(it));
-    state.query?.let((it) => query = query.query(it));
-    state.ruleContexts?.let((it) => query = query.setRuleContexts(it));
     state.ruleContexts?.let((it) => query = query.setRuleContexts(it));
     state.sumOrFiltersScore
         ?.let((it) => query = query.setSumOrFiltersScore(it));
     state.tagFilters?.let((it) => query = query.setTagFilters(it));
     state.userToken?.let((it) => query = query.setUserToken(it));
+    // TODO: filters from: state.filterGroups and/or state.disjunctiveFacets
     return query;
   }
 
