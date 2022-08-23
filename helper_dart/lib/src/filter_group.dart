@@ -1,4 +1,5 @@
 import 'filter.dart';
+import 'utils.dart';
 
 /// Identifier of a filter group.
 /// The group name is for access purpose only, won't be used for the actual
@@ -10,7 +11,7 @@ class FilterGroupID {
   factory FilterGroupID.and([String name = '']) => FilterGroupID(name);
 
   /// Create and [FilterGroupID] with operator [FilterOperator.or].
-  factory FilterGroupID.groupOr([String name = '']) =>
+  factory FilterGroupID.or([String name = '']) =>
       FilterGroupID(name, FilterOperator.or);
 
   final String name;
@@ -39,17 +40,63 @@ enum FilterOperator { and, or }
 
 /// Represents a filter group
 abstract class FilterGroup<T> {
-  const FilterGroup(this.groupID, this.filters);
+  const FilterGroup._(this.groupID, this.filters);
 
+  /// Create [FilterGroup] as [FacetFilterGroup].
+  static FacetFilterGroup facet([
+    String name = '',
+    Set<FilterFacet> filters = const {},
+    FilterOperator operator = FilterOperator.and,
+  ]) =>
+      FacetFilterGroup(FilterGroupID(name, operator), filters);
+
+  /// Create [FilterGroup] as [TagFilterGroup].
+  static TagFilterGroup tag([
+    String name = '',
+    Set<FilterTag> filters = const {},
+    FilterOperator operator = FilterOperator.and,
+  ]) =>
+      TagFilterGroup(FilterGroupID(name, operator), filters);
+
+  /// Create [FilterGroup] as [NumericFilterGroup].
+  static NumericFilterGroup numeric([
+    String name = '',
+    Set<FilterNumeric> filters = const {},
+    FilterOperator operator = FilterOperator.and,
+  ]) =>
+      NumericFilterGroup(FilterGroupID(name, operator), filters);
+
+  /// Create [FilterGroup] as [HierarchicalFilterGroup].
+  static HierarchicalFilterGroup hierarchical([
+    String name = '',
+    Set<HierarchicalFilter> filters = const {},
+  ]) =>
+      HierarchicalFilterGroup(name, filters);
+
+  /// Filter group ID (name and operator)
   final FilterGroupID groupID;
+
+  /// Set of filters.
   final Set<T> filters;
 
+  /// Create a copy with given parameters.
   FilterGroup<T> copyWith({FilterGroupID? groupID, Set<T>? filters});
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FilterGroup &&
+          runtimeType == other.runtimeType &&
+          groupID == other.groupID &&
+          filters.equals(other.filters);
+
+  @override
+  int get hashCode => groupID.hashCode ^ filters.hashing();
 }
 
 /// Facets filter group
 class FacetFilterGroup extends FilterGroup<FilterFacet> {
-  const FacetFilterGroup(super.groupID, super.filters);
+  const FacetFilterGroup(super.groupID, super.filters) : super._();
 
   /// Make a copy of the facet filters group.
   @override
@@ -63,15 +110,12 @@ class FacetFilterGroup extends FilterGroup<FilterFacet> {
       );
 
   @override
-  String toString() => 'FacetFilterGroup{'
-      ' id: $groupID,'
-      ' filters: $filters'
-      '}';
+  String toString() => 'FacetFilterGroup{groupID: $groupID, filters: $filters}';
 }
 
 /// Tags filter group
 class TagFilterGroup extends FilterGroup<FilterTag> {
-  const TagFilterGroup(super.groupID, super.filters);
+  const TagFilterGroup(super.groupID, super.filters) : super._();
 
   /// Make a copy of the tag filters group.
   @override
@@ -85,15 +129,12 @@ class TagFilterGroup extends FilterGroup<FilterTag> {
       );
 
   @override
-  String toString() => 'TagFilterGroup{'
-      ' id: $groupID,'
-      ' filters: $filters'
-      '}';
+  String toString() => 'TagFilterGroup{groupID: $groupID, filters: $filters}';
 }
 
 /// Numeric facets filter group
 class NumericFilterGroup extends FilterGroup<FilterNumeric> {
-  const NumericFilterGroup(super.groupID, super.filters);
+  const NumericFilterGroup(super.groupID, super.filters) : super._();
 
   /// Make a copy of the numeric filters group.
   @override
@@ -107,10 +148,8 @@ class NumericFilterGroup extends FilterGroup<FilterNumeric> {
       );
 
   @override
-  String toString() => 'NumericFilterGroup{'
-      ' id: $groupID,'
-      ' filters: $filters'
-      '}';
+  String toString() =>
+      'NumericFilterGroup{groupID: $groupID, filters: $filters}';
 }
 
 /// Hierarchical filter group
@@ -118,7 +157,7 @@ class HierarchicalFilterGroup extends FilterGroup<HierarchicalFilter> {
   HierarchicalFilterGroup(String name, Set<HierarchicalFilter> filters)
       : this._(FilterGroupID(name), filters);
 
-  const HierarchicalFilterGroup._(super.groupID, super.filters);
+  const HierarchicalFilterGroup._(super.groupID, super.filters) : super._();
 
   /// Make a copy of the hierarchical filters group.
   @override
@@ -132,8 +171,6 @@ class HierarchicalFilterGroup extends FilterGroup<HierarchicalFilter> {
       );
 
   @override
-  String toString() => 'HierarchicalFilterGroup{'
-      ' id: $groupID,'
-      ' filters: $filters'
-      '}';
+  String toString() =>
+      'HierarchicalFilterGroup{groupID: $groupID, filters: $filters}';
 }

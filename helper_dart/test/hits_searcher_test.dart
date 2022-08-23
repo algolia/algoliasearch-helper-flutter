@@ -58,12 +58,7 @@ void main() {
         const SearchState(indexName: 'myIndex'),
       );
 
-      when(searchService.search(any)).thenAnswer(
-        (Invocation inv) {
-          final state = inv.positionalArguments[0] as SearchState;
-          return Stream.value(SearchResponse({'query': state.query}));
-        },
-      );
+      when(searchService.search(any)).thenAnswer(mockResponse);
       const query = 'cat';
       searcher.query(query);
 
@@ -88,12 +83,7 @@ void main() {
 
     test('Should debounce search state', () async {
       final searchService = MockHitsSearchService();
-      when(searchService.search(any)).thenAnswer(
-        (Invocation inv) {
-          final state = inv.positionalArguments[0] as SearchState;
-          return Stream.value(SearchResponse({'query': state.query}));
-        },
-      );
+      when(searchService.search(any)).thenAnswer(mockResponse);
 
       final searcher = HitsSearcher.build(
         searchService,
@@ -116,12 +106,7 @@ void main() {
 
     test("Shouldn't debounce search state", () async {
       final searchService = MockHitsSearchService();
-      when(searchService.search(any)).thenAnswer(
-        (Invocation inv) {
-          final state = inv.positionalArguments[0] as SearchState;
-          return Stream.value(SearchResponse({'query': state.query}));
-        },
-      );
+      when(searchService.search(any)).thenAnswer(mockResponse);
 
       final searcher = HitsSearcher.build(
         searchService,
@@ -150,13 +135,7 @@ void main() {
 
     test('Should discard old requests', () async {
       final searchService = MockHitsSearchService();
-      when(searchService.search(any)).thenAnswer(
-        (Invocation inv) async* {
-          final state = inv.positionalArguments[0] as SearchState;
-          await delay();
-          yield SearchResponse({'query': state.query});
-        },
-      );
+      when(searchService.search(any)).thenAnswer(mockResponse);
 
       final searcher = HitsSearcher.build(
         searchService,
@@ -171,14 +150,48 @@ void main() {
       );
 
       searcher.query('c');
-      await delay(200);
+      await delay(50);
       searcher.query('ca');
-      await delay(200);
+      await delay(50);
       searcher.query('cat');
-      await delay(200);
+      await delay(50);
       searcher.dispose();
     });
   });
+
+  test('FilterState connect HitsSearcher', () async {
+    final searchService = MockHitsSearchService();
+    when(searchService.search(any)).thenAnswer(mockResponse);
+
+    const initSearchState = SearchState(indexName: 'myIndex');
+    final searcher = HitsSearcher.build(
+      searchService,
+      initSearchState,
+    );
+
+    final groupColors = FilterGroupID.and('colors');
+    final facetColorRed = Filter.facet('color', 'red');
+    final filterState = FilterState()..add(groupColors, {facetColorRed});
+
+    searcher.connectFilterState(filterState);
+    await delay();
+
+    final updated = initSearchState.copyWith(
+      filterGroups: {
+        FacetFilterGroup(groupColors, {facetColorRed})
+      },
+    );
+    final snapshot = searcher.snapshot();
+    expect(snapshot, updated);
+
+    searcher.dispose();
+  });
+}
+
+Stream<SearchResponse> mockResponse(Invocation inv) async* {
+  final state = inv.positionalArguments[0] as SearchState;
+  await delay(100);
+  yield SearchResponse({'query': state.query});
 }
 
 /// Return future with a delay

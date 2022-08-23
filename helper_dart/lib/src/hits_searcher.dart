@@ -80,6 +80,9 @@ class HitsSearcher {
     _updateState((state) => state.copyWith(query: query));
   }
 
+  /// Get current [SearchState].
+  SearchState snapshot() => _state.value;
+
   /// Apply search state configuration.
   void applyState(SearchState Function(SearchState state) config) {
     _updateState((state) => config(state));
