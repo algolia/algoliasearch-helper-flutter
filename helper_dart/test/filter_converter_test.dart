@@ -28,5 +28,24 @@ void main() {
       expect(converter.toSQL(filterDouble.not()), 'NOT \"attributeA\":1.0');
       expect(converter.toSQL(filterScore), '\"attributeA\":1<score=2>');
     });
+
+    test('Filter Facet String', () {
+      final filter = Filter.facet('attributeA', 'valueA');
+      final filterNegate = Filter.facet('attributeA', 'valueA').not();
+      final filterSpace = Filter.facet('attributeA', 'value with space');
+      final filterScore = Filter.facet('attributeA', 'valueA', score: 1);
+
+      const converter = FilterConverter();
+      expect(converter.toSQL(filter), '\"attributeA\":\"valueA\"');
+      expect(converter.toSQL(filterNegate), 'NOT \"attributeA\":\"valueA\"');
+      expect(
+        converter.toSQL(filterSpace),
+        '\"attributeA\":\"value with space\"',
+      );
+      expect(
+        converter.toSQL(filterScore),
+        '\"attributeA\":\"valueA\"<score=1>',
+      );
+    });
   });
 }
