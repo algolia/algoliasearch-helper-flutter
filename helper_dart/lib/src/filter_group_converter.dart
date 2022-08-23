@@ -66,7 +66,9 @@ class FilterConverter {
 
   /// Converts [FilterTag] to its SQL-like [String] representation.
   String _tagToSQL(FilterTag filter) {
-    final expression = '${filter.value}:${_escape(filter.value)}';
+    final attribute = filter.attribute;
+    final escapedValue = _escape(filter.value);
+    final expression = '$attribute:$escapedValue';
     return filter.isNegated ? 'NOT $expression' : expression;
   }
 

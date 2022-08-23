@@ -3,8 +3,8 @@ import 'package:algolia_helper_dart/src/filter_group_converter.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('Filter Facet SQL', () {
-    test('Filter Facet Boolean', () {
+  group('Filter facet SQL', () {
+    test('Filter facet Boolean', () {
       final filterTrue = Filter.facet('attributeA', true);
       final filterFalse = Filter.facet('attributeA', false);
       final filterScore = Filter.facet('attributeA', true, score: 4);
@@ -17,7 +17,7 @@ void main() {
       expect(converter.toSQL(filterScore), '\"attributeA\":true<score=4>');
     });
 
-    test('Filter Facet Number', () {
+    test('Filter facet Number', () {
       final filterInt = Filter.facet('attributeA', 1);
       final filterDouble = Filter.facet('attributeA', 1.0);
       final filterScore = Filter.facet('attributeA', 1, score: 2);
@@ -29,7 +29,7 @@ void main() {
       expect(converter.toSQL(filterScore), '\"attributeA\":1<score=2>');
     });
 
-    test('Filter Facet String', () {
+    test('Filter facet String', () {
       final filter = Filter.facet('attributeA', 'valueA');
       final filterNegate = Filter.facet('attributeA', 'valueA').not();
       final filterSpace = Filter.facet('attributeA', 'value with space');
@@ -84,5 +84,12 @@ void main() {
       expect(converter.toSQL(filterDouble), '\"attributeA\":0.0 TO 6.0');
       expect(converter.toSQL(filterInt.not()), 'NOT \"attributeA\":0 TO 6');
     });
+  });
+
+  test('Filter tag SQL', () {
+    final filter = Filter.tag('valueA');
+    const converter = FilterConverter();
+    expect(converter.toSQL(filter), '_tags:\"valueA\"');
+    expect(converter.toSQL(filter.not()), 'NOT _tags:\"valueA\"');
   });
 }
