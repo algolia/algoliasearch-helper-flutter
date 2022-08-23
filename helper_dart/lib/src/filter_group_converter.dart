@@ -59,7 +59,7 @@ class FilterConverter {
   String _facetToSQL(FilterFacet filter) {
     final value = _valueToSQL(filter.value);
     final attribute = _escape(filter.attribute);
-    final score = filter.score != null ? '<score=$filter.score>' : '';
+    final score = filter.score != null ? '<score=${filter.score}>' : '';
     final expression = '$attribute:$value$score';
     return filter.isNegated ? 'NOT $expression' : expression;
   }

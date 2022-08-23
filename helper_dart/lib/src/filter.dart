@@ -8,10 +8,10 @@ class Filter {
   /// Creates [FilterFacet] instance.
   static FilterFacet facet(
     String attribute,
-    dynamic value, [
+    dynamic value, {
     bool isNegated = false,
     int? score,
-  ]) =>
+  }) =>
       FilterFacet._(attribute, value, isNegated, score);
 
   /// Creates [FilterTag] instance.
@@ -22,18 +22,18 @@ class Filter {
   static FilterNumeric comparison(
     String attribute,
     NumericOperator operator,
-    num number, [
+    num number, {
     bool isNegated = false,
-  ]) =>
+  }) =>
       FilterNumeric.comparison(attribute, operator, number, isNegated);
 
   /// Creates [FilterNumeric] instance as numeric range.
   static FilterNumeric range(
-    String attribute,
-    num lowerBound,
-    num upperBound, [
+    String attribute, {
+    required num lowerBound,
+    required num upperBound,
     bool isNegated = false,
-  ]) =>
+  }) =>
       FilterNumeric.range(attribute, lowerBound, upperBound, isNegated);
 }
 
@@ -54,6 +54,9 @@ class FilterFacet implements Filter {
   final bool isNegated;
   final dynamic value;
   final int? score;
+
+  /// Negates a [FilterFacet].
+  FilterFacet not() => copyWith(isNegated: !isNegated);
 
   @override
   bool operator ==(Object other) =>
@@ -84,7 +87,7 @@ class FilterFacet implements Filter {
     bool? isNegated,
     int? score,
   }) =>
-      Filter.facet(
+      FilterFacet._(
         attribute ?? this.attribute,
         value ?? this.value,
         isNegated ?? this.isNegated,
@@ -127,7 +130,7 @@ class FilterTag implements Filter {
     String? value,
     bool? isNegated,
   }) =>
-      Filter.tag(
+      FilterTag._(
         value ?? this.value,
         isNegated ?? this.isNegated,
       );
