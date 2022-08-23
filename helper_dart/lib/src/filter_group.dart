@@ -1,3 +1,5 @@
+import 'package:collection/collection.dart';
+
 import 'filter.dart';
 import 'utils.dart';
 
@@ -39,8 +41,8 @@ class FilterGroupID {
 enum FilterOperator { and, or }
 
 /// Represents a filter group
-abstract class FilterGroup<T> {
-  const FilterGroup._(this.groupID, this.filters);
+abstract class FilterGroup<T> extends DelegatingSet<T> {
+  const FilterGroup._(this.groupID, this.filters): super(filters);
 
   /// Create [FilterGroup] as [FacetFilterGroup].
   static FacetFilterGroup facet([
