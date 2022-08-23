@@ -48,4 +48,41 @@ void main() {
       );
     });
   });
+
+  group('Filter numeric SQL', () {
+    test('Filter numeric comparison', () {
+      final less = Filter.comparison('attributeA', NumericOperator.less, 5.0);
+      final lessOrEquals =
+          Filter.comparison('attributeA', NumericOperator.lessOrEquals, 5.0);
+      final equals =
+          Filter.comparison('attributeA', NumericOperator.equals, 5.0);
+      final notEquals =
+          Filter.comparison('attributeA', NumericOperator.notEquals, 5.0);
+      final greater =
+          Filter.comparison('attributeA', NumericOperator.greater, 5.0);
+      final greaterOrEquals =
+          Filter.comparison('attributeA', NumericOperator.greaterOrEquals, 5.0);
+
+      const converter = FilterConverter();
+      expect(converter.toSQL(less), '\"attributeA\" < 5.0');
+      expect(converter.toSQL(lessOrEquals), '\"attributeA\" <= 5.0');
+      expect(converter.toSQL(equals), '\"attributeA\" = 5.0');
+      expect(converter.toSQL(notEquals), '\"attributeA\" != 5.0');
+      expect(converter.toSQL(greater), '\"attributeA\" > 5.0');
+      expect(converter.toSQL(greaterOrEquals), '\"attributeA\" >= 5.0');
+      expect(converter.toSQL(less.not()), 'NOT \"attributeA\" < 5.0');
+    });
+
+    test('Filter numeric range', () {
+      final filterInt =
+          Filter.range('attributeA', lowerBound: 0, upperBound: 6);
+      final filterDouble =
+          Filter.range('attributeA', lowerBound: 0.0, upperBound: 6.0);
+
+      const converter = FilterConverter();
+      expect(converter.toSQL(filterInt), '\"attributeA\":0 TO 6');
+      expect(converter.toSQL(filterDouble), '\"attributeA\":0.0 TO 6.0');
+      expect(converter.toSQL(filterInt.not()), 'NOT \"attributeA\":0 TO 6');
+    });
+  });
 }

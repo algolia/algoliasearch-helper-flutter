@@ -1,5 +1,7 @@
+import 'package:meta/meta.dart';
+
 /// Represents a search filter
-class Filter {
+abstract class Filter {
   const Filter._(this.attribute, this.isNegated);
 
   final String attribute;
@@ -35,6 +37,10 @@ class Filter {
     bool isNegated = false,
   }) =>
       FilterNumeric.range(attribute, lowerBound, upperBound, isNegated);
+
+  /// Negates a [FilterFacet].
+  @factory
+  Filter not();
 }
 
 /// A [FilterFacet] matches exactly an [attribute] with a [value].
@@ -54,9 +60,6 @@ class FilterFacet implements Filter {
   final bool isNegated;
   final dynamic value;
   final int? score;
-
-  /// Negates a [FilterFacet].
-  FilterFacet not() => copyWith(isNegated: !isNegated);
 
   @override
   bool operator ==(Object other) =>
@@ -93,6 +96,9 @@ class FilterFacet implements Filter {
         isNegated ?? this.isNegated,
         score ?? this.score,
       );
+
+  @override
+  FilterFacet not() => copyWith(isNegated: !isNegated);
 }
 
 /// A [FilterTag] filters on a specific [value].
@@ -134,6 +140,9 @@ class FilterTag implements Filter {
         value ?? this.value,
         isNegated ?? this.isNegated,
       );
+
+  @override
+  FilterTag not() => copyWith(isNegated: !isNegated);
 }
 
 /// A [FilterNumeric] filters on a numeric [value].
@@ -179,6 +188,9 @@ class FilterNumeric implements Filter {
         value ?? this.value,
         isNegated ?? this.isNegated,
       );
+
+  @override
+  FilterNumeric not() => copyWith(isNegated: !isNegated);
 }
 
 /// Represents a filter numeric value.
