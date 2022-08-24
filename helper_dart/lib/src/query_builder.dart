@@ -8,20 +8,23 @@ import 'search_state.dart';
 /// Transform single query into multiple requests for disjunctive/hierarchical
 /// faceting. Merges multiple search responses into a single one
 class QueryBuilder {
-  QueryBuilder(this.searchState);
+  /// Creates [QueryBuilder] instance.
+  const QueryBuilder(this._searchState);
 
-  final SearchState searchState;
+  /// Search state instance.
+  final SearchState _searchState;
 
   /// Number of search result queries
-  int get resultQueriesCount => 1;
+  int get _resultQueriesCount => 1;
 
   /// Number of generated disjunctive queries for given hierarchical
   /// filters list
-  int get disjunctiveQueriesCount => searchState.disjunctiveFacets?.length ?? 0;
+  int get _disjunctiveQueriesCount =>
+      _searchState.disjunctiveFacets?.length ?? 0;
 
   /// Number of generated hierarchical queries for given hierarchical
   /// filters list
-  int get hierarchicalQueriesCount {
+  int get _hierarchicalQueriesCount {
     final hierarchicalFilters = _getHierarchicalFilters();
     if (hierarchicalFilters.isEmpty) return 0;
     return hierarchicalFilters
@@ -29,8 +32,9 @@ class QueryBuilder {
         .reduce((value, element) => value + element);
   }
 
+  /// Get hierarchical filters from the search state's filter groups.
   Iterable<HierarchicalFilter> _getHierarchicalFilters() =>
-      searchState.filterGroups
+      _searchState.filterGroups
           ?.whereType<HierarchicalFilterGroup>()
           .expand((filterGroup) => filterGroup) ??
       [];
@@ -45,32 +49,34 @@ class QueryBuilder {
   }
 
   /// Total number of queries
-  int get totalQueriesCount =>
-      resultQueriesCount + disjunctiveQueriesCount + hierarchicalQueriesCount;
+  int get _totalQueriesCount =>
+      _resultQueriesCount +
+      _disjunctiveQueriesCount +
+      _hierarchicalQueriesCount;
 
   /// Build all the required queries for search, disjunctive and hierarchical
   /// faceting
   List<SearchState> build() => <SearchState>[
-        searchState,
-        ..._buildDisjunctiveFacetingQueries(searchState),
-        ..._buildHierarchicalFacetingQueries(searchState),
+        _searchState,
+        ..._buildDisjunctiveFacetingQueries(_searchState),
+        ..._buildHierarchicalFacetingQueries(_searchState),
       ];
 
   /// Merge search responses for generated queries regrouping
   /// the disjunctive and hierarchical facets information into a single response
   SearchResponse merge(List<SearchResponse> responses) {
     assert(
-      responses.length == totalQueriesCount,
+      responses.length == _totalQueriesCount,
       'number of responses (${responses.length}) not matches with number of '
-      'requests ($totalQueriesCount)',
+      'requests ($_totalQueriesCount)',
     );
 
     final aggregatedResponse = responses.removeAt(0);
 
     final disjunctiveFacetingResponses =
-        responses.sublist(0, disjunctiveQueriesCount);
+        responses.sublist(0, _disjunctiveQueriesCount);
     final hierarchicalFacetingResponses =
-        responses.sublist(disjunctiveQueriesCount, totalQueriesCount - 1);
+        responses.sublist(_disjunctiveQueriesCount, _totalQueriesCount - 1);
 
     for (final response in disjunctiveFacetingResponses) {
       aggregatedResponse.disjunctiveFacets.addAll(response.facets);
@@ -108,7 +114,7 @@ class QueryBuilder {
 
   /// Create modifiable copy of filter groups.
   Set<FilterGroup> _copyFilterGroups() =>
-      Set.from(searchState.filterGroups ?? {});
+      Set.from(_searchState.filterGroups ?? {});
 
   /// Build additional queries to fetch correct facets count values
   /// for hierarchical facets
