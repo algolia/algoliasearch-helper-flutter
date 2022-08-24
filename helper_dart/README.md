@@ -1,3 +1,3 @@
-# Algolia Dart Helpers
+# Algolia Helpers for Dart
 
 _TBD_
