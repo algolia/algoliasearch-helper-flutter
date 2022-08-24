@@ -14,7 +14,7 @@ import 'search_state.dart';
 class HitsSearchService {
   /// Creates [HitsSearchService] instance.
   HitsSearchService(this._client, this._disjunctiveFacetingEnabled)
-      : _log = defaultLogger;
+      : _log = algoliaLogger;
 
   /// Algolia API client
   final Algolia _client;
