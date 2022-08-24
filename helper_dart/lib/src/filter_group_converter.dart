@@ -83,10 +83,16 @@ class FilterConverter {
     switch (filter.value.runtimeType) {
       case NumericRange:
         return _sqlRange(
-            filter.value as NumericRange, filter.attribute, filter.isNegated);
+          filter.value as NumericRange,
+          filter.attribute,
+          filter.isNegated,
+        );
       case NumericComparison:
-        return _sqlComparison(filter.value as NumericComparison,
-            filter.attribute, filter.isNegated);
+        return _sqlComparison(
+          filter.value as NumericComparison,
+          filter.attribute,
+          filter.isNegated,
+        );
       default:
         throw ArgumentError('Filter type ${filter.runtimeType} not supported');
     }

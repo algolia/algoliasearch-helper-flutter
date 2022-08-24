@@ -108,7 +108,7 @@ class FacetFilterGroup extends FilterGroup<FilterFacet> {
   }) =>
       FacetFilterGroup(
         groupID ?? this.groupID,
-        filters ?? this._filters,
+        filters ?? _filters,
       );
 
   @override
@@ -128,7 +128,7 @@ class TagFilterGroup extends FilterGroup<FilterTag> {
   }) =>
       TagFilterGroup(
         groupID ?? this.groupID,
-        filters ?? this._filters,
+        filters ?? _filters,
       );
 
   @override
@@ -147,7 +147,7 @@ class NumericFilterGroup extends FilterGroup<FilterNumeric> {
   }) =>
       NumericFilterGroup(
         groupID ?? this.groupID,
-        filters ?? this._filters,
+        filters ?? _filters,
       );
 
   @override
@@ -172,7 +172,7 @@ class HierarchicalFilterGroup extends FilterGroup<HierarchicalFilter> {
   }) =>
       HierarchicalFilterGroup._(
         groupID ?? this.groupID,
-        filters ?? this._filters,
+        filters ?? _filters,
       );
 
   @override
