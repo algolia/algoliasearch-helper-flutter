@@ -3,6 +3,7 @@ import 'package:logging/logging.dart';
 
 import 'exception.dart';
 import 'extensions.dart';
+import 'filter_group.dart';
 import 'filter_group_converter.dart';
 import 'logger.dart';
 import 'query_builder.dart';
@@ -92,10 +93,7 @@ extension AlgoliaExt on Algolia {
         ?.let((it) => query = query.setSumOrFiltersScore(it));
     state.tagFilters?.let((it) => query = query.setTagFilters(it));
     state.userToken?.let((it) => query = query.setUserToken(it));
-    state.filterGroups?.let((it) {
-      final sql = const FilterGroupConverter().sql(it);
-      if (sql != null) query.filters(sql);
-    });
+    state.filterGroups?.let((it) => query = query.setFilterGroups(it));
     return query;
   }
 
@@ -144,6 +142,12 @@ extension AlgoliaQueryExt on AlgoliaQuery {
       query = query.setTagFilter(tagFilter);
     }
     return query;
+  }
+
+  /// Set filters as SQL-like [String] representation.
+  AlgoliaQuery setFilterGroups(Set<FilterGroup> filterGroups) {
+    final sql = const FilterGroupConverter().sql(filterGroups);
+    return sql != null ? filters(sql) : this;
   }
 }
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:algolia/algolia.dart';
 import 'package:algolia_helper_dart/algolia.dart';
 import 'package:algolia_helper_dart/src/hits_searcher_service.dart';
 import 'package:mockito/annotations.dart';
@@ -185,6 +186,38 @@ void main() {
     expect(snapshot, updated);
 
     searcher.dispose();
+  });
+
+  test('Filter Groups to filters', () {
+    final state = SearchState(
+      indexName: 'indexName',
+      filterGroups: {
+        FilterGroup.facet(filters: {Filter.facet('attributeA', 0)}),
+        FilterGroup.facet(
+          operator: FilterOperator.or,
+          filters: {Filter.facet('attributeA', 0)},
+        ),
+        FilterGroup.tag(
+          operator: FilterOperator.or,
+          filters: {Filter.tag('unknown')},
+        ),
+        FilterGroup.numeric(
+          operator: FilterOperator.or,
+          filters: {Filter.range('attributeA', lowerBound: 0, upperBound: 1)},
+        ),
+      },
+    );
+    const client = Algolia.init(
+      applicationId: 'applicationId',
+      apiKey: 'apiKey',
+    );
+
+    final query = client.queryOf(state);
+    expect(
+      query.parameters['filters'],
+      '("attributeA":0) AND ("attributeA":0) '
+      'AND (_tags:"unknown") AND ("attributeA":0 TO 1)',
+    );
   });
 }
 
