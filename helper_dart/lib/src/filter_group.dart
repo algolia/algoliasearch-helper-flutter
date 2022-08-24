@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:meta/meta.dart';
 
 import 'extensions.dart';
 import 'filter.dart';
@@ -46,6 +47,7 @@ abstract class FilterGroup<T> extends DelegatingSet<T> {
   const FilterGroup._(this.groupID, this._filters) : super(_filters);
 
   /// Creates [FilterGroup] as [FacetFilterGroup].
+  @factory
   static FacetFilterGroup facet({
     String name = '',
     Set<FilterFacet> filters = const {},
@@ -54,6 +56,7 @@ abstract class FilterGroup<T> extends DelegatingSet<T> {
       FacetFilterGroup(FilterGroupID(name, operator), filters);
 
   /// Creates [FilterGroup] as [TagFilterGroup].
+  @factory
   static TagFilterGroup tag({
     String name = '',
     Set<FilterTag> filters = const {},
@@ -62,6 +65,7 @@ abstract class FilterGroup<T> extends DelegatingSet<T> {
       TagFilterGroup(FilterGroupID(name, operator), filters);
 
   /// Creates [FilterGroup] as [NumericFilterGroup].
+  @factory
   static NumericFilterGroup numeric({
     String name = '',
     Set<FilterNumeric> filters = const {},
@@ -70,6 +74,7 @@ abstract class FilterGroup<T> extends DelegatingSet<T> {
       NumericFilterGroup(FilterGroupID(name, operator), filters);
 
   /// Creates [FilterGroup] as [HierarchicalFilterGroup].
+  @factory
   static HierarchicalFilterGroup hierarchical({
     String name = '',
     Set<HierarchicalFilter> filters = const {},
@@ -83,6 +88,7 @@ abstract class FilterGroup<T> extends DelegatingSet<T> {
   final Set<T> _filters;
 
   /// Create a copy with given parameters.
+  @factory
   FilterGroup<T> copyWith({FilterGroupID? groupID, Set<T>? filters});
 
   @override

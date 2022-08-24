@@ -8,7 +8,8 @@ import 'filter_group.dart';
 typedef FilterGroupMap<T> = Map<FilterGroupID, Set<T>>;
 
 /// Filter groups: facet, tag, numeric and hierarchical.
-class Filters {
+@sealed
+abstract class Filters {
   /// Creates [Filters] instance.
   @internal
   const Filters(
@@ -96,41 +97,11 @@ class Filters {
   }
 
   /// Create a copy with given parameters.
+  @factory
   Filters copyWith({
     Map<FilterGroupID, Set<FilterFacet>>? facetGroups,
     Map<FilterGroupID, Set<FilterTag>>? tagGroups,
     Map<FilterGroupID, Set<FilterNumeric>>? numericGroups,
     Map<String, HierarchicalFilter>? hierarchicalGroups,
-  }) =>
-      Filters(
-        facetGroups ?? this.facetGroups,
-        tagGroups ?? this.tagGroups,
-        numericGroups ?? this.numericGroups,
-        hierarchicalGroups ?? this.hierarchicalGroups,
-      );
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Filters &&
-          runtimeType == other.runtimeType &&
-          facetGroups == other.facetGroups &&
-          tagGroups == other.tagGroups &&
-          numericGroups == other.numericGroups &&
-          hierarchicalGroups == other.hierarchicalGroups;
-
-  @override
-  int get hashCode =>
-      facetGroups.hashCode ^
-      tagGroups.hashCode ^
-      numericGroups.hashCode ^
-      hierarchicalGroups.hashCode;
-
-  @override
-  String toString() => 'Filters{'
-      ' facetGroups: $facetGroups,'
-      ' tagGroups: $tagGroups,'
-      ' numericGroups: $numericGroups,'
-      ' hierarchicalGroups: $hierarchicalGroups'
-      '}';
+  });
 }
