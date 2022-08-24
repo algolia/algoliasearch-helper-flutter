@@ -3,6 +3,7 @@ import 'package:logging/logging.dart';
 
 import 'exception.dart';
 import 'extensions.dart';
+import 'filter_group_converter.dart';
 import 'logger.dart';
 import 'query_builder.dart';
 import 'search_response.dart';
@@ -91,7 +92,10 @@ extension AlgoliaExt on Algolia {
         ?.let((it) => query = query.setSumOrFiltersScore(it));
     state.tagFilters?.let((it) => query = query.setTagFilters(it));
     state.userToken?.let((it) => query = query.setUserToken(it));
-    // TODO: filters from: state.filterGroups and/or state.disjunctiveFacets
+    state.filterGroups?.let((it) {
+      final sql = const FilterGroupConverter().sql(it);
+      if (sql != null) query.filters(sql);
+    });
     return query;
   }
 

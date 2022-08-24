@@ -42,7 +42,7 @@ enum FilterOperator { and, or }
 
 /// Represents a filter group
 abstract class FilterGroup<T> extends DelegatingSet<T> {
-  const FilterGroup._(this.groupID, this.filters) : super(filters);
+  const FilterGroup._(this.groupID, this._filters) : super(_filters);
 
   /// Create [FilterGroup] as [FacetFilterGroup].
   static FacetFilterGroup facet({
@@ -79,7 +79,7 @@ abstract class FilterGroup<T> extends DelegatingSet<T> {
   final FilterGroupID groupID;
 
   /// Set of filters.
-  final Set<T> filters;
+  final Set<T> _filters;
 
   /// Create a copy with given parameters.
   FilterGroup<T> copyWith({FilterGroupID? groupID, Set<T>? filters});
@@ -90,10 +90,10 @@ abstract class FilterGroup<T> extends DelegatingSet<T> {
       other is FilterGroup &&
           runtimeType == other.runtimeType &&
           groupID == other.groupID &&
-          filters.equals(other.filters);
+          _filters.equals(other._filters);
 
   @override
-  int get hashCode => groupID.hashCode ^ filters.hashing();
+  int get hashCode => groupID.hashCode ^ _filters.hashing();
 }
 
 /// Facets filter group
@@ -108,11 +108,12 @@ class FacetFilterGroup extends FilterGroup<FilterFacet> {
   }) =>
       FacetFilterGroup(
         groupID ?? this.groupID,
-        filters ?? this.filters,
+        filters ?? this._filters,
       );
 
   @override
-  String toString() => 'FacetFilterGroup{groupID: $groupID, filters: $filters}';
+  String toString() =>
+      'FacetFilterGroup{groupID: $groupID, filters: $_filters}';
 }
 
 /// Tags filter group
@@ -127,11 +128,11 @@ class TagFilterGroup extends FilterGroup<FilterTag> {
   }) =>
       TagFilterGroup(
         groupID ?? this.groupID,
-        filters ?? this.filters,
+        filters ?? this._filters,
       );
 
   @override
-  String toString() => 'TagFilterGroup{groupID: $groupID, filters: $filters}';
+  String toString() => 'TagFilterGroup{groupID: $groupID, filters: $_filters}';
 }
 
 /// Numeric facets filter group
@@ -146,12 +147,12 @@ class NumericFilterGroup extends FilterGroup<FilterNumeric> {
   }) =>
       NumericFilterGroup(
         groupID ?? this.groupID,
-        filters ?? this.filters,
+        filters ?? this._filters,
       );
 
   @override
   String toString() =>
-      'NumericFilterGroup{groupID: $groupID, filters: $filters}';
+      'NumericFilterGroup{groupID: $groupID, filters: $_filters}';
 }
 
 /// Hierarchical filter group
@@ -171,10 +172,10 @@ class HierarchicalFilterGroup extends FilterGroup<HierarchicalFilter> {
   }) =>
       HierarchicalFilterGroup._(
         groupID ?? this.groupID,
-        filters ?? this.filters,
+        filters ?? this._filters,
       );
 
   @override
   String toString() =>
-      'HierarchicalFilterGroup{groupID: $groupID, filters: $filters}';
+      'HierarchicalFilterGroup{groupID: $groupID, filters: $_filters}';
 }

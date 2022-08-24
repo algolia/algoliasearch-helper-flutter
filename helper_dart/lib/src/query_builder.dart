@@ -32,7 +32,7 @@ class QueryBuilder {
   Iterable<HierarchicalFilter> _getHierarchicalFilters() =>
       searchState.filterGroups
           ?.whereType<HierarchicalFilterGroup>()
-          .expand((filterGroup) => filterGroup.filters) ??
+          .expand((filterGroup) => filterGroup) ??
       [];
 
   /// Number of generated hierarchical queries for given hierarchical
@@ -91,7 +91,7 @@ class QueryBuilder {
         final filterGroupsCopy = _copyFilterGroups();
         for (final filterGroup in filterGroupsCopy) {
           if (filterGroup.groupID.operator != FilterOperator.or) continue;
-          filterGroup.filters.removeWhere(
+          filterGroup.removeWhere(
             (element) => element is FilterFacet && element.attribute == facet,
           );
         }
@@ -115,7 +115,6 @@ class QueryBuilder {
   List<SearchState> _buildHierarchicalFacetingQueries(SearchState query) {
     final hierarchicalFilters = query.filterGroups
             ?.whereType<HierarchicalFilterGroup>()
-            .map((e) => e.filters)
             .expand((e) => e)
             .toList() ??
         [];
@@ -153,8 +152,7 @@ class QueryBuilder {
     final filterGroupsCopy = _copyFilterGroups()
       ..forEach((filterGroup) {
         if (filterGroup.groupID.operator == FilterOperator.and) {
-          filterGroup.filters
-              .removeWhere((filter) => filter == hierarchicalFilter);
+          filterGroup.removeWhere((filter) => filter == hierarchicalFilter);
         }
       });
 
@@ -164,7 +162,7 @@ class QueryBuilder {
       );
     }
 
-    filterGroupsCopy.removeWhere((group) => group.filters.isEmpty);
+    filterGroupsCopy.removeWhere((group) => group.isEmpty);
 
     return state.copyWith(
       facets: [facet],
