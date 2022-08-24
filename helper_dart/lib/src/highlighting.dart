@@ -9,7 +9,7 @@ extension Highlightable on Hit {
     String postTag = '</em>',
     bool inverted = false,
   ]) {
-    final highlightResult = json['_highlightResult'] as Map<String, dynamic>;
+    final highlightResult = this['_highlightResult'] as Map<String, dynamic>;
     final highlighted = highlightResult[attribute] as String;
     return HighlightedString.of(
       highlighted,

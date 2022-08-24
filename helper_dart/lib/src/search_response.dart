@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
 import '../algolia_helper.dart';
@@ -67,7 +68,8 @@ class SearchResponse {
   /// records).
   bool get exhaustiveNbHits => raw['exhaustiveNbHits'] as bool;
 
-  /// Time the server took to process the request, in milliseconds. This does not include network time.
+  /// Time the server took to process the request, in milliseconds.
+  /// This does not include network time.
   int get processingTimeMS => raw['processingTimeMS'] as int? ?? 0;
 
   @override
@@ -85,9 +87,9 @@ class SearchResponse {
 }
 
 /// Represents search hit result
-class Hit {
+class Hit extends DelegatingMap<String, dynamic> {
   /// Creates [Hit] instance.
-  Hit(this.json);
+  Hit(this._json) : super(_json);
 
   /// Creates [Hit] instance from [hit].
   factory Hit._from(Map hit) {
@@ -103,16 +105,16 @@ class Hit {
   }
 
   /// Hit raw json as map
-  final Map<String, dynamic> json;
+  final Map<String, dynamic> _json;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Hit && runtimeType == other.runtimeType && json == other.json;
+      other is Hit && runtimeType == other.runtimeType && _json == other._json;
 
   @override
-  int get hashCode => json.hashCode;
+  int get hashCode => _json.hashCode;
 
   @override
-  String toString() => 'Hit{json: $json}';
+  String toString() => 'Hit{json: $_json}';
 }

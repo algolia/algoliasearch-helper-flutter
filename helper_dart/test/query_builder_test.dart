@@ -9,7 +9,7 @@ void main() {
       query: 'phone',
       disjunctiveFacets: {'price', 'color'},
     );
-    final queryBuilder = QueryBuilder(query);
+    const queryBuilder = QueryBuilder(query);
     final queries = queryBuilder.build();
     final disjunctiveFacetingQueries = queries.skip(1);
     expect(disjunctiveFacetingQueries.length, 2);
