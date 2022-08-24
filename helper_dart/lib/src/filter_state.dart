@@ -12,6 +12,7 @@ class FilterState {
   /// Filters groups stream (facet, tag, numeric and hierarchical).
   Stream<Filters> get filters => _filters.stream.distinct();
 
+  /// Hot stream controller of [ImmutableFilters].
   final BehaviorSubject<ImmutableFilters> _filters =
       BehaviorSubject.seeded(const ImmutableFilters());
 

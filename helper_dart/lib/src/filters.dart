@@ -9,6 +9,7 @@ typedef FilterGroupMap<T> = Map<FilterGroupID, Set<T>>;
 
 /// Filter groups: facet, tag, numeric and hierarchical.
 class Filters {
+  /// Creates [Filters] instance.
   @internal
   const Filters(
     this.facetGroups,
