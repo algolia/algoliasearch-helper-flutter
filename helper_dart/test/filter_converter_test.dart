@@ -240,6 +240,105 @@ void main() {
         '(attributeA:0 TO 1 OR attributeB > 0)',
       );
     });
+
+    test('Two AND balanced groups of the same type', () {
+      final filterGroups = {
+        FilterGroup.tag(
+          operator: FilterOperator.or,
+          filters: {
+            Filter.tag('attributeA'),
+            Filter.tag('attributeB'),
+          },
+        ),
+        FilterGroup.tag(
+          operator: FilterOperator.or,
+          filters: {
+            Filter.tag('attributeA'),
+            Filter.tag('attributeB'),
+          },
+        ),
+      };
+
+      const converter = FilterGroupConverter();
+      expect(
+        converter.unquoted(filterGroups),
+        '(_tags:attributeA OR _tags:attributeB)',
+      );
+    });
+
+    test('Two AND balanced groups of the different types', () {
+      final filterGroups = <FilterGroup<Filter>>{
+        FilterGroup.tag(
+          operator: FilterOperator.or,
+          filters: {
+            Filter.tag('attributeA'),
+            Filter.tag('attributeB'),
+          },
+        ),
+        FilterGroup.numeric(
+          operator: FilterOperator.or,
+          filters: {
+            Filter.range('attributeA', lowerBound: 0, upperBound: 1),
+            Filter.range('attributeB', lowerBound: 0, upperBound: 1),
+          },
+        ),
+      };
+
+      const converter = FilterGroupConverter();
+      expect(
+        converter.unquoted(filterGroups),
+        '(_tags:attributeA OR _tags:attributeB)'
+        ' AND (attributeA:0 TO 1 OR attributeB:0 TO 1)',
+      );
+    });
+
+    test('Two AND unbalanced groups of the same type', () {
+      final filterGroups = {
+        FilterGroup.tag(
+          operator: FilterOperator.or,
+          filters: {
+            Filter.tag('attributeA'),
+          },
+        ),
+        FilterGroup.tag(
+          operator: FilterOperator.or,
+          filters: {
+            Filter.tag('attributeA'),
+            Filter.tag('attributeB'),
+          },
+        ),
+      };
+
+      const converter = FilterGroupConverter();
+      expect(
+        converter.unquoted(filterGroups),
+        '(_tags:attributeA) AND (_tags:attributeA OR _tags:attributeB)',
+      );
+    });
+
+    test('Two AND unbalanced groups of the different types', () {
+      final filterGroups = <FilterGroup<Filter>>{
+        FilterGroup.tag(
+          operator: FilterOperator.or,
+          filters: {
+            Filter.tag('attributeA'),
+            Filter.tag('attributeB'),
+          },
+        ),
+        FilterGroup.numeric(
+          operator: FilterOperator.or,
+          filters: {
+            Filter.range('attributeA', lowerBound: 0, upperBound: 1),
+          },
+        ),
+      };
+
+      const converter = FilterGroupConverter();
+      expect(
+        converter.unquoted(filterGroups),
+        '(_tags:attributeA OR _tags:attributeB) AND (attributeA:0 TO 1)',
+      );
+    });
   });
 
   test('Numeric operator symbols', () {
