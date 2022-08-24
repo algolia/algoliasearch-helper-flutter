@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 
-import '../algolia.dart';
 import 'filter.dart';
 import 'utils.dart';
 
@@ -46,41 +45,34 @@ abstract class FilterGroup<T> extends DelegatingSet<T> {
   const FilterGroup._(this.groupID, this.filters) : super(filters);
 
   /// Create [FilterGroup] as [FacetFilterGroup].
-  static FacetFilterGroup facet([
+  static FacetFilterGroup facet({
     String name = '',
     Set<FilterFacet> filters = const {},
     FilterOperator operator = FilterOperator.and,
-  ]) =>
+  }) =>
       FacetFilterGroup(FilterGroupID(name, operator), filters);
 
   /// Create [FilterGroup] as [TagFilterGroup].
-  static TagFilterGroup tag([
+  static TagFilterGroup tag({
     String name = '',
     Set<FilterTag> filters = const {},
     FilterOperator operator = FilterOperator.and,
-  ]) =>
+  }) =>
       TagFilterGroup(FilterGroupID(name, operator), filters);
 
   /// Create [FilterGroup] as [NumericFilterGroup].
-  static NumericFilterGroup numeric([
+  static NumericFilterGroup numeric({
     String name = '',
     Set<FilterNumeric> filters = const {},
     FilterOperator operator = FilterOperator.and,
-  ]) =>
+  }) =>
       NumericFilterGroup(FilterGroupID(name, operator), filters);
 
-  /// Create [FilterGroup] as [MultiFilterGroup].
-  static MultiFilterGroup multi([
-    String name = '',
-    Set<Filter> filters = const {},
-  ]) =>
-      MultiFilterGroup(FilterGroupID.and(name), filters);
-
   /// Create [FilterGroup] as [HierarchicalFilterGroup].
-  static HierarchicalFilterGroup hierarchical([
+  static HierarchicalFilterGroup hierarchical({
     String name = '',
     Set<HierarchicalFilter> filters = const {},
-  ]) =>
+  }) =>
       HierarchicalFilterGroup(name, filters);
 
   /// Filter group ID (name and operator)
@@ -102,26 +94,6 @@ abstract class FilterGroup<T> extends DelegatingSet<T> {
 
   @override
   int get hashCode => groupID.hashCode ^ filters.hashing();
-}
-
-/// Filter group for any kind of [Filter].
-class MultiFilterGroup extends FilterGroup<Filter> {
-  MultiFilterGroup(super.groupID, super.filters) : super._() {
-    assert(groupID.operator == FilterOperator.and);
-  }
-
-  @override
-  FilterGroup<Filter> copyWith({
-    FilterGroupID? groupID,
-    Set<Filter>? filters,
-  }) =>
-      MultiFilterGroup(
-        groupID ?? this.groupID,
-        filters ?? this.filters,
-      );
-
-  @override
-  String toString() => 'MultiFilterGroup{groupID: $groupID, filters: $filters}';
 }
 
 /// Facets filter group
@@ -187,7 +159,9 @@ class HierarchicalFilterGroup extends FilterGroup<HierarchicalFilter> {
   HierarchicalFilterGroup(String name, Set<HierarchicalFilter> filters)
       : this._(FilterGroupID(name), filters);
 
-  const HierarchicalFilterGroup._(super.groupID, super.filters) : super._();
+  HierarchicalFilterGroup._(super.groupID, super.filters) : super._() {
+    assert(groupID.operator == FilterOperator.and);
+  }
 
   /// Make a copy of the hierarchical filters group.
   @override

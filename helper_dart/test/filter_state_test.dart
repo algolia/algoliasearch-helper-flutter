@@ -196,8 +196,8 @@ void main() {
     final snapshot = filterState.snapshot();
     final filterGroups = snapshot.toFilterGroups();
     expect(filterGroups, {
-      FilterGroup.facet(attributeA, {facetA}),
-      FilterGroup.facet(attributeB, {facetB}),
+      FilterGroup.facet(name: attributeA, filters: {facetA}),
+      FilterGroup.facet(name: attributeB, filters: {facetB}),
     });
   });
 

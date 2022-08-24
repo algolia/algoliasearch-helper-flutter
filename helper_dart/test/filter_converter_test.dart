@@ -1,5 +1,4 @@
 import 'package:algolia_helper_dart/algolia.dart';
-import 'package:algolia_helper_dart/src/filter_group_builder.dart';
 import 'package:algolia_helper_dart/src/filter_group_converter.dart';
 import 'package:test/test.dart';
 
@@ -97,11 +96,14 @@ void main() {
   group('Filter group SQL', () {
     test('Filter group facet AND', () {
       final filterGroups = {
-        FilterGroup.facet('groupA', {
-          Filter.facet('attributeA', 0),
-          Filter.facet('attributeA', 1),
-        })
+        FilterGroup.facet(
+          filters: {
+            Filter.facet('attributeA', 0),
+            Filter.facet('attributeA', 1),
+          },
+        )
       };
+
       const converter = FilterGroupConverter();
       expect(
         converter.toSQLUnquoted(filterGroups),
@@ -112,14 +114,14 @@ void main() {
     test('Filter group facet OR', () {
       final filterGroups = {
         FilterGroup.facet(
-          'groupA',
-          {
+          operator: FilterOperator.or,
+          filters: {
             Filter.facet('attributeA', 0),
             Filter.facet('attributeA', 1),
           },
-          FilterOperator.or,
         )
       };
+
       const converter = FilterGroupConverter();
       expect(
         converter.toSQLUnquoted(filterGroups),
@@ -130,12 +132,11 @@ void main() {
     test('Filter group tag OR', () {
       final filterGroups = {
         FilterGroup.tag(
-          'groupA',
-          {
+          operator: FilterOperator.or,
+          filters: {
             Filter.tag('a'),
             Filter.tag('b'),
           },
-          FilterOperator.or,
         )
       };
       const converter = FilterGroupConverter();
@@ -145,12 +146,11 @@ void main() {
     test('Filter group numeric OR', () {
       final filterGroups = {
         FilterGroup.numeric(
-          'groupA',
-          {
+          operator: FilterOperator.or,
+          filters: {
             Filter.range('attributeA', lowerBound: 0, upperBound: 1),
             Filter.comparison('attributeA', NumericOperator.notEquals, 0),
           },
-          FilterOperator.or,
         )
       };
       const converter = FilterGroupConverter();
@@ -172,7 +172,7 @@ void main() {
 
     test('Single filter', () {
       final filterGroups = {
-        FilterGroup.facet('groupA', {Filter.facet('attributeA', 0)})
+        FilterGroup.facet(filters: {Filter.facet('attributeA', 0)})
       };
       const converter = FilterGroupConverter();
       expect(converter.toSQLUnquoted(filterGroups), '(attributeA:0)');
@@ -180,17 +180,18 @@ void main() {
 
     test('one of every type', () {
       final filterGroups = <FilterGroup<Filter>>{
-        FilterGroup.facet('groupA', {Filter.facet('attributeA', 0)}),
+        FilterGroup.facet(filters: {Filter.facet('attributeA', 0)}),
         FilterGroup.facet(
-          'groupA',
-          {Filter.facet('attributeA', 0)},
-          FilterOperator.or,
+          operator: FilterOperator.or,
+          filters: {Filter.facet('attributeA', 0)},
         ),
-        FilterGroup.tag('groupA', {Filter.tag('unknown')}, FilterOperator.or),
+        FilterGroup.tag(
+          operator: FilterOperator.or,
+          filters: {Filter.tag('unknown')},
+        ),
         FilterGroup.numeric(
-          'groupA',
-          {Filter.range('attributeA', lowerBound: 0, upperBound: 1)},
-          FilterOperator.or,
+          operator: FilterOperator.or,
+          filters: {Filter.range('attributeA', lowerBound: 0, upperBound: 1)},
         ),
       };
       const converter = FilterGroupConverter();
@@ -205,22 +206,30 @@ void main() {
 
     test('Two of every type', () {
       final filterGroups = <FilterGroup<Filter>>{
-        (FacetGroupBuilder()
-              ..facet('attributeA', 0)
-              ..facet('attributeB', 0))
-            .build(),
-        (FacetGroupBuilder(operator: FilterOperator.or)
-              ..facet('attributeA', 0)
-              ..facet('attributeB', 0))
-            .build(),
-        (TagGroupBuilder(operator: FilterOperator.or)
-              ..tag('attributeA')
-              ..tag('attributeB'))
-            .build(),
-        (NumericGroupBuilder(operator: FilterOperator.or)
-              ..range('attributeA', lowerBound: 0, upperBound: 1)
-              ..comparison('attributeB', NumericOperator.greater, 0))
-            .build(),
+        FilterGroup.facet(
+          filters: {
+            Filter.facet('attributeA', 0),
+            Filter.facet('attributeB', 0),
+          },
+        ),
+        FilterGroup.facet(
+          operator: FilterOperator.or,
+          filters: {
+            Filter.facet('attributeA', 0),
+            Filter.facet('attributeB', 0),
+          },
+        ),
+        FilterGroup.tag(
+          operator: FilterOperator.or,
+          filters: {Filter.tag('attributeA'), Filter.tag('attributeB')},
+        ),
+        FilterGroup.numeric(
+          operator: FilterOperator.or,
+          filters: {
+            Filter.range('attributeA', lowerBound: 0, upperBound: 1),
+            Filter.comparison('attributeB', NumericOperator.greater, 0),
+          },
+        ),
       };
       const converter = FilterGroupConverter();
       expect(
@@ -229,21 +238,6 @@ void main() {
         '(attributeA:0 OR attributeB:0) AND '
         '(_tags:attributeA OR _tags:attributeB) AND '
         '(attributeA:0 TO 1 OR attributeB > 0)',
-      );
-    });
-
-    test('single And group with different types', () {
-      final filterGroups = {
-        (MultiFilterGroupBuilder()
-              ..facet('attributeA', 0)
-              ..tag('unknown'))
-            .build()
-      };
-
-      const converter = FilterGroupConverter();
-      expect(
-        converter.toSQLUnquoted(filterGroups),
-        '(attributeA:0 AND _tags:unknown)',
       );
     });
   });
