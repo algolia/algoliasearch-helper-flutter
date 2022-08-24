@@ -36,11 +36,11 @@ class MockHitsSearchService extends _i1.Mock implements _i3.HitsSearchService {
   }
 
   @override
-  _i2.Algolia get client => (super.noSuchMethod(Invocation.getter(#client),
+  _i2.Algolia get _client => (super.noSuchMethod(Invocation.getter(#client),
           returnValue: _FakeAlgolia_0(this, Invocation.getter(#client)))
       as _i2.Algolia);
   @override
-  bool get disjunctiveFacetingEnabled =>
+  bool get _disjunctiveFacetingEnabled =>
       (super.noSuchMethod(Invocation.getter(#disjunctiveFacetingEnabled),
           returnValue: false) as bool);
   @override

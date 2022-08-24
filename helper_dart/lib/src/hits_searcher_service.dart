@@ -12,11 +12,17 @@ import 'search_state.dart';
 
 /// Service handling search requests.
 class HitsSearchService {
-  HitsSearchService(this.client, this.disjunctiveFacetingEnabled)
+  /// Creates [HitsSearchService] instance.
+  HitsSearchService(this._client, this._disjunctiveFacetingEnabled)
       : _log = defaultLogger;
 
-  final Algolia client;
-  final bool disjunctiveFacetingEnabled;
+  /// Algolia API client
+  final Algolia _client;
+
+  /// Disjunctive faceting enable status
+  final bool _disjunctiveFacetingEnabled;
+
+  /// Search events logger.
   final Logger _log;
 
   /// Search responses as a stream.
@@ -25,7 +31,7 @@ class HitsSearchService {
 
   /// Run search query using [state] and get a search result.
   Future<SearchResponse> _search(SearchState state) =>
-      disjunctiveFacetingEnabled
+      _disjunctiveFacetingEnabled
           ? _disjunctiveSearch(state)
           : _singleQuerySearch(state);
 
@@ -33,7 +39,7 @@ class HitsSearchService {
   Future<SearchResponse> _singleQuerySearch(SearchState state) async {
     _log.fine('Run search with state: $state');
     try {
-      final response = await client.queryOf(state).getObjects();
+      final response = await _client.queryOf(state).getObjects();
       _log.fine('Search response: $response');
       return response.toSearchResponse();
     } catch (exception) {
@@ -47,9 +53,9 @@ class HitsSearchService {
     _log.fine('Start disjunctive search: $state');
     try {
       final queryBuilder = QueryBuilder(state);
-      final queries = queryBuilder.build().map(client.queryOf).toList();
+      final queries = queryBuilder.build().map(_client.queryOf).toList();
       final responses =
-          await client.multipleQueries.addQueries(queries).getObjects();
+          await _client.multipleQueries.addQueries(queries).getObjects();
       _log.fine('Search responses: $responses');
       return queryBuilder
           .merge(responses.map((r) => r.toSearchResponse()).toList());
@@ -153,16 +159,12 @@ extension AlgoliaQueryExt on AlgoliaQuery {
 
 /// Extensions over [AlgoliaQuerySnapshot].
 extension AlgoliaQuerySnapshotExt on AlgoliaQuerySnapshot {
+  /// Converts API response to [SearchResponse].
   SearchResponse toSearchResponse() => SearchResponse(toMap());
-}
-
-/// Extensions over a list of [AlgoliaQuerySnapshot].
-extension ListAlgoliaQuerySnapshotExt on List<AlgoliaQuerySnapshot> {
-  SearchResponse toSearchResponseFor(SearchState state) =>
-      QueryBuilder(state).merge(map((e) => e.toSearchResponse()).toList());
 }
 
 /// Extensions over [AlgoliaError].
 extension AlgoliaErrorExt on AlgoliaError {
+  /// Converts API error to [SearchError].
   SearchError toSearchError() => SearchError(error, statusCode);
 }
