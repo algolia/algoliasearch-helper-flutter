@@ -42,9 +42,10 @@ enum FilterOperator { and, or }
 
 /// Represents a filter group
 abstract class FilterGroup<T> extends DelegatingSet<T> {
+  /// Creates [FilterGroupID] instance.
   const FilterGroup._(this.groupID, this._filters) : super(_filters);
 
-  /// Create [FilterGroup] as [FacetFilterGroup].
+  /// Creates [FilterGroup] as [FacetFilterGroup].
   static FacetFilterGroup facet({
     String name = '',
     Set<FilterFacet> filters = const {},
@@ -52,7 +53,7 @@ abstract class FilterGroup<T> extends DelegatingSet<T> {
   }) =>
       FacetFilterGroup(FilterGroupID(name, operator), filters);
 
-  /// Create [FilterGroup] as [TagFilterGroup].
+  /// Creates [FilterGroup] as [TagFilterGroup].
   static TagFilterGroup tag({
     String name = '',
     Set<FilterTag> filters = const {},
@@ -60,7 +61,7 @@ abstract class FilterGroup<T> extends DelegatingSet<T> {
   }) =>
       TagFilterGroup(FilterGroupID(name, operator), filters);
 
-  /// Create [FilterGroup] as [NumericFilterGroup].
+  /// Creates [FilterGroup] as [NumericFilterGroup].
   static NumericFilterGroup numeric({
     String name = '',
     Set<FilterNumeric> filters = const {},
@@ -68,7 +69,7 @@ abstract class FilterGroup<T> extends DelegatingSet<T> {
   }) =>
       NumericFilterGroup(FilterGroupID(name, operator), filters);
 
-  /// Create [FilterGroup] as [HierarchicalFilterGroup].
+  /// Creates [FilterGroup] as [HierarchicalFilterGroup].
   static HierarchicalFilterGroup hierarchical({
     String name = '',
     Set<HierarchicalFilter> filters = const {},
@@ -98,6 +99,7 @@ abstract class FilterGroup<T> extends DelegatingSet<T> {
 
 /// Facets filter group
 class FacetFilterGroup extends FilterGroup<FilterFacet> {
+  /// Creates an [FilterGroup] instance.
   const FacetFilterGroup(super.groupID, super.filters) : super._();
 
   /// Make a copy of the facet filters group.
@@ -118,6 +120,7 @@ class FacetFilterGroup extends FilterGroup<FilterFacet> {
 
 /// Tags filter group
 class TagFilterGroup extends FilterGroup<FilterTag> {
+  /// Creates an [TagFilterGroup] instance.
   const TagFilterGroup(super.groupID, super.filters) : super._();
 
   /// Make a copy of the tag filters group.
@@ -137,6 +140,7 @@ class TagFilterGroup extends FilterGroup<FilterTag> {
 
 /// Numeric facets filter group
 class NumericFilterGroup extends FilterGroup<FilterNumeric> {
+  /// Creates an [NumericFilterGroup] instance.
   const NumericFilterGroup(super.groupID, super.filters) : super._();
 
   /// Make a copy of the numeric filters group.
@@ -157,9 +161,11 @@ class NumericFilterGroup extends FilterGroup<FilterNumeric> {
 
 /// Hierarchical filter group
 class HierarchicalFilterGroup extends FilterGroup<HierarchicalFilter> {
+  /// Creates an [HierarchicalFilterGroup] instance.
   HierarchicalFilterGroup(String name, Set<HierarchicalFilter> filters)
       : this._(FilterGroupID(name), filters);
 
+  /// Creates an [HierarchicalFilterGroup] instance.
   HierarchicalFilterGroup._(super.groupID, super.filters) : super._() {
     assert(groupID.operator == FilterOperator.and);
   }
