@@ -1,8 +1,8 @@
 import 'package:collection/collection.dart';
 
+import 'extensions.dart';
 import 'filter.dart';
 import 'filter_group.dart';
-import 'utils.dart';
 
 /// Converts [FilterGroup] to an SQL like syntax.
 class FilterGroupConverter {
@@ -11,7 +11,7 @@ class FilterGroupConverter {
 
   /// Converts [FilterGroup] to its SQL-like [String] representation.
   /// Returns `null` if the list is empty.
-  String? toSQL(Set<FilterGroup<Filter>> filterGroups) {
+  String? sql(Set<FilterGroup<Filter>> filterGroups) {
     final groups = filterGroups.whereNot((element) => element.isEmpty);
     if (groups.isEmpty) return null;
     return groups.joinToString(
@@ -20,14 +20,14 @@ class FilterGroupConverter {
         prefix: '(',
         postfix: ')',
         separator: _separatorOf(group),
-        transform: (filter) => const FilterConverter().toSQL(filter),
+        transform: (filter) => const FilterConverter().sql(filter),
       ),
     );
   }
 
-  /// Same as [toSQL], but removes quotes for readability purposes.
-  String? toSQLUnquoted(Set<FilterGroup<Filter>> filterGroups) =>
-      toSQL(filterGroups)?.replaceAll('\"', '');
+  /// Same as [sql], but removes quotes for readability purposes.
+  String? unquoted(Set<FilterGroup<Filter>> filterGroups) =>
+      sql(filterGroups)?.replaceAll('\"', '');
 
   /// Get separator string (i.e. AND/OR) of a [group].
   String _separatorOf(FilterGroup group) {
@@ -46,22 +46,22 @@ class FilterConverter {
   const FilterConverter();
 
   /// Converts [Filter] to its SQL-like [String] representation.
-  String toSQL(Filter filter) {
+  String sql(Filter filter) {
     switch (filter.runtimeType) {
       case FilterFacet:
-        return _facetToSQL(filter as FilterFacet);
+        return _sqlFacet(filter as FilterFacet);
       case FilterTag:
-        return _tagToSQL(filter as FilterTag);
+        return _sqlTag(filter as FilterTag);
       case FilterNumeric:
-        return _numericToSQL(filter as FilterNumeric);
+        return _sqlNumeric(filter as FilterNumeric);
       default:
         throw ArgumentError('Filter type ${filter.runtimeType} not supported');
     }
   }
 
   /// Converts [FilterFacet] to its SQL-like [String] representation.
-  String _facetToSQL(FilterFacet filter) {
-    final value = _valueToSQL(filter.value);
+  String _sqlFacet(FilterFacet filter) {
+    final value = _sqlValue(filter.value);
     final attribute = _escape(filter.attribute);
     final score = filter.score != null ? '<score=${filter.score}>' : '';
     final expression = '$attribute:$value$score';
@@ -69,7 +69,7 @@ class FilterConverter {
   }
 
   /// Converts [FilterTag] to its SQL-like [String] representation.
-  String _tagToSQL(FilterTag filter) {
+  String _sqlTag(FilterTag filter) {
     final attribute = filter.attribute;
     final escapedValue = _escape(filter.value);
     final expression = '$attribute:$escapedValue';
@@ -77,13 +77,13 @@ class FilterConverter {
   }
 
   /// Converts [FilterNumeric] to its SQL-like [String] representation.
-  String _numericToSQL(FilterNumeric filter) {
+  String _sqlNumeric(FilterNumeric filter) {
     switch (filter.value.runtimeType) {
       case NumericRange:
-        return _rangeToSQL(
+        return _sqlRange(
             filter.value as NumericRange, filter.attribute, filter.isNegated);
       case NumericComparison:
-        return _comparisonToSQL(filter.value as NumericComparison,
+        return _sqlComparison(filter.value as NumericComparison,
             filter.attribute, filter.isNegated);
       default:
         throw ArgumentError('Filter type ${filter.runtimeType} not supported');
@@ -91,7 +91,7 @@ class FilterConverter {
   }
 
   /// Converts [NumericRange] to its SQL-like [String] representation.
-  String _rangeToSQL(NumericRange range, String attribute, bool isNegated) {
+  String _sqlRange(NumericRange range, String attribute, bool isNegated) {
     final escapedAttribute = _escape(attribute);
     final lowerBound = range.lowerBound;
     final upperBound = range.upperBound;
@@ -101,7 +101,7 @@ class FilterConverter {
 
   /// Converts [FilterNumeric] with [NumericComparison] value to its SQL-like
   /// [String] representation.
-  String _comparisonToSQL(
+  String _sqlComparison(
     NumericComparison comparison,
     String attribute,
     bool isNegated,
@@ -114,7 +114,7 @@ class FilterConverter {
   }
 
   /// Converts [value] to its SQL-like [String] representation.
-  String _valueToSQL(dynamic value) {
+  String _sqlValue(dynamic value) {
     switch (value.runtimeType) {
       case String:
         return _escape(value as String);

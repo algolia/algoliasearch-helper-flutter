@@ -1,5 +1,5 @@
+import 'extensions.dart';
 import 'filter_group.dart';
-import 'utils.dart';
 
 /// Representation of search state.
 class SearchState {

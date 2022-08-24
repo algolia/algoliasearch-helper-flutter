@@ -1,9 +1,9 @@
 import 'package:meta/meta.dart';
 
+import 'extensions.dart';
 import 'filter.dart';
 import 'filter_group.dart';
 import 'filters.dart';
-import 'utils.dart';
 
 /// Immutable filters implementation.
 /// **All operations create a new object with requested changes.**

@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 
+import 'extensions.dart';
 import 'filter.dart';
-import 'utils.dart';
 
 /// Identifier of a filter group.
 /// The group name is for access purpose only, won't be used for the actual

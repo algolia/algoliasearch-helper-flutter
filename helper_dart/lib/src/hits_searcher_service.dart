@@ -2,11 +2,11 @@ import 'package:algolia/algolia.dart';
 import 'package:logging/logging.dart';
 
 import 'exception.dart';
+import 'extensions.dart';
 import 'logger.dart';
 import 'query_builder.dart';
 import 'search_response.dart';
 import 'search_state.dart';
-import 'utils.dart';
 
 /// Service handling search requests.
 class HitsSearchService {
