@@ -1,5 +1,5 @@
-import 'package:algolia_helper_dart/algolia.dart';
-import 'package:algolia_helper_dart/src/query_builder.dart';
+import 'package:algolia_helper/algolia_helper.dart';
+import 'package:algolia_helper/src/query_builder.dart';
 import 'package:test/test.dart';
 
 void main() {

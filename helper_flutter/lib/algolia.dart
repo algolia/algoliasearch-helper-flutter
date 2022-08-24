@@ -4,6 +4,6 @@
 /// experiences at a deeper level for Flutter framework.
 library algolia_helper_flutter;
 
-export 'package:algolia_helper_dart/algolia.dart'; // expose dart helpers
+export 'package:algolia_helper/algolia_helper.dart'; // expose dart helpers
 
 export 'src/highlighting.dart';

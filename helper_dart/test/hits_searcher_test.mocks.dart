@@ -6,9 +6,9 @@
 import 'dart:async' as _i4;
 
 import 'package:algolia/algolia.dart' as _i2;
-import 'package:algolia_helper_dart/src/hits_searcher_service.dart' as _i3;
-import 'package:algolia_helper_dart/src/search_response.dart' as _i5;
-import 'package:algolia_helper_dart/src/search_state.dart' as _i6;
+import 'package:algolia_helper/src/hits_searcher_service.dart' as _i3;
+import 'package:algolia_helper/src/search_response.dart' as _i5;
+import 'package:algolia_helper/src/search_state.dart' as _i6;
 import 'package:mockito/mockito.dart' as _i1;
 
 // ignore_for_file: type=lint

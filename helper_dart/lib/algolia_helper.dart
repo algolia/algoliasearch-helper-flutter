@@ -2,7 +2,7 @@
 ///
 /// Provides patterns and APIs that make it possible to customize search
 /// experiences at a deeper level, in pure Dart.
-library algolia_helper_dart;
+library algolia_helper;
 
 export 'src/exception.dart';
 export 'src/filter.dart';

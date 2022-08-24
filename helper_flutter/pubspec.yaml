@@ -8,7 +8,7 @@ environment:
   flutter: ">=1.17.0"
 
 dependencies:
-  algolia_helper_dart: 0.0.1  # Use the exact version until the API is stable.
+  algolia_helper: 0.0.1  # Use the exact version until the API is stable.
   flutter:
     sdk: flutter
 
@@ -18,7 +18,7 @@ dev_dependencies:
     sdk: flutter
 
 dependency_overrides:
-  algolia_helper_dart:
+  algolia_helper:
     path: ../helper_dart
 
 
