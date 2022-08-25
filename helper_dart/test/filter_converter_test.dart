@@ -24,8 +24,9 @@ void main() {
 
       const converter = FilterConverter();
       expect(converter.sql(filterInt), '\"attributeA\":1');
-      expect(converter.sql(filterDouble), '\"attributeA\":1.0');
-      expect(converter.sql(filterDouble.not()), 'NOT \"attributeA\":1.0');
+      expect(converter.sql(filterDouble), '\"attributeA\":${1.0}');
+      expect(converter.sql(filterDouble.not()), 'NOT \"attributeA\":${1.0}');
+      expect(converter.sql(filterScore), '\"attributeA\":1<score=2>');
       expect(converter.sql(filterScore), '\"attributeA\":1<score=2>');
     });
 
@@ -51,26 +52,25 @@ void main() {
 
   group('Filter numeric SQL', () {
     test('Filter numeric comparison', () {
-      final less = Filter.comparison('attributeA', NumericOperator.less, 5.0);
+      final less = Filter.comparison('attributeA', NumericOperator.less, 5);
       final lessOrEquals =
-          Filter.comparison('attributeA', NumericOperator.lessOrEquals, 5.0);
-      final equals =
-          Filter.comparison('attributeA', NumericOperator.equals, 5.0);
+          Filter.comparison('attributeA', NumericOperator.lessOrEquals, 5);
+      final equals = Filter.comparison('attributeA', NumericOperator.equals, 5);
       final notEquals =
-          Filter.comparison('attributeA', NumericOperator.notEquals, 5.0);
+          Filter.comparison('attributeA', NumericOperator.notEquals, 5);
       final greater =
-          Filter.comparison('attributeA', NumericOperator.greater, 5.0);
+          Filter.comparison('attributeA', NumericOperator.greater, 5);
       final greaterOrEquals =
-          Filter.comparison('attributeA', NumericOperator.greaterOrEquals, 5.0);
+          Filter.comparison('attributeA', NumericOperator.greaterOrEquals, 5);
 
       const converter = FilterConverter();
-      expect(converter.sql(less), '\"attributeA\" < 5.0');
-      expect(converter.sql(lessOrEquals), '\"attributeA\" <= 5.0');
-      expect(converter.sql(equals), '\"attributeA\" = 5.0');
-      expect(converter.sql(notEquals), '\"attributeA\" != 5.0');
-      expect(converter.sql(greater), '\"attributeA\" > 5.0');
-      expect(converter.sql(greaterOrEquals), '\"attributeA\" >= 5.0');
-      expect(converter.sql(less.not()), 'NOT \"attributeA\" < 5.0');
+      expect(converter.sql(less), '\"attributeA\" < 5');
+      expect(converter.sql(lessOrEquals), '\"attributeA\" <= 5');
+      expect(converter.sql(equals), '\"attributeA\" = 5');
+      expect(converter.sql(notEquals), '\"attributeA\" != 5');
+      expect(converter.sql(greater), '\"attributeA\" > 5');
+      expect(converter.sql(greaterOrEquals), '\"attributeA\" >= 5');
+      expect(converter.sql(less.not()), 'NOT \"attributeA\" < 5');
     });
 
     test('Filter numeric range', () {
@@ -81,7 +81,7 @@ void main() {
 
       const converter = FilterConverter();
       expect(converter.sql(filterInt), '\"attributeA\":0 TO 6');
-      expect(converter.sql(filterDouble), '\"attributeA\":0.0 TO 6.0');
+      expect(converter.sql(filterDouble), '\"attributeA\":${0.0} TO ${6.0}');
       expect(converter.sql(filterInt.not()), 'NOT \"attributeA\":0 TO 6');
     });
   });
