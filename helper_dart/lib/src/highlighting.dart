@@ -87,10 +87,10 @@ HighlightedString _highlightTokenizer(
 
 /// Highlight string token.
 class HighlightToken {
-  HighlightToken._(this.content, this.highlighted);
+  HighlightToken._(this.content, this.isHighlighted);
 
   final String content;
-  final bool highlighted;
+  final bool isHighlighted;
 
   @override
   bool operator ==(Object other) =>
@@ -98,14 +98,14 @@ class HighlightToken {
       other is HighlightToken &&
           runtimeType == other.runtimeType &&
           content == other.content &&
-          highlighted == other.highlighted;
+          isHighlighted == other.isHighlighted;
 
   @override
-  int get hashCode => content.hashCode ^ highlighted.hashCode;
+  int get hashCode => content.hashCode ^ isHighlighted.hashCode;
 
   @override
   String toString() =>
-      'HighlightToken{content: $content, highlighted: $highlighted}';
+      'HighlightToken{content: $content, highlighted: $isHighlighted}';
 }
 
 class _Defaults {
