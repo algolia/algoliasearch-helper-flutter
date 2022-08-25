@@ -4,9 +4,9 @@ void main() {
   // Create a hits searcher.
   // The Searcher performs search requests and obtains search result
   final searcher = HitsSearcher(
-    applicationID: 'latency',
-    apiKey: '1a23398ec6339348c9a753b22aaed3cb',
-    indexName: 'movies',
+    applicationID: 'MY_APPLICATION_ID',
+    apiKey: 'MY_API_KEY',
+    indexName: 'MY_INDEX_NAME',
   );
 
   // Create the component to handle the filtering logic: FilterState.
@@ -21,7 +21,6 @@ void main() {
   // Run your search operations and listen the results!
   searcher.responses.listen((response) {
     print('${response.nbHits} hits found');
-    print('query: ${response.params}');
     for (var hit in response.hits) {
       print("> ${hit['title']}");
     }

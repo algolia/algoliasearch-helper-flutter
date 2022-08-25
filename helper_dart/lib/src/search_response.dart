@@ -16,7 +16,7 @@ class SearchResponse {
   final Map<String, dynamic> raw;
 
   /// Search hits list
-  final Iterable<Hit> hits;
+  final List<Hit> hits;
 
   /// A mapping of each facet name to the corresponding facet counts for
   /// disjunctive facets.
@@ -98,7 +98,7 @@ class Hit extends DelegatingMap<String, dynamic> {
   }
 
   /// Creates List of [Hit] from [data].
-  static Iterable<Hit> _fromList(data) {
+  static List<Hit> _fromList(data) {
     final hits = data as List?;
     if (hits == null) return const [];
     return List<Map>.from(hits).map(Hit._from).toList();

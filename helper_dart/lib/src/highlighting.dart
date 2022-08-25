@@ -10,7 +10,8 @@ extension Highlightable on Hit {
     bool inverted = false,
   ]) {
     final highlightResult = this['_highlightResult'] as Map<String, dynamic>;
-    final highlighted = highlightResult[attribute] as String;
+    final highlightAttr = highlightResult[attribute] as Map<String, dynamic>;
+    final highlighted = highlightAttr['value'] as String;
     return HighlightedString.of(
       highlighted,
       preTag: preTag,
