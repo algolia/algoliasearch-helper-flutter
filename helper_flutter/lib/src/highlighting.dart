@@ -2,7 +2,7 @@ import 'package:algolia_helper_dart/algolia.dart';
 import 'package:flutter/widgets.dart';
 
 extension HighlightingExt on HighlightedString {
-  /// Converts [HighlightedString] to [TextSpan] list.
+  /// Converts [HighlightedString] to [TextSpan].
   TextSpan toTextSpan([
     TextStyle regularTextStyle = const TextStyle(fontWeight: FontWeight.normal),
     TextStyle highlightedTextStyle =
