@@ -3,6 +3,10 @@ import 'search_response.dart';
 /// Extension over [Hit].
 extension Highlightable on Hit {
   /// Get [HighlightedString] of an attribute
+  /// - [preTag] and [postTag] indicate the highlighted substrings
+  /// (default values: <em> and </em> accordingly)
+  /// - [inverted] flag inverts the highlighted and non-highlighted substrings
+  /// if set
   HighlightedString getHightlightedString(
     String attribute, [
     String preTag = _Defaults.preTag,

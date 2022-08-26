@@ -3,6 +3,8 @@ import 'package:flutter/widgets.dart';
 
 extension HighlightingExt on HighlightedString {
   /// Converts [HighlightedString] to [TextSpan].
+  /// Applies [regularTextStyle] and [highlightedTextStyle] styles to
+  /// to non-highlighted and highlighted sub-spans accordingly
   TextSpan toTextSpan([
     TextStyle regularTextStyle = const TextStyle(fontWeight: FontWeight.normal),
     TextStyle highlightedTextStyle =
