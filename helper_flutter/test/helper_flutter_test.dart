@@ -6,8 +6,10 @@ void main() {
   test('adds one to input values', () {
     const string = 'This <em>John</em> Doe looks like <em>John</em>athan.';
     final highlighted = HighlightedString.of(string);
-    const regularStyle = TextStyle(fontWeight: FontWeight.normal, color: Color(0xFF421133));
-    const highlightedStyle = TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF42A5F5));
+    const regularStyle =
+        TextStyle(fontWeight: FontWeight.normal, color: Color(0xFF421133));
+    const highlightedStyle =
+        TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF42A5F5));
     final span = highlighted.toTextSpan(regularStyle, highlightedStyle);
     expect(span.children?.length, 5);
     span.children?.asMap().forEach((index, value) {
