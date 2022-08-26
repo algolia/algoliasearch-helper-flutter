@@ -1,12 +1,8 @@
 import 'package:collection/collection.dart';
-import 'package:meta/meta.dart';
-
-import '../algolia_helper.dart';
 
 /// Search operation response.
 class SearchResponse {
   /// Creates [SearchResponse] instance.
-  @internal
   SearchResponse(this.raw)
       : hits = Hit._fromList(raw['hits']),
         disjunctiveFacets = {},
