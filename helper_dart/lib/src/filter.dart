@@ -1,13 +1,19 @@
 import 'package:meta/meta.dart';
 
 /// Represents a search filter
+@sealed
 abstract class Filter {
+  /// Creates [Filter] instance.
   const Filter._(this.attribute, this.isNegated);
 
+  /// The [attribute] this filter applies on.
   final String attribute;
+
+  /// Whether or not the filter is negated.
   final bool isNegated;
 
   /// Creates [FilterFacet] instance.
+  @factory
   static FilterFacet facet(
     String attribute,
     dynamic value, {
@@ -17,10 +23,12 @@ abstract class Filter {
       FilterFacet._(attribute, value, isNegated, score);
 
   /// Creates [FilterTag] instance.
+  @factory
   static FilterTag tag(String value, [bool isNegated = false]) =>
       FilterTag._(value, isNegated);
 
   /// Creates [FilterNumeric] instance as numeric comparison.
+  @factory
   static FilterNumeric comparison(
     String attribute,
     NumericOperator operator,
@@ -30,6 +38,7 @@ abstract class Filter {
       FilterNumeric.comparison(attribute, operator, number, isNegated);
 
   /// Creates [FilterNumeric] instance as numeric range.
+  @factory
   static FilterNumeric range(
     String attribute, {
     required num lowerBound,
@@ -47,6 +56,7 @@ abstract class Filter {
 /// An optional [score] allows to assign a priority between several
 /// [FilterFacet] that are evaluated in the same filter group.
 class FilterFacet implements Filter {
+  /// Creates [FilterFacet] instance.
   const FilterFacet._(
     this.attribute,
     this.value, [
@@ -58,7 +68,11 @@ class FilterFacet implements Filter {
   final String attribute;
   @override
   final bool isNegated;
+
+  /// Facet filter value (String, bool or num).
   final dynamic value;
+
+  /// Filter facet score.
   final int? score;
 
   @override
@@ -104,12 +118,15 @@ class FilterFacet implements Filter {
 /// A [FilterTag] filters on a specific [value].
 /// It uses a reserved keywords `_tags` as [attribute].
 class FilterTag implements Filter {
+  /// Creates [FilterTag] instance.
   const FilterTag._(this.value, [this.isNegated = false]);
 
   @override
   final String attribute = '_tags';
   @override
   final bool isNegated;
+
+  /// Filter tag value.
   final String value;
 
   @override
@@ -147,12 +164,15 @@ class FilterTag implements Filter {
 
 /// A [FilterNumeric] filters on a numeric [value].
 class FilterNumeric implements Filter {
+  /// Creates [FilterNumeric] instance.
   const FilterNumeric._(this.attribute, this.value, [this.isNegated = false]);
 
   @override
   final String attribute;
   @override
   final bool isNegated;
+
+  /// Filter numeric value.
   final NumericValue value;
 
   /// Creates numeric value as a comparison.
@@ -194,46 +214,75 @@ class FilterNumeric implements Filter {
 }
 
 /// Represents a filter numeric value.
+@sealed
 abstract class NumericValue {
+  /// Creates an [NumericValue] instance.
   NumericValue._();
 }
 
 /// Numeric range comprised within a [lowerBound] and an [upperBound].
 class NumericRange implements NumericValue {
+  /// Creates [NumericRange] instance.
   const NumericRange._(this.lowerBound, this.upperBound);
 
+  /// The minimum value for the input.
   final num lowerBound;
+
+  /// The maximum value for the input.
   final num upperBound;
 }
 
 /// Numeric comparison of a [number] using a [NumericOperator].
 class NumericComparison implements NumericValue {
+  /// Creates [NumericComparison] instance.
   const NumericComparison._(this.operator, this.number);
 
+  /// Comparison operator to apply.
   final NumericOperator operator;
+
+  /// Numeric value to filter on.
   final num number;
 }
 
 /// Numeric comparison operators
 enum NumericOperator {
+  /// Numeric operator `<`
   less('<'),
+
+  /// Numeric operator `<=`
   lessOrEquals('<='),
+
+  /// Numeric operator `=`
   equals('='),
+
+  /// Numeric operator `!=`
   notEquals('!='),
+
+  /// Numeric operator `>=`
   greaterOrEquals('>='),
+
+  /// Numeric operator `>`
   greater('>');
 
+  /// Numeric operator constructor
   const NumericOperator(this.operator);
 
+  /// String representation of the operator.
   final String operator;
 }
 
 /// Filter for hierarchical
 class HierarchicalFilter {
+  /// Creates an [HierarchicalFilter] instance.
   HierarchicalFilter(this.attributes, this.path, this.filter);
 
+  /// Attributes names.
   final List<String> attributes;
+
+  /// Filter facets path.
   final List<FilterFacet> path;
+
+  /// Filter facet value.
   final FilterFacet filter;
 
   @override

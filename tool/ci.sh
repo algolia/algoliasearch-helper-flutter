@@ -84,6 +84,10 @@ for PKG in ${PKGS}; do
         dart test || EXIT_CODE=$?
         ;;
       test_1)
+        echo 'dart test -p chrome'
+        dart test -p chrome || EXIT_CODE=$?
+        ;;
+      test_2)
         echo 'flutter test'
         flutter test || EXIT_CODE=$?
         ;;

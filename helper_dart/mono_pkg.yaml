@@ -8,6 +8,7 @@ stages:
           - analyze: --fatal-infos .
   - unit_test:
       - test:
+      - test: -p chrome
 
 cache:
   directories:

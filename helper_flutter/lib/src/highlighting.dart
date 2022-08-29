@@ -1,6 +1,7 @@
-import 'package:algolia_helper_dart/algolia.dart';
+import 'package:algolia_helper/algolia_helper.dart';
 import 'package:flutter/widgets.dart';
 
+/// Extension over [HighlightedString].
 extension HighlightingExt on HighlightedString {
   /// Converts [HighlightedString] to [TextSpan] list.
   List<TextSpan> toTextSpans([

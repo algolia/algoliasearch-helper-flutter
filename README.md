@@ -1,6 +1,6 @@
-# Algolia Flutter/Dart Helpers
+# Algolia Helpers for Flutter/Dart
 
-| Package | Description | Version |
-|---|---|---|
-| [algolia_helper_dart](helper_dart/) | Algolia Dart Helper | [![pub package](https://img.shields.io/pub/v/algolia_helper_dart.svg)](https://pub.dev/packages/algolia_helper_dart) |
-| [algolia_helper_flutter](helper_flutter/) | Algolia Flutter Helper | [![pub package](https://img.shields.io/pub/v/algolia_helper_flutter.svg)](https://pub.dev/packages/algolia_helper_flutter) |
+| Package                                  | Description                 | Version                                                                                                                    |
+|------------------------------------------|-----------------------------|----------------------------------------------------------------------------------------------------------------------------|
+| [algolia_helper](helper_dart)            | Algolia Helpers for Dart    | [![pub package](https://img.shields.io/pub/v/algolia_helper.svg)](https://pub.dev/packages/algolia_helper)                 |
+| [algolia_helper_flutter](helper_flutter) | Algolia Helpers for Flutter | [![pub package](https://img.shields.io/pub/v/algolia_helper_flutter.svg)](https://pub.dev/packages/algolia_helper_flutter) |

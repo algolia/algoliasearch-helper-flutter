@@ -5,12 +5,13 @@ extension Highlightable on Hit {
   /// Get [HighlightedString] of an attribute
   HighlightedString getHightlightedString(
     String attribute, [
-    String preTag = _Defaults.preTag,
-    String postTag = _Defaults.postTag,
+    String preTag = '<em>',
+    String postTag = '</em>',
     bool inverted = false,
   ]) {
-    final highlightResult = json['_highlightResult'] as Map<String, dynamic>;
-    final highlighted = highlightResult[attribute] as String;
+    final highlightResult = this['_highlightResult'] as Map<String, dynamic>;
+    final highlightAttr = highlightResult[attribute] as Map<String, dynamic>;
+    final highlighted = highlightAttr['value'] as String;
     return HighlightedString.of(
       highlighted,
       preTag: preTag,
@@ -22,20 +23,25 @@ extension Highlightable on Hit {
 
 /// Highlighted string as a list of tokens.
 class HighlightedString {
+  /// Creates [HighlightedString] instance.
   HighlightedString._(
     this.original,
     this.tokens,
   );
 
+  /// Creates [HighlightedString] instance.
   factory HighlightedString.of(
     String string, {
-    String preTag = _Defaults.preTag,
-    String postTag = _Defaults.postTag,
+    String preTag = '<em>',
+    String postTag = '</em>',
     bool inverted = false,
   }) =>
       _highlightTokenizer(string, preTag, postTag, inverted);
 
+  /// Original highlighted string.
   final String original;
+
+  /// List of highlight tokens.
   final Iterable<HighlightToken> tokens;
 
   @override
@@ -87,9 +93,13 @@ HighlightedString _highlightTokenizer(
 
 /// Highlight string token.
 class HighlightToken {
+  /// Creates [HighlightToken] instance.
   HighlightToken._(this.content, this.highlighted);
 
+  /// Token string.
   final String content;
+
+  /// Returns `true` if this token is highlighted, `false` otherwise.
   final bool highlighted;
 
   @override
@@ -106,9 +116,4 @@ class HighlightToken {
   @override
   String toString() =>
       'HighlightToken{content: $content, highlighted: $highlighted}';
-}
-
-class _Defaults {
-  static const preTag = '<em>';
-  static const postTag = '</em>';
 }
