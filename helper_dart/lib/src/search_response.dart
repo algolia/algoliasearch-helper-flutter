@@ -1,5 +1,7 @@
 import 'package:collection/collection.dart';
 
+import 'extensions.dart';
+
 /// Search operation response.
 class SearchResponse {
   /// Creates [SearchResponse] instance.
@@ -16,11 +18,11 @@ class SearchResponse {
 
   /// A mapping of each facet name to the corresponding facet counts for
   /// disjunctive facets.
-  Map<String, Map<String, int>> disjunctiveFacets;
+  Map<String, List<Facet>> disjunctiveFacets;
 
   /// A mapping of each facet name to the corresponding facet counts for
   /// hierarchical facets.
-  Map<String, Map<String, int>> hierarchicalFacets;
+  Map<String, List<Facet>> hierarchicalFacets;
 
   /// An url-encoded string of all query parameters.
   String get params => raw['params'] as String;
@@ -48,12 +50,12 @@ class SearchResponse {
   int get page => raw['page'] as int? ?? 0;
 
   /// A mapping of each facet name to the corresponding facet counts.
-  /// Returned only if [SearchState.facets] is non-empty.
-  Map<String, Map<String, int>> get facets =>
-      raw['facets'] as Map<String, Map<String, int>>? ?? {};
+  /// Returned only if `SearchState.facets` is non-empty.
+  Map<String, List<Facet>> get facets =>
+      Facet._fromMap(raw['facets'] as Map<String, dynamic>? ?? {});
 
   /// Statistics for numerical facets.
-  /// Returned only if [SearchState.facets] is non-empty and at least one of
+  /// Returned only if `SearchState.facets` is non-empty and at least one of
   /// the returned facets contains numerical values.
   Map<String, Map<String, int>> get facetsStats =>
       raw['facets_stats'] as Map<String, Map<String, int>>? ?? {};
@@ -113,4 +115,44 @@ class Hit extends DelegatingMap<String, dynamic> {
 
   @override
   String toString() => 'Hit{json: $_json}';
+}
+
+/// A value of a given facet, together with its number of occurrences.
+/// Useful when an ordered list of facet values has to be presented to the user.
+class Facet {
+  /// Creates [Facet] instance.
+  const Facet(this.value, this.count, [this.highlighted]);
+
+  /// Creates Map of attributes and [Facet] lists from [json].
+  static Map<String, List<Facet>> _fromMap(Map<String, dynamic> json) =>
+      json.map((key, value) {
+        final facetsMap = Map<String, int>.from(value as Map? ?? {});
+        final facetsList = facetsMap.toList(Facet.new);
+        return MapEntry(key, facetsList);
+      });
+
+  /// Name of the facet. Is equal to the value associated to an attribute.
+  final String value;
+
+  /// Number of times this [value] occurs for a given attribute.
+  final int count;
+
+  /// Highlighted value.
+  final String? highlighted;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Facet &&
+          runtimeType == other.runtimeType &&
+          value == other.value &&
+          count == other.count &&
+          highlighted == other.highlighted;
+
+  @override
+  int get hashCode => value.hashCode ^ count.hashCode ^ highlighted.hashCode;
+
+  @override
+  String toString() =>
+      'Facet{value: $value, count: $count, highlighted: $highlighted}';
 }
