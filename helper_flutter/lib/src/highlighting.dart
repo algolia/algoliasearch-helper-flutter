@@ -35,7 +35,7 @@ extension HighlightingExt on HighlightedString {
 
   /// Converts [HighlightedString] to list of [InlineSpan].
   /// Applies [regularTextStyle] and [highlightedTextStyle] styles to
-  /// to non-highlighted and highlighted sub-spans accordingly
+  /// to non-highlighted and highlighted spans accordingly
   List<InlineSpan> toInlineSpans({
     TextStyle regularTextStyle = const TextStyle(fontWeight: FontWeight.normal),
     TextStyle highlightedTextStyle =
