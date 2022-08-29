@@ -40,7 +40,7 @@ class HighlightedString {
       _highlightTokenizer(string, preTag, postTag, inverted);
 
   final String original;
-  final Iterable<HighlightToken> tokens;
+  final Iterable<HighlightableToken> tokens;
 
   @override
   bool operator ==(Object other) =>
@@ -65,13 +65,13 @@ HighlightedString _highlightTokenizer(
   String postTag,
   bool inverted,
 ) {
-  final tokens = <HighlightToken>[];
+  final tokens = <HighlightableToken>[];
 
   final re = RegExp('$preTag(\\w+)$postTag');
   final matches = re.allMatches(string).toList();
 
   void append(String string, bool isHighlighted) {
-    tokens.add(HighlightToken._(string, isHighlighted));
+    tokens.add(HighlightableToken._(string, isHighlighted));
   }
 
   var prev = 0;
@@ -89,9 +89,9 @@ HighlightedString _highlightTokenizer(
   return HighlightedString._(string, tokens);
 }
 
-/// Highlight string token.
-class HighlightToken {
-  HighlightToken._(this.content, this.isHighlighted);
+/// Highlightable string token.
+class HighlightableToken {
+  HighlightableToken._(this.content, this.isHighlighted);
 
   final String content;
   final bool isHighlighted;
@@ -99,7 +99,7 @@ class HighlightToken {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is HighlightToken &&
+      other is HighlightableToken &&
           runtimeType == other.runtimeType &&
           content == other.content &&
           isHighlighted == other.isHighlighted;
