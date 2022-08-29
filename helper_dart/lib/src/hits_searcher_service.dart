@@ -19,7 +19,7 @@ class HitsSearchService {
   /// Algolia API client
   final Algolia _client;
 
-  /// Disjunctive faceting enable status
+  /// Disjunctive faceting enablement status
   final bool _disjunctiveFacetingEnabled;
 
   /// Search events logger.

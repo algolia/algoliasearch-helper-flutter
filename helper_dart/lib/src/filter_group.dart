@@ -105,7 +105,7 @@ abstract class FilterGroup<T> extends DelegatingSet<T> {
 
 /// Facets filter group
 class FacetFilterGroup extends FilterGroup<FilterFacet> {
-  /// Creates an [FilterGroup] instance.
+  /// Creates a [FilterGroup] instance.
   const FacetFilterGroup(super.groupID, super.filters) : super._();
 
   /// Make a copy of the facet filters group.
@@ -126,7 +126,7 @@ class FacetFilterGroup extends FilterGroup<FilterFacet> {
 
 /// Tags filter group
 class TagFilterGroup extends FilterGroup<FilterTag> {
-  /// Creates an [TagFilterGroup] instance.
+  /// Creates a [TagFilterGroup] instance.
   const TagFilterGroup(super.groupID, super.filters) : super._();
 
   /// Make a copy of the tag filters group.
@@ -146,7 +146,7 @@ class TagFilterGroup extends FilterGroup<FilterTag> {
 
 /// Numeric facets filter group
 class NumericFilterGroup extends FilterGroup<FilterNumeric> {
-  /// Creates an [NumericFilterGroup] instance.
+  /// Creates a [NumericFilterGroup] instance.
   const NumericFilterGroup(super.groupID, super.filters) : super._();
 
   /// Make a copy of the numeric filters group.
@@ -171,7 +171,7 @@ class HierarchicalFilterGroup extends FilterGroup<HierarchicalFilter> {
   HierarchicalFilterGroup(String name, Set<HierarchicalFilter> filters)
       : this._(FilterGroupID(name), filters);
 
-  /// Creates an [HierarchicalFilterGroup] instance.
+  /// Creates a [HierarchicalFilterGroup] instance.
   HierarchicalFilterGroup._(super.groupID, super.filters) : super._() {
     assert(groupID.operator == FilterOperator.and);
   }
