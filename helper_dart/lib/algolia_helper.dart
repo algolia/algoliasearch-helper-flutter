@@ -5,6 +5,7 @@
 library algolia_helper;
 
 export 'src/exception.dart';
+export 'src/facet_list.dart';
 export 'src/filter.dart';
 export 'src/filter_group.dart';
 export 'src/filter_state.dart';
