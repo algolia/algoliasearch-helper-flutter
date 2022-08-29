@@ -10,7 +10,7 @@ void main() {
   final facetA = Filter.facet(attributeA, 0);
   final facetB = Filter.facet(attributeB, 0);
   final tag = Filter.tag('0');
-  final numeric = Filter.range(attributeA, 0, 10);
+  final numeric = Filter.range(attributeA, lowerBound: 0, upperBound: 10);
 
   test('FilterState add facet', () {
     final filterState = FilterState();
@@ -196,8 +196,8 @@ void main() {
     final snapshot = filterState.snapshot();
     final filterGroups = snapshot.toFilterGroups();
     expect(filterGroups, {
-      FilterGroup.facet(attributeA, {facetA}),
-      FilterGroup.facet(attributeB, {facetB}),
+      FilterGroup.facet(name: attributeA, filters: {facetA}),
+      FilterGroup.facet(name: attributeB, filters: {facetB}),
     });
   });
 

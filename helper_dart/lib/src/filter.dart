@@ -1,5 +1,7 @@
+import 'package:meta/meta.dart';
+
 /// Represents a search filter
-class Filter {
+abstract class Filter {
   const Filter._(this.attribute, this.isNegated);
 
   final String attribute;
@@ -8,10 +10,10 @@ class Filter {
   /// Creates [FilterFacet] instance.
   static FilterFacet facet(
     String attribute,
-    dynamic value, [
+    dynamic value, {
     bool isNegated = false,
     int? score,
-  ]) =>
+  }) =>
       FilterFacet._(attribute, value, isNegated, score);
 
   /// Creates [FilterTag] instance.
@@ -22,19 +24,23 @@ class Filter {
   static FilterNumeric comparison(
     String attribute,
     NumericOperator operator,
-    num number, [
+    num number, {
     bool isNegated = false,
-  ]) =>
+  }) =>
       FilterNumeric.comparison(attribute, operator, number, isNegated);
 
   /// Creates [FilterNumeric] instance as numeric range.
   static FilterNumeric range(
-    String attribute,
-    num lowerBound,
-    num upperBound, [
+    String attribute, {
+    required num lowerBound,
+    required num upperBound,
     bool isNegated = false,
-  ]) =>
+  }) =>
       FilterNumeric.range(attribute, lowerBound, upperBound, isNegated);
+
+  /// Negates a [FilterFacet].
+  @factory
+  Filter not();
 }
 
 /// A [FilterFacet] matches exactly an [attribute] with a [value].
@@ -84,12 +90,15 @@ class FilterFacet implements Filter {
     bool? isNegated,
     int? score,
   }) =>
-      Filter.facet(
+      FilterFacet._(
         attribute ?? this.attribute,
         value ?? this.value,
         isNegated ?? this.isNegated,
         score ?? this.score,
       );
+
+  @override
+  FilterFacet not() => copyWith(isNegated: !isNegated);
 }
 
 /// A [FilterTag] filters on a specific [value].
@@ -127,10 +136,13 @@ class FilterTag implements Filter {
     String? value,
     bool? isNegated,
   }) =>
-      Filter.tag(
+      FilterTag._(
         value ?? this.value,
         isNegated ?? this.isNegated,
       );
+
+  @override
+  FilterTag not() => copyWith(isNegated: !isNegated);
 }
 
 /// A [FilterNumeric] filters on a numeric [value].
@@ -176,6 +188,9 @@ class FilterNumeric implements Filter {
         value ?? this.value,
         isNegated ?? this.isNegated,
       );
+
+  @override
+  FilterNumeric not() => copyWith(isNegated: !isNegated);
 }
 
 /// Represents a filter numeric value.

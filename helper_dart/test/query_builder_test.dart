@@ -56,7 +56,7 @@ void main() {
         case 1:
           expect(query.facets, ['price']);
           expect(
-            query.filterGroups!.first.filters
+            query.filterGroups!.first
                 .whereType<Filter>()
                 .map((f) => f.attribute)
                 .contains('price'),
@@ -67,7 +67,7 @@ void main() {
         case 2:
           expect(query.facets, ['color']);
           expect(
-            query.filterGroups!.first.filters
+            query.filterGroups!.first
                 .whereType<Filter>()
                 .map((f) => f.attribute)
                 .contains('color'),
@@ -78,7 +78,7 @@ void main() {
         case 3:
           expect(query.facets, ['brand']);
           expect(
-            query.filterGroups!.first.filters
+            query.filterGroups!.first
                 .whereType<Filter>()
                 .map((f) => f.attribute)
                 .contains('brand'),
@@ -100,9 +100,9 @@ void main() {
           ?.firstWhere((g) => g.groupID.name == 'g2') as FacetFilterGroup;
       final group3 = query.filterGroups
           ?.firstWhere((g) => g.groupID.name == 'g3') as FacetFilterGroup;
-      expect(group1.filters.map((f) => f.attribute).contains(facet), false);
-      expect(group2.filters.length, 1);
-      expect(group3.filters.length, 4);
+      expect(group1.map((f) => f.attribute).contains(facet), false);
+      expect(group2.length, 1);
+      expect(group3.length, 4);
     }
   });
 
@@ -153,7 +153,7 @@ void main() {
             const FilterGroupID('color'),
           );
           expect(
-            query.filterGroups!.first.filters,
+            query.filterGroups!.first,
             {Filter.facet('color', 'red')},
           );
           break;
@@ -166,14 +166,14 @@ void main() {
             const FilterGroupID('color'),
           );
           expect(
-            query.filterGroups!.first.filters,
+            query.filterGroups!.first,
             {Filter.facet('color', 'red')},
           );
           expect(
             query.filterGroups!.last.groupID,
             const FilterGroupID('_hierarchical'),
           );
-          expect(query.filterGroups!.last.filters, {Filter.facet(lvl0, 'a')});
+          expect(query.filterGroups!.last, {Filter.facet(lvl0, 'a')});
           break;
 
         case 3:
@@ -184,7 +184,7 @@ void main() {
             const FilterGroupID('color'),
           );
           expect(
-            query.filterGroups!.first.filters,
+            query.filterGroups!.first,
             {Filter.facet('color', 'red')},
           );
           expect(
@@ -192,7 +192,7 @@ void main() {
             const FilterGroupID('_hierarchical'),
           );
           expect(
-            query.filterGroups!.last.filters,
+            query.filterGroups!.last,
             {Filter.facet(lvl1, 'a > b')},
           );
           break;
@@ -205,7 +205,7 @@ void main() {
             const FilterGroupID('color'),
           );
           expect(
-            query.filterGroups!.first.filters,
+            query.filterGroups!.first,
             {Filter.facet('color', 'red')},
           );
           expect(
@@ -213,7 +213,7 @@ void main() {
             const FilterGroupID('_hierarchical'),
           );
           expect(
-            query.filterGroups!.last.filters,
+            query.filterGroups!.last,
             {Filter.facet(lvl2, 'a > b > c')},
           );
           break;

@@ -1,8 +1,8 @@
 import 'package:meta/meta.dart';
 
+import 'extensions.dart';
 import 'filter.dart';
 import 'filter_group.dart';
-import 'utils.dart';
 
 /// Map of filter groups convenience type.
 typedef FilterGroupMap<T> = Map<FilterGroupID, Set<T>>;
