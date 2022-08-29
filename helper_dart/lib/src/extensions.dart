@@ -68,32 +68,3 @@ extension SetNullabkeExt<T> on Set<T>? {
   /// Uses [SetEquality] to calculate hashcode.
   int hashing() => _setEquality.hash(this);
 }
-
-extension IterableExt<T> on Iterable<T> {
-  /// Creates a string from all the elements separated using [separator] and
-  /// using the given [prefix] and [postfix] if supplied.
-  ///
-  /// If the collection could be huge, you can specify a non-negative value of
-  /// [limit], in which case only the first [limit] elements will be appended,
-  /// followed by the [truncated] string (which defaults to "...").
-  String joinToString({
-    String separator = ', ',
-    String prefix = '',
-    String postfix = '',
-    int limit = -1,
-    String truncated = '...',
-    String Function(T element)? transform,
-  }) {
-    final buffer = StringBuffer(prefix);
-    var count = 0;
-    for (final element in this) {
-      if (++count > 1) buffer.write(separator);
-      if (limit >= 0 && count > limit) break;
-      final str = transform != null ? transform(element) : element.toString();
-      buffer.write(str);
-    }
-    if (limit >= 0 && count > limit) buffer.write(truncated);
-    buffer.write(postfix);
-    return buffer.toString();
-  }
-}

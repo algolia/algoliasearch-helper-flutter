@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 
-import 'extensions.dart';
 import 'filter.dart';
 import 'filter_group.dart';
 
@@ -16,20 +15,20 @@ class FilterGroupConverter {
         .whereType<FilterGroup<Filter>>()
         .whereNot((element) => element.isEmpty);
     if (groups.isEmpty) return null;
-    return groups.joinToString(
-      separator: ' AND ',
-      transform: (group) => group.joinToString(
-        prefix: '(',
-        postfix: ')',
-        separator: _separatorOf(group),
-        transform: (filter) => const FilterConverter().sql(filter),
-      ),
-    );
+    return groups.map(_sqlGroup).join(' AND ');
   }
 
   /// Same as [sql], but removes quotes for readability purposes.
   String? unquoted(Set<FilterGroup<Filter>> filterGroups) =>
       sql(filterGroups)?.replaceAll('\"', '');
+
+  /// Convert a filter group to an SQL-like syntax
+  String _sqlGroup(FilterGroup<Filter> group) {
+    final sql = group
+        .map((filter) => const FilterConverter().sql(filter))
+        .join(_separatorOf(group));
+    return '($sql)';
+  }
 
   /// Get separator string (i.e. AND/OR) of a [group].
   String _separatorOf(FilterGroup group) {
