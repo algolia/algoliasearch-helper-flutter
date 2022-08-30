@@ -54,8 +54,11 @@ extension ListNullableExt<T> on List<T>? {
 
 /// Extension over [Set]
 extension SetExt<T> on Set<T> {
-  /// Get unmodifiable copy of this set.
+  /// Get an unmodifiable copy of this set.
   Set<T> unmodifiable() => Set<T>.unmodifiable(this);
+
+  /// Get a modifiable copy of this set.
+  Set<T> modifiable() => Set<T>.from(this);
 }
 
 /// Extension over [Set]
