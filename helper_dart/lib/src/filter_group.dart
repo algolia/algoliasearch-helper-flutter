@@ -42,15 +42,15 @@ class FilterGroupID {
 enum FilterOperator { and, or }
 
 /// Represents a filter group
-abstract class FilterGroup<T> extends DelegatingSet<T> {
+abstract class FilterGroup<T extends Filter> extends DelegatingSet<T> {
   /// Creates [FilterGroupID] instance.
   const FilterGroup._(this.groupID, this._filters) : super(_filters);
 
   /// Creates [FilterGroup] as [FacetFilterGroup].
   @factory
   static FacetFilterGroup facet({
+    required Set<FilterFacet> filters,
     String name = '',
-    Set<FilterFacet> filters = const {},
     FilterOperator operator = FilterOperator.and,
   }) =>
       FacetFilterGroup(FilterGroupID(name, operator), filters);
@@ -58,8 +58,8 @@ abstract class FilterGroup<T> extends DelegatingSet<T> {
   /// Creates [FilterGroup] as [TagFilterGroup].
   @factory
   static TagFilterGroup tag({
+    required Set<FilterTag> filters,
     String name = '',
-    Set<FilterTag> filters = const {},
     FilterOperator operator = FilterOperator.and,
   }) =>
       TagFilterGroup(FilterGroupID(name, operator), filters);
@@ -67,8 +67,8 @@ abstract class FilterGroup<T> extends DelegatingSet<T> {
   /// Creates [FilterGroup] as [NumericFilterGroup].
   @factory
   static NumericFilterGroup numeric({
+    required Set<FilterNumeric> filters,
     String name = '',
-    Set<FilterNumeric> filters = const {},
     FilterOperator operator = FilterOperator.and,
   }) =>
       NumericFilterGroup(FilterGroupID(name, operator), filters);
@@ -76,10 +76,17 @@ abstract class FilterGroup<T> extends DelegatingSet<T> {
   /// Creates [FilterGroup] as [HierarchicalFilterGroup].
   @factory
   static HierarchicalFilterGroup hierarchical({
+    required Set<FilterFacet> filters,
+    required List<FilterFacet> path,
+    required List<String> attributes,
     String name = '',
-    Set<HierarchicalFilter> filters = const {},
   }) =>
-      HierarchicalFilterGroup(name, filters);
+      HierarchicalFilterGroup(
+        FilterGroupID.and(name),
+        filters,
+        path,
+        attributes,
+      );
 
   /// Filter group ID (name and operator)
   final FilterGroupID groupID;
@@ -110,7 +117,7 @@ class FacetFilterGroup extends FilterGroup<FilterFacet> {
 
   /// Make a copy of the facet filters group.
   @override
-  FilterGroup<FilterFacet> copyWith({
+  FacetFilterGroup copyWith({
     FilterGroupID? groupID,
     Set<FilterFacet>? filters,
   }) =>
@@ -131,7 +138,7 @@ class TagFilterGroup extends FilterGroup<FilterTag> {
 
   /// Make a copy of the tag filters group.
   @override
-  FilterGroup<FilterTag> copyWith({
+  TagFilterGroup copyWith({
     FilterGroupID? groupID,
     Set<FilterTag>? filters,
   }) =>
@@ -151,7 +158,7 @@ class NumericFilterGroup extends FilterGroup<FilterNumeric> {
 
   /// Make a copy of the numeric filters group.
   @override
-  FilterGroup<FilterNumeric> copyWith({
+  NumericFilterGroup copyWith({
     FilterGroupID? groupID,
     Set<FilterNumeric>? filters,
   }) =>
@@ -166,28 +173,51 @@ class NumericFilterGroup extends FilterGroup<FilterNumeric> {
 }
 
 /// Hierarchical filter group
-class HierarchicalFilterGroup extends FilterGroup<HierarchicalFilter> {
+class HierarchicalFilterGroup extends FilterGroup<FilterFacet> {
   /// Creates an [HierarchicalFilterGroup] instance.
-  HierarchicalFilterGroup(String name, Set<HierarchicalFilter> filters)
-      : this._(FilterGroupID(name), filters);
-
-  /// Creates a [HierarchicalFilterGroup] instance.
-  HierarchicalFilterGroup._(super.groupID, super.filters) : super._() {
+  HierarchicalFilterGroup(
+    super.groupID,
+    super.filters,
+    this.path,
+    this.attributes,
+  ) : super._() {
     assert(groupID.operator == FilterOperator.and);
   }
 
+  /// Filter facets path.
+  final List<FilterFacet> path;
+
+  /// Attributes names.
+  final List<String> attributes;
+
   /// Make a copy of the hierarchical filters group.
   @override
-  FilterGroup<HierarchicalFilter> copyWith({
+  HierarchicalFilterGroup copyWith({
     FilterGroupID? groupID,
-    Set<HierarchicalFilter>? filters,
+    Set<FilterFacet>? filters,
+    List<FilterFacet>? path,
+    List<String>? attributes,
   }) =>
-      HierarchicalFilterGroup._(
+      HierarchicalFilterGroup(
         groupID ?? this.groupID,
         filters ?? _filters,
+        path ?? this.path,
+        attributes ?? this.attributes,
       );
 
   @override
   String toString() =>
       'HierarchicalFilterGroup{groupID: $groupID, filters: $_filters}';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      super == other &&
+          other is HierarchicalFilterGroup &&
+          runtimeType == other.runtimeType &&
+          path == other.path &&
+          attributes == other.attributes;
+
+  @override
+  int get hashCode => super.hashCode ^ path.hashCode ^ attributes.hashCode;
 }

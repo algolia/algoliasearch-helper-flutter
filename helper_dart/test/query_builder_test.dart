@@ -118,15 +118,17 @@ void main() {
       Filter.facet(lvl1, 'a > b'),
       Filter.facet(lvl2, 'a > b > c')
     ];
-    final hierarchicalFilter =
-        HierarchicalFilter(attributes, path, Filter.facet(lvl2, 'a > b > c'));
 
     final colorGroup = FacetFilterGroup(
       const FilterGroupID('color'),
       {Filter.facet('color', 'red')},
     );
-    final hierarchicalGroup =
-        HierarchicalFilterGroup('h', {hierarchicalFilter});
+    final hierarchicalGroup = FilterGroup.hierarchical(
+      name: 'h',
+      path: path,
+      attributes: attributes,
+      filters: {Filter.facet(lvl2, 'a > b > c')},
+    );
     final filterGroups = <FilterGroup>{colorGroup, hierarchicalGroup};
 
     final query = SearchState(
@@ -147,7 +149,7 @@ void main() {
 
         case 1:
           expect(query.facets, [lvl0]);
-          expect(query.filterGroups!.length, 2);
+          expect(query.filterGroups!.length, 1);
           expect(
             query.filterGroups!.first.groupID,
             const FilterGroupID('color'),
@@ -225,22 +227,26 @@ void main() {
   });
 
   test('test disjunctive & hierarchical responses merging', () {
-    final hierarchicalFilter = HierarchicalFilter(
-      ['category.lvl0', 'category.lvl1', 'category.lvl2', 'category.lvl3'],
-      [
-        Filter.facet('category.lvl0', 'a'),
-        Filter.facet('category.lvl1', 'a > b'),
-        Filter.facet('category.lvl2', 'a > b > c')
-      ],
-      Filter.facet('category.lvl2', 'a > b > c'),
-    );
-
     final query = SearchState(
       indexName: 'index',
       query: 'phone',
       disjunctiveFacets: {'color', 'brand', 'size'},
       filterGroups: {
-        HierarchicalFilterGroup('category', {hierarchicalFilter})
+        FilterGroup.hierarchical(
+          name: 'category',
+          filters: {Filter.facet('category.lvl2', 'a > b > c')},
+          path: [
+            Filter.facet('category.lvl0', 'a'),
+            Filter.facet('category.lvl1', 'a > b'),
+            Filter.facet('category.lvl2', 'a > b > c')
+          ],
+          attributes: [
+            'category.lvl0',
+            'category.lvl1',
+            'category.lvl2',
+            'category.lvl3'
+          ],
+        )
       },
     );
 

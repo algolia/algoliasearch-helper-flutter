@@ -91,7 +91,14 @@ abstract class Filters {
     final numerics =
         numericGroups.toList(NumericFilterGroup.new).unmodifiable();
     final hierarchical = hierarchicalGroups
-        .toList((name, filter) => HierarchicalFilterGroup(name, {filter}))
+        .toList(
+          (name, group) => HierarchicalFilterGroup(
+            FilterGroupID.and(name),
+            {group.filter},
+            group.path,
+            group.attributes,
+          ),
+        )
         .unmodifiable();
     return {...facets, ...tags, ...numerics, ...hierarchical};
   }
