@@ -1,4 +1,4 @@
-import 'package:algolia_helper_dart/algolia.dart';
+import 'package:algolia_helper/algolia_helper.dart';
 import 'package:test/test.dart';
 
 void main() {

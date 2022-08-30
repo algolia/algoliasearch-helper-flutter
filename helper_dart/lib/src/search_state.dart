@@ -3,6 +3,7 @@ import 'filter_group.dart';
 
 /// Representation of search state.
 class SearchState {
+  /// Creates [SearchState] instance.
   const SearchState({
     required this.indexName,
     this.analytics,

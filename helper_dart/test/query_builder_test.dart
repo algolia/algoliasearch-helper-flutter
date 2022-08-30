@@ -1,5 +1,5 @@
-import 'package:algolia_helper_dart/algolia.dart';
-import 'package:algolia_helper_dart/src/query_builder.dart';
+import 'package:algolia_helper/algolia_helper.dart';
+import 'package:algolia_helper/src/query_builder.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -9,7 +9,7 @@ void main() {
       query: 'phone',
       disjunctiveFacets: {'price', 'color'},
     );
-    final queryBuilder = QueryBuilder(query);
+    const queryBuilder = QueryBuilder(query);
     final queries = queryBuilder.build();
     final disjunctiveFacetingQueries = queries.skip(1);
     expect(disjunctiveFacetingQueries.length, 2);
@@ -336,60 +336,82 @@ void main() {
       hierarchicalResponse4,
     ]);
 
-    expect(aggregatedResponse.disjunctiveFacets, {
-      'color': {
-        'red': 1,
-        'green': 2,
-        'blue': 3,
-      },
-      'brand': {'sony': 10, 'apple': 20, 'samsung': 30},
-      'size': {
-        's': 15,
-        'm': 20,
-        'l': 25,
-      }
+    expect(aggregatedResponse.disjunctiveFacets, const {
+      'color': [
+        Facet('red', 1),
+        Facet('green', 2),
+        Facet('blue', 3),
+      ],
+      'brand': [
+        Facet('sony', 10),
+        Facet('apple', 20),
+        Facet('samsung', 30),
+      ],
+      'size': [
+        Facet('s', 15),
+        Facet('m', 20),
+        Facet('l', 25),
+      ]
     });
-    expect(aggregatedResponse.hierarchicalFacets, {
-      'categoryl.lvl0': {
-        'home': 25,
-        'electronics': 35,
-        'clothes': 45,
-      },
-      'category.lvl1': {
-        'home > kitchen': 10,
-        'home > bedroom': 15,
-        'electronics > portable': 28,
-        'electronics > appliance': 7,
-        'clothes > men': 12,
-        'clothes > women': 33,
-      },
-      'category.lvl2': {
-        'home > kitchen > accessories': 10,
-        'home > bedroom > furniture': 15,
-        'electronics > portable > smartphones': 20,
-        'electronics > portable > laptops': 8,
-        'electronics > appliance > major': 7,
-        'clothes > men > shirts': 12,
-        'clothes > women > dresses': 10,
-        'clothes > women > jeans': 23,
-      },
-      'category.lvl3': {
-        'home > kitchen > accessories > tableware': 10,
-        'home > bedroom > furniture > beds': 10,
-        'home > bedroom > furniture > others': 5,
-        'electronics > portable > smartphones > ios': 8,
-        'electronics > portable > smartphones > android': 12,
-        'electronics > portable > laptops > gaming': 3,
-        'electronics > portable > laptops > office': 5,
-        'electronics > appliance > major > fridges': 5,
-        'electronics > appliance > major > washing machines': 2,
-        'clothes > men > shirts > casual': 6,
-        'clothes > men > shirts > formal': 6,
-        'clothes > women > dresses > casual': 7,
-        'clothes > women > dresses > formal': 3,
-        'clothes > women > jeans > regular': 9,
-        'clothes > women > jeans > slim': 14,
-      }
+
+    expect(aggregatedResponse.disjunctiveFacets, const {
+      'color': [
+        Facet('red', 1),
+        Facet('green', 2),
+        Facet('blue', 3),
+      ],
+      'brand': [
+        Facet('sony', 10),
+        Facet('apple', 20),
+        Facet('samsung', 30),
+      ],
+      'size': [
+        Facet('s', 15),
+        Facet('m', 20),
+        Facet('l', 25),
+      ]
+    });
+    expect(aggregatedResponse.hierarchicalFacets, const {
+      'categoryl.lvl0': [
+        Facet('home', 25),
+        Facet('electronics', 35),
+        Facet('clothes', 45),
+      ],
+      'category.lvl1': [
+        Facet('home > kitchen', 10),
+        Facet('home > bedroom', 15),
+        Facet('electronics > portable', 28),
+        Facet('electronics > appliance', 7),
+        Facet('clothes > men', 12),
+        Facet('clothes > women', 33),
+      ],
+      'category.lvl2': [
+        Facet('home > kitchen > accessories', 10),
+        Facet('home > bedroom > furniture', 15),
+        Facet('electronics > portable > smartphones', 20),
+        Facet('electronics > portable > laptops', 8),
+        Facet('electronics > appliance > major', 7),
+        Facet('clothes > men > shirts', 12),
+        Facet('clothes > women > dresses', 10),
+        Facet('clothes > women > jeans', 23),
+      ],
+      'category.lvl3': [
+        Facet('home > kitchen > accessories > tableware', 10),
+        Facet('home > bedroom > furniture > beds', 10),
+        Facet('home > bedroom > furniture > others', 5),
+        Facet('electronics > portable > smartphones > ios', 8),
+        Facet('electronics > portable > smartphones > android', 12),
+        Facet('electronics > portable > laptops > gaming', 3),
+        Facet('electronics > portable > laptops > office', 5),
+        Facet('electronics > appliance > major > fridges', 5),
+        Facet('electronics > appliance > major > washing machines', 2),
+        Facet('clothes > men > shirts > casual', 6),
+        Facet('clothes > men > shirts > formal', 6),
+        Facet('clothes > women > dresses > casual', 7),
+        Facet('clothes > women > dresses > formal', 3),
+        Facet('clothes > women > jeans > regular', 9),
+        Facet('clothes > women > jeans > slim', 14),
+      ]
     });
   });
 }

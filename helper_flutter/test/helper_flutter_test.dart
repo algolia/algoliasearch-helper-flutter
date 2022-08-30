@@ -1,4 +1,4 @@
-import 'package:algolia_helper_flutter/algolia.dart';
+import 'package:algolia_helper_flutter/algolia_helper_flutter.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 

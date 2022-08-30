@@ -8,6 +8,7 @@ import 'filters.dart';
 /// Immutable filters implementation.
 /// **All operations create a new object with requested changes.**
 class ImmutableFilters extends Filters {
+  /// Creates [ImmutableFilters] instance.
   @internal
   const ImmutableFilters({
     Map<FilterGroupID, Set<FilterFacet>> facetGroups = const {},
@@ -133,7 +134,8 @@ class ImmutableFilters extends Filters {
       );
 }
 
-extension _FilterGroupMapExt<T extends Filter> on FilterGroupMap<T> {
+/// Extensions over [FilterGroupMap].
+extension FilterGroupMapExt<T extends Filter> on FilterGroupMap<T> {
   /// Returns new filter group instance with updated values.
   FilterGroupMap<T> add(FilterGroupID groupID, T filter) {
     final current = Set<T>.from(this[groupID] ?? const {});
