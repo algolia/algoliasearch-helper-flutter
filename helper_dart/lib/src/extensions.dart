@@ -1,5 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:rxdart/rxdart.dart';
 
 /// Extensions over Object class.
 extension ObjectExt<T> on T {

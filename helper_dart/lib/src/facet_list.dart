@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:algolia_helper/src/immutable_filters.dart';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
@@ -10,6 +9,7 @@ import 'filter.dart';
 import 'filter_group.dart';
 import 'filter_state.dart';
 import 'hits_searcher.dart';
+import 'immutable_filters.dart';
 import 'logger.dart';
 import 'search_response.dart';
 
@@ -17,71 +17,68 @@ import 'search_response.dart';
 /// and lets the user refine their search results by filtering on specific
 /// values.
 @experimental
-class FacetList {
+abstract class FacetList {
   /// Create [FacetList] instance.
-  FacetList({
-    required this.searcher,
-    required this.filterState,
-    required this.attribute,
-    required this.groupID,
-    this.selectionMode = SelectionMode.multiple,
-    this.persistent = true,
-  }) : _log = algoliaLogger {
-    // Searcher setup
-    searcher.applyState(
-      (state) => state.copyWith(
-        facets: List.from(
-          (state.facets ?? [])..add(attribute),
-        ),
-      ),
-    );
-
-    // Setup selection stream events listener.
-    _selectionsSubscription = _selectionEvents.stream.listen((selections) {
-      _log.finest('[FacetList] Selections: $selections');
-      filterState.modify((filters) {
-
-        final filtersSet =
-            selections.map((value) => Filter.facet(attribute, value)).toSet();
-        _log.finest('[FacetList] Before clear: $filters');
-        filters = _clearFilters(filters);
-        _log.finest('[FacetList] After clear: $filters');
-        _log.finest('[FacetList] FilterState to add: $groupID -> $filtersSet');
-        filters = filters.add(groupID, filtersSet);
-        _log.finest('[FacetList] FilterState after add: $filters');
-        return filters;
-      });
-    });
-  }
-
-  /// Clear filters from [ImmutableFilters] depending
-  ImmutableFilters _clearFilters(ImmutableFilters filters) {
-    switch (selectionMode) {
-      case SelectionMode.single:
-        return filters.clear([groupID]);
-      case SelectionMode.multiple:
-        final filtersToRemove = _facetsToRemove();
-        _log.finest('[FacetList] filters to remove: $filtersToRemove');
-        return filters.remove(groupID, filtersToRemove);
-    }
-  }
+  factory FacetList({
+    required HitsSearcher searcher,
+    required FilterState filterState,
+    required String attribute,
+    required FilterGroupID groupID,
+    SelectionMode selectionMode = SelectionMode.multiple,
+    bool persistent = true,
+  }) =>
+      _FacetList(
+        searcher: searcher,
+        filterState: filterState,
+        attribute: attribute,
+        groupID: groupID,
+        selectionMode: selectionMode,
+        persistent: persistent,
+      );
 
   /// Create [FacetList] instance.
-  FacetList.create({
+  factory FacetList.create({
     required HitsSearcher searcher,
     required FilterState filterState,
     required String attribute,
     FilterOperator operator = FilterOperator.or,
     SelectionMode selectionMode = SelectionMode.multiple,
     bool persistent = true,
-  }) : this(
-          searcher: searcher,
-          filterState: filterState,
-          attribute: attribute,
-          groupID: FilterGroupID(attribute, operator),
-          selectionMode: selectionMode,
-          persistent: persistent,
-        );
+  }) =>
+      _FacetList(
+        searcher: searcher,
+        filterState: filterState,
+        attribute: attribute,
+        groupID: FilterGroupID(attribute, operator),
+        selectionMode: selectionMode,
+        persistent: persistent,
+      );
+
+  /// Stream of [Facet] list with selection status.
+  Stream<List<SelectableFacet>> get facets;
+
+  /// Select a facet by it's value.
+  void select(String selection);
+
+  /// Dispose the component.
+  void dispose();
+}
+
+/// Implementation of [FacetList].
+class _FacetList implements FacetList {
+  /// Create [_FacetList] instance.
+  _FacetList({
+    required this.searcher,
+    required this.filterState,
+    required this.attribute,
+    required this.groupID,
+    required this.selectionMode,
+    required this.persistent,
+  }) : _log = algoliaLogger('FacetList') {
+    _initSearcher();
+    _initSelections();
+    _initFacets();
+  }
 
   /// Hits Searcher component
   final HitsSearcher searcher;
@@ -101,14 +98,68 @@ class FacetList {
   /// Should the selection be kept even if it does not match current results.
   final bool persistent;
 
-  /// Selection events stream
-  final _selectionEvents = BehaviorSubject<Set<String>>.seeded({});
-
   /// Events logger
   final Logger _log;
 
-  /// Selection events subscription
+  /// Selection events stream
+  final _selectionEvents = BehaviorSubject<Set<String>>.seeded({});
+
+  @override
+  Stream<List<SelectableFacet>> get facets => Rx.combineLatest2(
+        _items,
+        _selections,
+        (List<Facet> facets, Set<String> selections) => facets
+            .map(
+              (facet) => SelectableFacet(
+                item: facet,
+                isSelected: selections.contains(facet.value),
+              ),
+            )
+            .toList(),
+      );
+
+  /// List facets items.
+  late final ValueStream<List<Facet>> _items;
+  late final StreamSubscription _itemsSubscription;
+
+  /// Set of selected facet values.
+  late final ValueStream<Set<String>> _selections;
   late final StreamSubscription _selectionsSubscription;
+
+  /// Setup selection stream events listener.
+  void _initSearcher() {
+    searcher.applyState(
+      (state) => state.copyWith(
+        facets: List.from(
+          (state.facets ?? [])..add(attribute),
+        ),
+      ),
+    );
+  }
+
+  /// Searcher setup
+  void _initSelections() {
+    _selectionEvents.stream.listen((selections) {
+      filterState.modify((filters) {
+        final filtersSet =
+            selections.map((value) => Filter.facet(attribute, value)).toSet();
+        filters = _clearFilters(filters);
+        filters = filters.add(groupID, filtersSet);
+        return filters;
+      });
+    });
+  }
+
+  /// Clear filters from [ImmutableFilters] depending
+  ImmutableFilters _clearFilters(ImmutableFilters filters) {
+    switch (selectionMode) {
+      case SelectionMode.single:
+        return filters.clear([groupID]);
+      case SelectionMode.multiple:
+        final filtersToRemove = _facetsToRemove();
+        return filters.remove(groupID, filtersToRemove);
+    }
+  }
 
   /// Get the set of facets to remove in case of multiple selection mode.
   /// In case of persistent selection, current selections are kept.
@@ -126,43 +177,44 @@ class FacetList {
     return {...currentFilters, ...currentSelections};
   }
 
-  /// Stream of [Facet] list with selection status.
-  Stream<List<SelectableFacet>> get facets => Rx.combineLatest2(
-        _items,
-        _selections,
-        (List<Facet> facets, Set<String> selections) => facets
-            .map(
-              (facet) => SelectableFacet(
-                item: facet,
-                isSelected: selections.contains(facet.value),
-              ),
-            )
-            .toList(),
-      );
+  /// Facet streams setup
+  void _initFacets() {
+    _initFacetFilters();
+    _initFacetItems();
+  }
 
-  /// List facets items.
-  late final ValueStream<List<Facet>> _items = searcher.responses
-      .map(
-        (response) =>
-            response.disjunctiveFacets[attribute] ??
-            response.facets[attribute] ??
-            [],
-      )
-      .shareValue();
+  /// Facets filters selections events from Filter State setup
+  void _initFacetFilters() {
+    final valueStream = filterState.filters
+        .map(
+          (filters) =>
+              filters
+                  .getFacetFilters(groupID)
+                  ?.map((e) => e.value.toString())
+                  .toSet() ??
+              {},
+        )
+        .publishValue();
+    _selections = valueStream;
+    _selectionsSubscription = valueStream.connect();
+  }
 
-  /// Set of selected facet values.
-  late final ValueStream<Set<String>> _selections = filterState.filters.map(
-    (filters) {
-      _log.finest('[FacetList] FilterState filters: $filters');
-      return filters
-              .getFacetFilters(groupID)
-              ?.map((e) => e.value.toString())
-              .toSet() ??
-          {};
-    },
-  ).shareValue();
+  /// Facets filters list from Hits Searcher setup
+  void _initFacetItems() {
+    final valueStream = searcher.responses
+        .map(
+          (response) =>
+              response.disjunctiveFacets[attribute] ??
+              response.facets[attribute] ??
+              [],
+        )
+        .publishValue();
 
-  /// Select a facet by it's value.
+    _items = valueStream;
+    _itemsSubscription = valueStream.connect();
+  }
+
+  @override
   void select(String selection) {
     final selections = _selectionsSet(selection);
     _selectionEvents.sink.add(selections);
@@ -171,8 +223,7 @@ class FacetList {
   /// Get new set of selection after a selection operation.
   Set<String> _selectionsSet(String selection) {
     final current = _selectionEvents.value;
-    _log.finest(
-        '[FaceList] current selections: $current -> $selection selected');
+    _log.finest('current facet selections: $current -> $selection selected');
     switch (selectionMode) {
       case SelectionMode.single:
         return current.contains(selection) ? {} : {selection};
@@ -184,9 +235,11 @@ class FacetList {
     }
   }
 
-  /// Dispose the component.
+  @override
   void dispose() {
+    _selectionEvents.close();
     _selectionsSubscription.cancel();
+    _itemsSubscription.cancel();
   }
 }
 
