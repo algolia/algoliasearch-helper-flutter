@@ -1,4 +1,3 @@
-import 'package:algolia_helper/algolia_helper.dart';
 import 'package:algolia_helper_flutter/algolia_helper_flutter.dart';
 import 'package:flutter/material.dart';
 

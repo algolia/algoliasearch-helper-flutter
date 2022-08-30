@@ -1,4 +1,3 @@
-import 'package:algolia_helper/algolia_helper.dart';
 import 'package:algolia_helper_flutter/algolia_helper_flutter.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -12,7 +11,9 @@ void main() {
     const highlightedStyle =
         TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF42A5F5));
     final span = highlighted.toTextSpan(
-        regularTextStyle: regularStyle, highlightedTextStyle: highlightedStyle);
+      regularTextStyle: regularStyle,
+      highlightedTextStyle: highlightedStyle,
+    );
     expect(span.children?.length, 5);
     span.children?.asMap().forEach((index, value) {
       switch (index) {
