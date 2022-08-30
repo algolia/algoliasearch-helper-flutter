@@ -11,9 +11,7 @@ class FilterGroupConverter {
   /// Converts [FilterGroup] to its SQL-like [String] representation.
   /// Returns `null` if the list is empty.
   String? sql(Set<FilterGroup> filterGroups) {
-    final groups = filterGroups
-        .whereType<FilterGroup<Filter>>()
-        .whereNot((element) => element.isEmpty);
+    final groups = filterGroups.whereNot((element) => element.isEmpty);
     if (groups.isEmpty) return null;
     return groups.map(_sqlGroup).join(' AND ');
   }

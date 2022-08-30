@@ -91,7 +91,14 @@ abstract class Filters {
     final numerics =
         numericGroups.toList(NumericFilterGroup.new).unmodifiable();
     final hierarchical = hierarchicalGroups
-        .toList((name, filter) => HierarchicalFilterGroup(name, {filter}))
+        .toList(
+          (name, group) => HierarchicalFilterGroup(
+            FilterGroupID.and(name),
+            {group.filter},
+            group.path,
+            group.attributes,
+          ),
+        )
         .unmodifiable();
     return {...facets, ...tags, ...numerics, ...hierarchical};
   }
@@ -104,4 +111,28 @@ abstract class Filters {
     Map<FilterGroupID, Set<FilterNumeric>>? numericGroups,
     Map<String, HierarchicalFilter>? hierarchicalGroups,
   });
+
+  @override
+  String toString() => 'Filters{'
+      'facetGroups: $facetGroups, '
+      'tagGroups: $tagGroups, numericGroups: '
+      '$numericGroups, hierarchicalGroups: $hierarchicalGroups'
+      '}';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Filters &&
+          runtimeType == other.runtimeType &&
+          facetGroups.equals(other.facetGroups) &&
+          tagGroups.equals(other.tagGroups) &&
+          numericGroups.equals(other.numericGroups) &&
+          hierarchicalGroups.equals(other.hierarchicalGroups);
+
+  @override
+  int get hashCode =>
+      facetGroups.hashing() ^
+      tagGroups.hashing() ^
+      numericGroups.hashing() ^
+      hierarchicalGroups.hashing();
 }

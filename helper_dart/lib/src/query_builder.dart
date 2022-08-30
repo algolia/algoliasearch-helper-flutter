@@ -33,19 +33,16 @@ class QueryBuilder {
   }
 
   /// Get hierarchical filters from the search state's filter groups.
-  Iterable<HierarchicalFilter> _getHierarchicalFilters() =>
-      _searchState.filterGroups
-          ?.whereType<HierarchicalFilterGroup>()
-          .expand((filterGroup) => filterGroup) ??
-      [];
+  Iterable<HierarchicalFilterGroup> _getHierarchicalFilters() =>
+      _searchState.filterGroups?.whereType<HierarchicalFilterGroup>() ?? [];
 
   /// Number of generated hierarchical queries for given hierarchical
   /// filter
-  int _getHierarchicalQueriesCount(HierarchicalFilter filter) {
-    if (filter.attributes.length == filter.path.length) {
-      return filter.attributes.length;
+  int _getHierarchicalQueriesCount(HierarchicalFilterGroup group) {
+    if (group.attributes.length == group.path.length) {
+      return group.attributes.length;
     }
-    return filter.path.isEmpty ? 0 : filter.path.length + 1;
+    return group.path.isEmpty ? 0 : group.path.length + 1;
   }
 
   /// Total number of queries
@@ -119,11 +116,8 @@ class QueryBuilder {
   /// Build additional queries to fetch correct facets count values
   /// for hierarchical facets
   List<SearchState> _buildHierarchicalFacetingQueries(SearchState query) {
-    final hierarchicalFilters = query.filterGroups
-            ?.whereType<HierarchicalFilterGroup>()
-            .expand((e) => e)
-            .toList() ??
-        [];
+    final hierarchicalFilters =
+        query.filterGroups?.whereType<HierarchicalFilterGroup>().toList() ?? [];
 
     final queries = <SearchState>[];
     for (final hierarchicalFilter in hierarchicalFilters) {
@@ -152,15 +146,11 @@ class QueryBuilder {
   SearchState _hierarchicalQueryOf(
     String facet,
     FilterFacet? pathFilter,
-    HierarchicalFilter hierarchicalFilter,
+    HierarchicalFilterGroup group,
     SearchState state,
   ) {
     final filterGroupsCopy = _copyFilterGroups()
-      ..forEach((filterGroup) {
-        if (filterGroup.groupID.operator == FilterOperator.and) {
-          filterGroup.removeWhere((filter) => filter == hierarchicalFilter);
-        }
-      });
+      ..removeWhere((filter) => filter == group);
 
     if (pathFilter != null) {
       filterGroupsCopy.add(

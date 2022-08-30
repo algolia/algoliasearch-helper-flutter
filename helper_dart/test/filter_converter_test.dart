@@ -162,9 +162,9 @@ void main() {
 
     test('Empty groups', () {
       final filterGroups = <FilterGroup<Filter>>{
-        FilterGroup.facet(),
-        FilterGroup.numeric(),
-        FilterGroup.tag(),
+        FilterGroup.facet(filters: const {}),
+        FilterGroup.numeric(filters: const {}),
+        FilterGroup.tag(filters: const {}),
       };
       const converter = FilterGroupConverter();
       expect(converter.unquoted(filterGroups), null);
