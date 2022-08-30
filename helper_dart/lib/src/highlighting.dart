@@ -44,7 +44,7 @@ class HighlightedString {
 
   /// Original highlighted string.
   final String original;
-  
+
   /// List of highlightable tokens.
   final Iterable<HighlightableToken> tokens;
 
@@ -101,7 +101,7 @@ class HighlightableToken {
 
   /// Token string.
   final String content;
-  
+
   /// Returns `true` if this token is highlighted, `false` otherwise.
   final bool isHighlighted;
 

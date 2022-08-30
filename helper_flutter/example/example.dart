@@ -89,9 +89,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       title: RichText(
                         text: TextSpan(
                           style: Theme.of(context).textTheme.subtitle2,
-                          children: hit
-                              .getHighlightedString('title')
-                              .toInlineSpans(),
+                          children:
+                              hit.getHighlightedString('title').toInlineSpans(),
                         ),
                       ),
                       subtitle: Text((hit['genre'] as List).join(', ')),
