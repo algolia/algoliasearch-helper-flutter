@@ -90,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         text: TextSpan(
                           style: Theme.of(context).textTheme.subtitle2,
                           children: hit
-                              .getHightlightedString('title')
+                              .getHighlightedString('title')
                               .toInlineSpans(),
                         ),
                       ),

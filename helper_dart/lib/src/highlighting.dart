@@ -7,7 +7,7 @@ extension Highlightable on Hit {
   /// (default values: <em> and </em> accordingly)
   /// - [inverted] flag inverts the highlighted and non-highlighted substrings
   /// if set
-  HighlightedString getHightlightedString(
+  HighlightedString getHighlightedString(
     String attribute, [
     String preTag = '<em>',
     String postTag = '</em>',
