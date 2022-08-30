@@ -20,22 +20,22 @@ class FilterState {
 
   /// Adds [filters] to the provided [groupID].
   void add(FilterGroupID groupID, Iterable<Filter> filters) {
-    _modify((it) => it.add(groupID, filters));
+    modify((it) => it.add(groupID, filters));
   }
 
   /// Overrides [filters] with the provided [map].
   void set(Map<FilterGroupID, Set<Filter>> map) {
-    _modify((it) => it.set(map));
+    modify((it) => it.set(map));
   }
 
   /// Removes [filters] from [groupID].
   void remove(FilterGroupID groupID, Iterable<Filter> filters) {
-    _modify((it) => it.remove(groupID, filters));
+    modify((it) => it.remove(groupID, filters));
   }
 
   /// Toggles [filter] in given [groupID].
   void toggle(FilterGroupID groupID, Filter filter) =>
-      _modify((it) => it.toggle(groupID, filter));
+      modify((it) => it.toggle(groupID, filter));
 
   /// Checks if [filter] exists in [groupID].
   bool contains(FilterGroupID groupID, Filter filter) =>
@@ -46,23 +46,23 @@ class FilterState {
     String attribute,
     HierarchicalFilter hierarchicalFilter,
   ) {
-    _modify((it) => it.addHierarchical(attribute, hierarchicalFilter));
+    modify((it) => it.addHierarchical(attribute, hierarchicalFilter));
   }
 
   /// Removes [HierarchicalFilter] of given [attribute].
   void removeHierarchical(String attribute) {
-    _modify((it) => it.removeHierarchical(attribute));
+    modify((it) => it.removeHierarchical(attribute));
   }
 
   /// Clears [groupIDs].
   /// If none provided, all filters will be cleared.
   void clear([Iterable<FilterGroupID>? groupIDs]) {
-    _modify((it) => it.clear(groupIDs));
+    modify((it) => it.clear(groupIDs));
   }
 
   /// Clears all except [groupIDs].
   void clearExcept(Iterable<FilterGroupID> groupIDs) {
-    _modify((it) => it.clearExcept(groupIDs));
+    modify((it) => it.clearExcept(groupIDs));
   }
 
   /// Get current [filters] value.
@@ -74,7 +74,9 @@ class FilterState {
   }
 
   /// Updates [filters] by applying [action] to current filters value.
-  void _modify(ImmutableFilters Function(ImmutableFilters filters) action) {
+  /// Useful to apply multiple consecutive update operations without firing
+  /// multiple filters events.
+  void modify(ImmutableFilters Function(ImmutableFilters filters) action) {
     final current = _filters.value;
     final updated = action(current);
     _filters.sink.add(updated);
