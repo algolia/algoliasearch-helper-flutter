@@ -22,17 +22,19 @@ extension HighlightingExt on HighlightedString {
     bool? spellOut,
   }) =>
       TextSpan(
-          style: style,
-          children: toInlineSpans(
-              regularTextStyle: regularTextStyle,
-              highlightedTextStyle: highlightedTextStyle,),
-          recognizer: recognizer,
-          mouseCursor: mouseCursor,
-          onEnter: onEnter,
-          onExit: onExit,
-          semanticsLabel: semanticsLabel,
-          locale: locale,
-          spellOut: spellOut,);
+        style: style,
+        children: toInlineSpans(
+          regularTextStyle: regularTextStyle,
+          highlightedTextStyle: highlightedTextStyle,
+        ),
+        recognizer: recognizer,
+        mouseCursor: mouseCursor,
+        onEnter: onEnter,
+        onExit: onExit,
+        semanticsLabel: semanticsLabel,
+        locale: locale,
+        spellOut: spellOut,
+      );
 
   /// Converts [HighlightedString] to list of [InlineSpan].
   /// Applies [regularTextStyle] and [highlightedTextStyle] styles to
