@@ -3,7 +3,11 @@ import 'search_response.dart';
 /// Extension over [Hit].
 extension Highlightable on Hit {
   /// Get [HighlightedString] of an attribute
-  HighlightedString getHightlightedString(
+  /// - [preTag] and [postTag] indicate the highlighted substrings
+  /// (default values: <em> and </em> accordingly)
+  /// - [inverted] flag inverts the highlighted and non-highlighted substrings
+  /// if set
+  HighlightedString getHighlightedString(
     String attribute, [
     String preTag = '<em>',
     String postTag = '</em>',
@@ -41,8 +45,8 @@ class HighlightedString {
   /// Original highlighted string.
   final String original;
 
-  /// List of highlight tokens.
-  final Iterable<HighlightToken> tokens;
+  /// List of highlightable tokens.
+  final Iterable<HighlightableToken> tokens;
 
   @override
   bool operator ==(Object other) =>
@@ -67,13 +71,13 @@ HighlightedString _highlightTokenizer(
   String postTag,
   bool inverted,
 ) {
-  final tokens = <HighlightToken>[];
+  final tokens = <HighlightableToken>[];
 
   final re = RegExp('$preTag(\\w+)$postTag');
   final matches = re.allMatches(string).toList();
 
   void append(String string, bool isHighlighted) {
-    tokens.add(HighlightToken._(string, isHighlighted));
+    tokens.add(HighlightableToken._(string, isHighlighted));
   }
 
   var prev = 0;
@@ -91,29 +95,28 @@ HighlightedString _highlightTokenizer(
   return HighlightedString._(string, tokens);
 }
 
-/// Highlight string token.
-class HighlightToken {
-  /// Creates [HighlightToken] instance.
-  HighlightToken._(this.content, this.highlighted);
+/// Highlightable string token.
+class HighlightableToken {
+  HighlightableToken._(this.content, this.isHighlighted);
 
   /// Token string.
   final String content;
 
   /// Returns `true` if this token is highlighted, `false` otherwise.
-  final bool highlighted;
+  final bool isHighlighted;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is HighlightToken &&
+      other is HighlightableToken &&
           runtimeType == other.runtimeType &&
           content == other.content &&
-          highlighted == other.highlighted;
+          isHighlighted == other.isHighlighted;
 
   @override
-  int get hashCode => content.hashCode ^ highlighted.hashCode;
+  int get hashCode => content.hashCode ^ isHighlighted.hashCode;
 
   @override
   String toString() =>
-      'HighlightToken{content: $content, highlighted: $highlighted}';
+      'HighlightToken{content: $content, highlighted: $isHighlighted}';
 }
