@@ -1,3 +1,4 @@
+import 'package:algolia_helper/algolia_helper.dart';
 import 'package:algolia_helper_flutter/algolia_helper_flutter.dart';
 import 'package:flutter/material.dart';
 
@@ -88,8 +89,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       title: RichText(
                         text: TextSpan(
                           style: Theme.of(context).textTheme.subtitle2,
-                          children:
-                              hit.getHightlightedString('title').toTextSpans(),
+                          children: hit
+                              .getHightlightedString('title')
+                              .toInlineSpans(),
                         ),
                       ),
                       subtitle: Text((hit['genre'] as List).join(', ')),
