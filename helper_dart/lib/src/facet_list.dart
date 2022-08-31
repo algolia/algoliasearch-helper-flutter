@@ -12,6 +12,7 @@ import 'hits_searcher.dart';
 import 'immutable_filters.dart';
 import 'logger.dart';
 import 'search_response.dart';
+import 'selectable_item.dart';
 
 /// FacetList (refinement list) is a filtering components that displays facets,
 /// and lets the user refine their search results by filtering on specific
@@ -67,6 +68,12 @@ abstract class FacetList {
   void dispose();
 }
 
+/// Elements selection mode.
+enum SelectionMode { single, multiple }
+
+/// [Facet] with selection status.
+typedef SelectableFacet = SelectableItem<Facet>;
+
 /// Implementation of [FacetList].
 class _FacetList implements FacetList {
   /// Create [_FacetList] instance.
@@ -78,7 +85,7 @@ class _FacetList implements FacetList {
     required this.selectionMode,
     required this.persistent,
   }) : _log = algoliaLogger('FacetList') {
-    // Setup search state
+    // Setup search state by adding `attribute` to the search state
     searcher.applyState(
       (state) => state.copyWith(
         facets: List.from(
@@ -87,15 +94,10 @@ class _FacetList implements FacetList {
       ),
     );
 
-    // Setup selection events
-    _selectionEvents.stream.listen((selections) {
-      filterState.modify((filters) {
-        final filtersSet =
-            selections.map((value) => Filter.facet(attribute, value)).toSet();
-        filters = _clearFilters(filters);
-        return filters.add(groupID, filtersSet);
-      });
-    });
+    // Setup subject streams. Not using addStream since we can't stop subjects.
+    _responseSubscription = _responseFacets.subscribe(_searcherFacetsStream());
+    _selectionsSubscription = _selections.subscribe(_filtersSelectionsStream());
+    _facetsSubscription = _facets.subscribe(_selectableFacetsStream());
   }
 
   /// Hits Searcher component
@@ -119,8 +121,19 @@ class _FacetList implements FacetList {
   /// Events logger
   final Logger _log;
 
-  /// Selection events stream
-  final _selectionEvents = BehaviorSubject<Set<String>>();//.seeded({});
+  /// Selectable facets lists stream.
+  final BehaviorSubject<List<SelectableFacet>> _facets = BehaviorSubject();
+
+  /// List of facets lists values from search responses.
+  final BehaviorSubject<List<Facet>> _responseFacets = BehaviorSubject();
+
+  /// Set of selected facet values from the filter state.
+  final BehaviorSubject<Set<String>> _selections = BehaviorSubject();
+
+  // Streams subscriptions
+  late final StreamSubscription _facetsSubscription;
+  late final StreamSubscription _responseSubscription;
+  late final StreamSubscription _selectionsSubscription;
 
   @override
   Stream<List<SelectableFacet>> get facets => _facets.stream.distinct();
@@ -128,11 +141,10 @@ class _FacetList implements FacetList {
   @override
   List<SelectableFacet>? snapshot() => _facets.valueOrNull;
 
-  /// Facets list subject stream, derived from [_items] and [_selections].
-  late final BehaviorSubject<List<SelectableFacet>> _facets = BehaviorSubject()
-    ..addStream(
-      Rx.combineLatest2(
-        _items,
+  /// Create stream of [SelectableFacet] lists from
+  /// [_responseFacets] and [_selections].
+  Stream<List<SelectableFacet>> _selectableFacetsStream() => Rx.combineLatest2(
+        _responseFacets,
         _selections,
         (List<Facet> facets, Set<String> selections) {
           final facetsList = _buildSelectableFacets(facets, selections);
@@ -140,8 +152,7 @@ class _FacetList implements FacetList {
               ? _buildPersistentSelectableFacets(facetsList, selections)
               : facetsList;
         },
-      ),
-    );
+      );
 
   /// Builds a list of [SelectableFacet] from [facets] and [selections].
   List<SelectableFacet> _buildSelectableFacets(
@@ -157,7 +168,7 @@ class _FacetList implements FacetList {
           )
           .toList();
 
-  /// Builds a list of [SelectableFacet] with persistant selections
+  /// Builds a list of [SelectableFacet] with persistent selections
   /// from [facetsList] and [selections].
   List<SelectableFacet> _buildPersistentSelectableFacets(
     List<SelectableItem<Facet>> facetsList,
@@ -178,29 +189,49 @@ class _FacetList implements FacetList {
           .toList()
         ..addAll(facetsList);
 
-  /// List facets items.
-  late final BehaviorSubject<List<Facet>> _items = BehaviorSubject()
-    ..addStream(
-      searcher.responses.map(
+  /// Build facets lists stream from [searcher].
+  Stream<List<Facet>> _searcherFacetsStream() => searcher.responses.map(
         (response) =>
             response.disjunctiveFacets[attribute] ??
             response.facets[attribute] ??
             [],
-      ),
-    );
+      );
 
-  /// Set of selected facet values.
-  late final BehaviorSubject<Set<String>> _selections = BehaviorSubject()
-    ..addStream(
-      filterState.filters.map(
+  /// Build selections stream from [filterState] filters updates.
+  Stream<Set<String>> _filtersSelectionsStream() => filterState.filters.map(
         (filters) =>
             filters
                 .getFacetFilters(groupID)
                 ?.map((e) => e.value.toString())
                 .toSet() ??
             {},
-      ),
-    );
+      );
+
+  @override
+  void select(String selection) {
+    final selections = _selectionsSet(selection);
+    filterState.modify((filters) {
+      final filtersSet =
+          selections.map((value) => Filter.facet(attribute, value)).toSet();
+      filters = _clearFilters(filters);
+      return filters.add(groupID, filtersSet);
+    });
+  }
+
+  /// Get new set of selection after a selection operation.
+  Set<String> _selectionsSet(String selection) {
+    final current = _selections.valueOrNull ?? {};
+    _log.finest('current facet selections: $current -> $selection selected');
+    switch (selectionMode) {
+      case SelectionMode.single:
+        return current.contains(selection) ? {} : {selection};
+      case SelectionMode.multiple:
+        final set = current.modifiable();
+        return current.contains(selection)
+            ? (set..remove(selection))
+            : (set..add(selection));
+    }
+  }
 
   /// Clear filters from [ImmutableFilters] depending
   ImmutableFilters _clearFilters(ImmutableFilters filters) {
@@ -216,7 +247,7 @@ class _FacetList implements FacetList {
   /// Get the set of facets to remove in case of multiple selection mode.
   /// In case of persistent selection, current selections are kept.
   Set<FilterFacet> _facetsToRemove() {
-    final currentFilters = _items.valueOrNull
+    final currentFilters = _responseFacets.valueOrNull
             ?.map((facet) => Filter.facet(attribute, facet.value))
             .toSet() ??
         {};
@@ -230,63 +261,15 @@ class _FacetList implements FacetList {
   }
 
   @override
-  void select(String selection) {
-    final selections = _selectionsSet(selection);
-    _selectionEvents.sink.add(selections);
-  }
-
-  /// Get new set of selection after a selection operation.
-  Set<String> _selectionsSet(String selection) {
-    final current = _selectionEvents.valueOrNull ?? {};
-    _log.finest('current facet selections: $current -> $selection selected');
-    switch (selectionMode) {
-      case SelectionMode.single:
-        return current.contains(selection) ? {} : {selection};
-      case SelectionMode.multiple:
-        final set = current.modifiable();
-        return current.contains(selection)
-            ? (set..remove(selection))
-            : (set..add(selection));
-    }
-  }
-
-  @override
   void dispose() {
-    _selectionEvents.close();
-    _facets.close();
+    _log.finest('component dispose');
+    // Cancel all subscriptions
+    _responseSubscription.cancel();
+    _selectionsSubscription.cancel();
+    _facetsSubscription.cancel();
+    // Close all subjects
+    _responseFacets.close();
     _selections.close();
-    _items.close();
+    _facets.close();
   }
 }
-
-/// Elements selection mode.
-enum SelectionMode { single, multiple }
-
-/// Represents a value with selection status.
-class SelectableItem<T> {
-  /// Creates [SelectableItem] instance.
-  const SelectableItem({required this.item, required this.isSelected});
-
-  /// Item value.
-  final T item;
-
-  /// Selection status.
-  final bool isSelected;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is SelectableItem &&
-          runtimeType == other.runtimeType &&
-          item == other.item &&
-          isSelected == other.isSelected;
-
-  @override
-  int get hashCode => item.hashCode ^ isSelected.hashCode;
-
-  @override
-  String toString() => 'SelectableItem{item: $item, isSelected: $isSelected}';
-}
-
-/// [Facet] with selection status.
-typedef SelectableFacet = SelectableItem<Facet>;

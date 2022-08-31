@@ -2,6 +2,7 @@ import 'package:algolia_helper/algolia_helper.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
+import 'hits_searcher_test.dart';
 import 'hits_searcher_test.mocks.dart';
 
 void main() {
@@ -136,7 +137,11 @@ void main() {
     });
 
     test('Single selection should clear filters', () async {
-      final searcher = mockHitsSearcher();
+      final searcher = mockHitsSearcher({
+        'facets': {
+          'color': {'red': 1}
+        }
+      });
 
       const groupID = FilterGroupID('color', FilterOperator.or);
       final filterState = FilterState()
@@ -151,26 +156,89 @@ void main() {
         attribute: 'color',
         groupID: groupID,
         selectionMode: SelectionMode.single,
-        persistent: true,
       );
 
-      await expectLater(
-        facetList.facets,
-        emitsThrough(
-          [
-            const SelectableFacet(item: Facet('red', 0), isSelected: true),
-            const SelectableFacet(item: Facet('green', 0), isSelected: true),
-          ],
-        ),
-      );
-
+      await delay();
       facetList.select('red');
 
       await expectLater(
-        facetList.facets,
+        filterState.filters,
+        emitsThrough(const ImmutableFilters()),
+      );
+    });
+
+    test('Multiple selection should not clear filters', () async {
+      final searcher = mockHitsSearcher({
+        'facets': {
+          'color': {'red': 1}
+        }
+      });
+
+      const groupID = FilterGroupID('color', FilterOperator.or);
+      final filterState = FilterState()
+        ..add(groupID, [
+          Filter.facet('color', 'red'),
+          Filter.facet('color', 'green'),
+        ]);
+
+      final facetList = FacetList.create(
+        searcher: searcher,
+        filterState: filterState,
+        attribute: 'color',
+        groupID: groupID,
+      );
+
+      await delay();
+      facetList.select('red');
+
+      await expectLater(
+        filterState.filters,
         emitsThrough(
-          [const SelectableFacet(item: Facet('red', 0), isSelected: true)],
+          ImmutableFilters(
+            facetGroups: {
+              groupID: {Filter.facet('color', 'green')}
+            },
+          ),
         ),
+      );
+    });
+
+    test('Facet persistent selection', () async {
+      final searcher = mockHitsSearcher({
+        'facets': {
+          'color': {'red': 1}
+        }
+      });
+
+      const groupID = FilterGroupID('color', FilterOperator.or);
+      final filterState = FilterState()
+        ..add(groupID, [
+          Filter.facet('color', 'red'),
+          Filter.facet('color', 'green'),
+        ]);
+
+      final facetList = FacetList.create(
+        searcher: searcher,
+        filterState: filterState,
+        attribute: 'color',
+        groupID: groupID,
+        persistent: true,
+      );
+
+      await delay();
+      facetList.select('green');
+
+      await expectLater(
+        facetList.facets,
+        emitsInOrder([
+          [
+            const SelectableFacet(item: Facet('green', 0), isSelected: true),
+            const SelectableFacet(item: Facet('red', 1), isSelected: true),
+          ],
+          [
+            const SelectableFacet(item: Facet('red', 1), isSelected: true),
+          ]
+        ]),
       );
     });
   });
