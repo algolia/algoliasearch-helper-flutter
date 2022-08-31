@@ -23,24 +23,6 @@ abstract class FacetList {
     required HitsSearcher searcher,
     required FilterState filterState,
     required String attribute,
-    required FilterGroupID groupID,
-    SelectionMode selectionMode = SelectionMode.multiple,
-    bool persistent = true,
-  }) =>
-      _FacetList(
-        searcher: searcher,
-        filterState: filterState,
-        attribute: attribute,
-        groupID: groupID,
-        selectionMode: selectionMode,
-        persistent: persistent,
-      );
-
-  /// Create [FacetList] instance.
-  factory FacetList.create({
-    required HitsSearcher searcher,
-    required FilterState filterState,
-    required String attribute,
     FilterOperator operator = FilterOperator.or,
     SelectionMode selectionMode = SelectionMode.multiple,
     bool persistent = true,
@@ -54,8 +36,29 @@ abstract class FacetList {
         persistent: persistent,
       );
 
+  /// Create [FacetList] instance.
+  factory FacetList.create({
+    required HitsSearcher searcher,
+    required FilterState filterState,
+    required String attribute,
+    required FilterGroupID groupID,
+    SelectionMode selectionMode = SelectionMode.multiple,
+    bool persistent = true,
+  }) =>
+      _FacetList(
+        searcher: searcher,
+        filterState: filterState,
+        attribute: attribute,
+        groupID: groupID,
+        selectionMode: selectionMode,
+        persistent: persistent,
+      );
+
   /// Stream of [Facet] list with selection status.
   Stream<List<SelectableFacet>> get facets;
+
+  /// Snapshot of the latest [facets] value.
+  List<SelectableFacet> snapshot();
 
   /// Select a facet by it's value.
   void select(String selection);
@@ -120,7 +123,15 @@ class _FacetList implements FacetList {
   final _selectionEvents = BehaviorSubject<Set<String>>.seeded({});
 
   @override
-  Stream<List<SelectableFacet>> get facets => Rx.combineLatest2(
+  Stream<List<SelectableFacet>> get facets => _facets.stream;
+
+  @override
+  List<SelectableFacet> snapshot() => _facets.value;
+
+  /// Facets list subject stream, derived from [_items] and [_selections].
+  late final BehaviorSubject<List<SelectableFacet>> _facets = BehaviorSubject()
+    ..addStream(
+      Rx.combineLatest2(
         _items,
         _selections,
         (List<Facet> facets, Set<String> selections) => facets
@@ -131,7 +142,8 @@ class _FacetList implements FacetList {
               ),
             )
             .toList(),
-      );
+      ),
+    );
 
   /// List facets items.
   late final BehaviorSubject<List<Facet>> _items = BehaviorSubject()
@@ -156,17 +168,6 @@ class _FacetList implements FacetList {
             {},
       ),
     );
-
-  /// Setup selection stream events listener.
-  void _initSearcher() {
-    searcher.applyState(
-      (state) => state.copyWith(
-        facets: List.from(
-          (state.facets ?? [])..add(attribute),
-        ),
-      ),
-    );
-  }
 
   /// Clear filters from [ImmutableFilters] depending
   ImmutableFilters _clearFilters(ImmutableFilters filters) {
@@ -219,6 +220,7 @@ class _FacetList implements FacetList {
   @override
   void dispose() {
     _selectionEvents.close();
+    _facets.close();
     _selections.close();
     _items.close();
   }
