@@ -24,11 +24,9 @@ void main() {
         const SearchState(indexName: 'myIndex'),
       );
 
-      final filterState = FilterState();
-
       final facetList = FacetList(
         searcher: searcher,
-        filterState: filterState,
+        filterState: FilterState(),
         attribute: 'color',
       )..select('blue');
 
@@ -41,6 +39,7 @@ void main() {
         ]),
       );
     });
+
     test('Get facet items with persistent selection', () async {
       final searchService = MockHitsSearchService();
       final initial = SearchResponse(const {
@@ -58,11 +57,9 @@ void main() {
         const SearchState(indexName: 'myIndex'),
       );
 
-      final filterState = FilterState();
-
       final facetList = FacetList(
         searcher: searcher,
-        filterState: filterState,
+        filterState: FilterState(),
         attribute: 'color',
         persistent: true,
       )..select('blue');
@@ -70,12 +67,13 @@ void main() {
       await expectLater(
         facetList.facets,
         emits(const [
+          SelectableFacet(item: Facet('blue', 0), isSelected: true),
           SelectableFacet(item: Facet('red', 1), isSelected: false),
           SelectableFacet(item: Facet('green', 1), isSelected: false),
-          SelectableFacet(item: Facet('blue', 0), isSelected: true),
         ]),
       );
     });
+
     test('Get facet items without persistent selection', () async {
       final searchService = MockHitsSearchService();
       final initial = SearchResponse(const {
@@ -93,11 +91,11 @@ void main() {
         const SearchState(indexName: 'myIndex'),
       );
 
-      final filterState = FilterState();
-
       final facetList = FacetList(
-          searcher: searcher, filterState: filterState, attribute: 'color')
-        ..select('blue');
+        searcher: searcher,
+        filterState: FilterState(),
+        attribute: 'color',
+      )..select('blue');
 
       await expectLater(
         facetList.facets,

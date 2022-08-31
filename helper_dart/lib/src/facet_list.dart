@@ -134,16 +134,49 @@ class _FacetList implements FacetList {
       Rx.combineLatest2(
         _items,
         _selections,
-        (List<Facet> facets, Set<String> selections) => facets
-            .map(
-              (facet) => SelectableFacet(
-                item: facet,
-                isSelected: selections.contains(facet.value),
-              ),
-            )
-            .toList(),
+        (List<Facet> facets, Set<String> selections) {
+          final facetsList = _buildSelectableFacets(facets, selections);
+          return persistent
+              ? _buildPersistentSelectableFacets(facetsList, selections)
+              : facetsList;
+        },
       ),
     );
+
+  /// Builds a list of [SelectableFacet] from [facets] and [selections].
+  List<SelectableFacet> _buildSelectableFacets(
+    List<Facet> facets,
+    Set<String> selections,
+  ) =>
+      facets
+          .map(
+            (facet) => SelectableFacet(
+              item: facet,
+              isSelected: selections.contains(facet.value),
+            ),
+          )
+          .toList();
+
+  /// Builds a list of [SelectableFacet] with persistant selections
+  /// from [facetsList] and [selections].
+  List<SelectableFacet> _buildPersistentSelectableFacets(
+    List<SelectableItem<Facet>> facetsList,
+    Set<String> selections,
+  ) =>
+      selections
+          .where(
+            (selection) => facetsList.every(
+              (selectableFacet) => selectableFacet.item.value != selection,
+            ),
+          )
+          .map(
+            (selection) => SelectableFacet(
+              item: Facet(selection, 0),
+              isSelected: true,
+            ),
+          )
+          .toList()
+        ..addAll(facetsList);
 
   /// List facets items.
   late final BehaviorSubject<List<Facet>> _items = BehaviorSubject()
