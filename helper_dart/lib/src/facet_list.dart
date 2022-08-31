@@ -25,7 +25,7 @@ abstract class FacetList {
     required String attribute,
     FilterOperator operator = FilterOperator.or,
     SelectionMode selectionMode = SelectionMode.multiple,
-    bool persistent = true,
+    bool persistent = false,
   }) =>
       _FacetList(
         searcher: searcher,
@@ -43,7 +43,7 @@ abstract class FacetList {
     required String attribute,
     required FilterGroupID groupID,
     SelectionMode selectionMode = SelectionMode.multiple,
-    bool persistent = true,
+    bool persistent = false,
   }) =>
       _FacetList(
         searcher: searcher,
