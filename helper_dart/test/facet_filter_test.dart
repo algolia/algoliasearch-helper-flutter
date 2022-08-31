@@ -106,4 +106,69 @@ void main() {
       );
     });
   });
+
+  group('Update filter state', () {
+    test('Selection should update filter state', () async {
+      final searchService = MockHitsSearchService();
+      final initial = SearchResponse({});
+      when(searchService.search(any)).thenAnswer((_) => Stream.value(initial));
+
+      final searcher = HitsSearcher.build(
+        searchService,
+        const SearchState(indexName: 'myIndex'),
+      );
+
+      const groupID = FilterGroupID('color', FilterOperator.or);
+      final filterState = FilterState();
+
+      FacetList.create(
+        searcher: searcher,
+        filterState: filterState,
+        attribute: 'color',
+        groupID: groupID,
+      ).select('red');
+
+      await expectLater(
+        filterState.filters,
+        emitsThrough(
+          ImmutableFilters(
+            facetGroups: {
+              groupID: {Filter.facet('color', 'red')},
+            },
+          ),
+        ),
+      );
+    });
+
+    test('Filter State should update facets list', () async {
+      final searchService = MockHitsSearchService();
+      final initial = SearchResponse({});
+      when(searchService.search(any)).thenAnswer((_) => Stream.value(initial));
+
+      final searcher = HitsSearcher.build(
+        searchService,
+        const SearchState(indexName: 'myIndex'),
+      );
+
+      const groupID = FilterGroupID('color', FilterOperator.or);
+      final filterState = FilterState();
+
+      final facetList = FacetList.create(
+        searcher: searcher,
+        filterState: filterState,
+        attribute: 'color',
+        groupID: groupID,
+        persistent: true,
+      );
+
+      filterState.add(groupID, {Filter.facet('color', 'red')});
+
+      await expectLater(
+        facetList.facets,
+        emitsThrough([
+          const SelectableFacet(item: Facet('red', 0), isSelected: true),
+        ]),
+      );
+    });
+  });
 }

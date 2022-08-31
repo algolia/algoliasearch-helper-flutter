@@ -58,7 +58,7 @@ abstract class FacetList {
   Stream<List<SelectableFacet>> get facets;
 
   /// Snapshot of the latest [facets] value.
-  List<SelectableFacet> snapshot();
+  List<SelectableFacet>? snapshot();
 
   /// Select a facet by it's value.
   void select(String selection);
@@ -123,10 +123,10 @@ class _FacetList implements FacetList {
   final _selectionEvents = BehaviorSubject<Set<String>>.seeded({});
 
   @override
-  Stream<List<SelectableFacet>> get facets => _facets.stream;
+  Stream<List<SelectableFacet>> get facets => _facets.stream.distinct();
 
   @override
-  List<SelectableFacet> snapshot() => _facets.value;
+  List<SelectableFacet>? snapshot() => _facets.valueOrNull;
 
   /// Facets list subject stream, derived from [_items] and [_selections].
   late final BehaviorSubject<List<SelectableFacet>> _facets = BehaviorSubject()

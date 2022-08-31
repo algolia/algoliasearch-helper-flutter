@@ -24,32 +24,10 @@ extension MapExt<K, E> on Map<K, E> {
   Map<K, E> unmodifiable() => Map<K, E>.unmodifiable(this);
 }
 
-/// Extension over [Map]
-extension MapNullableExt<K, E> on Map<K, E>? {
-  static const _mapEquality = MapEquality();
-
-  /// Uses [ListEquality] to calculate equality.
-  bool equals(Map? other) => _mapEquality.equals(this, other);
-
-  /// Uses [ListEquality] to calculate hashcode.
-  int hashing() => _mapEquality.hash(this);
-}
-
 /// Extension over [List]
 extension ListExt<T> on List<T> {
   /// Get unmodifiable copy of this list.
   List<T> unmodifiable() => List<T>.unmodifiable(this);
-}
-
-/// Extension over [List]
-extension ListNullableExt<T> on List<T>? {
-  static const _listEquality = ListEquality();
-
-  /// Uses [ListEquality] to calculate equality.
-  bool equals(List? other) => _listEquality.equals(this, other);
-
-  /// Uses [ListEquality] to calculate hashcode.
-  int hashing() => _listEquality.hash(this);
 }
 
 /// Extension over [Set]
@@ -61,13 +39,12 @@ extension SetExt<T> on Set<T> {
   Set<T> modifiable() => Set<T>.from(this);
 }
 
-/// Extension over [Set]
-extension SetNullabkeExt<T> on Set<T>? {
-  static const _setEquality = SetEquality();
+/// Equals extensions over nullable [Object].
+extension OrderedHashEqualsExt on Object? {
+  /// Uses [DeepCollectionEquality] to calculate equality.
+  bool equals(dynamic other) =>
+      const DeepCollectionEquality().equals(this, other);
 
-  /// Uses [SetEquality] to calculate equality.
-  bool equals(Set? other) => _setEquality.equals(this, other);
-
-  /// Uses [SetEquality] to calculate hashcode.
-  int hashing() => _setEquality.hash(this);
+  /// Uses [DeepCollectionEquality] to calculate hash value.
+  int hashing() => const DeepCollectionEquality().hash(this);
 }
