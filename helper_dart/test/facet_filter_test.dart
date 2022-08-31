@@ -7,8 +7,7 @@ import 'hits_searcher_test.mocks.dart';
 void main() {
   group('Build facets list', () {
     test('Get facet items', () async {
-      final searchService = MockHitsSearchService();
-      final initial = SearchResponse(const {
+      final searcher = mockHitsSearcher({
         'facets': {
           'color': {
             'red': 1,
@@ -17,12 +16,6 @@ void main() {
           }
         }
       });
-      when(searchService.search(any)).thenAnswer((_) => Stream.value(initial));
-
-      final searcher = HitsSearcher.build(
-        searchService,
-        const SearchState(indexName: 'myIndex'),
-      );
 
       final facetList = FacetList(
         searcher: searcher,
@@ -41,8 +34,7 @@ void main() {
     });
 
     test('Get facet items with persistent selection', () async {
-      final searchService = MockHitsSearchService();
-      final initial = SearchResponse(const {
+      final searcher = mockHitsSearcher({
         'facets': {
           'color': {
             'red': 1,
@@ -50,12 +42,6 @@ void main() {
           }
         }
       });
-      when(searchService.search(any)).thenAnswer((_) => Stream.value(initial));
-
-      final searcher = HitsSearcher.build(
-        searchService,
-        const SearchState(indexName: 'myIndex'),
-      );
 
       final facetList = FacetList(
         searcher: searcher,
@@ -75,8 +61,7 @@ void main() {
     });
 
     test('Get facet items without persistent selection', () async {
-      final searchService = MockHitsSearchService();
-      final initial = SearchResponse(const {
+      final searcher = mockHitsSearcher({
         'facets': {
           'color': {
             'red': 1,
@@ -84,12 +69,6 @@ void main() {
           }
         }
       });
-      when(searchService.search(any)).thenAnswer((_) => Stream.value(initial));
-
-      final searcher = HitsSearcher.build(
-        searchService,
-        const SearchState(indexName: 'myIndex'),
-      );
 
       final facetList = FacetList(
         searcher: searcher,
@@ -109,15 +88,7 @@ void main() {
 
   group('Update filter state', () {
     test('Selection should update filter state', () async {
-      final searchService = MockHitsSearchService();
-      final initial = SearchResponse({});
-      when(searchService.search(any)).thenAnswer((_) => Stream.value(initial));
-
-      final searcher = HitsSearcher.build(
-        searchService,
-        const SearchState(indexName: 'myIndex'),
-      );
-
+      final searcher = mockHitsSearcher();
       const groupID = FilterGroupID('color', FilterOperator.or);
       final filterState = FilterState();
 
@@ -140,15 +111,8 @@ void main() {
       );
     });
 
-    test('Filter State should update facets list', () async {
-      final searchService = MockHitsSearchService();
-      final initial = SearchResponse({});
-      when(searchService.search(any)).thenAnswer((_) => Stream.value(initial));
-
-      final searcher = HitsSearcher.build(
-        searchService,
-        const SearchState(indexName: 'myIndex'),
-      );
+    test('Filter State should update facets list (persistent)', () async {
+      final searcher = mockHitsSearcher();
 
       const groupID = FilterGroupID('color', FilterOperator.or);
       final filterState = FilterState();
@@ -170,5 +134,55 @@ void main() {
         ]),
       );
     });
+
+    test('Single selection should clear filters', () async {
+      final searcher = mockHitsSearcher();
+
+      const groupID = FilterGroupID('color', FilterOperator.or);
+      final filterState = FilterState()
+        ..add(groupID, [
+          Filter.facet('color', 'red'),
+          Filter.facet('color', 'green'),
+        ]);
+
+      final facetList = FacetList.create(
+        searcher: searcher,
+        filterState: filterState,
+        attribute: 'color',
+        groupID: groupID,
+        selectionMode: SelectionMode.single,
+        persistent: true,
+      );
+
+      await expectLater(
+        facetList.facets,
+        emitsThrough(
+          [
+            const SelectableFacet(item: Facet('red', 0), isSelected: true),
+            const SelectableFacet(item: Facet('green', 0), isSelected: true),
+          ],
+        ),
+      );
+
+      facetList.select('red');
+
+      await expectLater(
+        facetList.facets,
+        emitsThrough(
+          [const SelectableFacet(item: Facet('red', 0), isSelected: true)],
+        ),
+      );
+    });
   });
+}
+
+HitsSearcher mockHitsSearcher([Map<String, dynamic> json = const {}]) {
+  final searchService = MockHitsSearchService();
+  final initial = SearchResponse(json);
+  when(searchService.search(any)).thenAnswer((_) => Stream.value(initial));
+
+  return HitsSearcher.build(
+    searchService,
+    const SearchState(indexName: 'myIndex'),
+  );
 }

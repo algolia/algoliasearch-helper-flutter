@@ -120,7 +120,7 @@ class _FacetList implements FacetList {
   final Logger _log;
 
   /// Selection events stream
-  final _selectionEvents = BehaviorSubject<Set<String>>.seeded({});
+  final _selectionEvents = BehaviorSubject<Set<String>>();//.seeded({});
 
   @override
   Stream<List<SelectableFacet>> get facets => _facets.stream.distinct();
@@ -237,7 +237,7 @@ class _FacetList implements FacetList {
 
   /// Get new set of selection after a selection operation.
   Set<String> _selectionsSet(String selection) {
-    final current = _selectionEvents.value;
+    final current = _selectionEvents.valueOrNull ?? {};
     _log.finest('current facet selections: $current -> $selection selected');
     switch (selectionMode) {
       case SelectionMode.single:
