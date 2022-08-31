@@ -75,9 +75,24 @@ class _FacetList implements FacetList {
     required this.selectionMode,
     required this.persistent,
   }) : _log = algoliaLogger('FacetList') {
-    _initSearcher();
-    _initSelections();
-    _initFacets();
+    // Setup search state
+    searcher.applyState(
+      (state) => state.copyWith(
+        facets: List.from(
+          (state.facets ?? [])..add(attribute),
+        ),
+      ),
+    );
+
+    // Setup selection events
+    _selectionEvents.stream.listen((selections) {
+      filterState.modify((filters) {
+        final filtersSet =
+            selections.map((value) => Filter.facet(attribute, value)).toSet();
+        filters = _clearFilters(filters);
+        return filters.add(groupID, filtersSet);
+      });
+    });
   }
 
   /// Hits Searcher component
@@ -119,12 +134,28 @@ class _FacetList implements FacetList {
       );
 
   /// List facets items.
-  late final ValueStream<List<Facet>> _items;
-  late final StreamSubscription _itemsSubscription;
+  late final BehaviorSubject<List<Facet>> _items = BehaviorSubject()
+    ..addStream(
+      searcher.responses.map(
+        (response) =>
+            response.disjunctiveFacets[attribute] ??
+            response.facets[attribute] ??
+            [],
+      ),
+    );
 
   /// Set of selected facet values.
-  late final ValueStream<Set<String>> _selections;
-  late final StreamSubscription _selectionsSubscription;
+  late final BehaviorSubject<Set<String>> _selections = BehaviorSubject()
+    ..addStream(
+      filterState.filters.map(
+        (filters) =>
+            filters
+                .getFacetFilters(groupID)
+                ?.map((e) => e.value.toString())
+                .toSet() ??
+            {},
+      ),
+    );
 
   /// Setup selection stream events listener.
   void _initSearcher() {
@@ -135,19 +166,6 @@ class _FacetList implements FacetList {
         ),
       ),
     );
-  }
-
-  /// Searcher setup
-  void _initSelections() {
-    _selectionEvents.stream.listen((selections) {
-      filterState.modify((filters) {
-        final filtersSet =
-            selections.map((value) => Filter.facet(attribute, value)).toSet();
-        filters = _clearFilters(filters);
-        filters = filters.add(groupID, filtersSet);
-        return filters;
-      });
-    });
   }
 
   /// Clear filters from [ImmutableFilters] depending
@@ -177,43 +195,6 @@ class _FacetList implements FacetList {
     return {...currentFilters, ...currentSelections};
   }
 
-  /// Facet streams setup
-  void _initFacets() {
-    _initFacetFilters();
-    _initFacetItems();
-  }
-
-  /// Facets filters selections events from Filter State setup
-  void _initFacetFilters() {
-    final valueStream = filterState.filters
-        .map(
-          (filters) =>
-              filters
-                  .getFacetFilters(groupID)
-                  ?.map((e) => e.value.toString())
-                  .toSet() ??
-              {},
-        )
-        .publishValue();
-    _selections = valueStream;
-    _selectionsSubscription = valueStream.connect();
-  }
-
-  /// Facets filters list from Hits Searcher setup
-  void _initFacetItems() {
-    final valueStream = searcher.responses
-        .map(
-          (response) =>
-              response.disjunctiveFacets[attribute] ??
-              response.facets[attribute] ??
-              [],
-        )
-        .publishValue();
-
-    _items = valueStream;
-    _itemsSubscription = valueStream.connect();
-  }
-
   @override
   void select(String selection) {
     final selections = _selectionsSet(selection);
@@ -238,8 +219,8 @@ class _FacetList implements FacetList {
   @override
   void dispose() {
     _selectionEvents.close();
-    _selectionsSubscription.cancel();
-    _itemsSubscription.cancel();
+    _selections.close();
+    _items.close();
   }
 }
 
