@@ -139,20 +139,6 @@ class ImmutableFilters extends Filters {
         numericGroups: numericGroups ?? this.numericGroups,
         hierarchicalGroups: hierarchicalGroups ?? this.hierarchicalGroups,
       );
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      super == other &&
-          other is ImmutableFilters &&
-          runtimeType == other.runtimeType &&
-          facetGroups.equals(other.facetGroups) &&
-          tagGroups.equals(other.tagGroups) &&
-          numericGroups.equals(other.numericGroups) &&
-          hierarchicalGroups.equals(other.hierarchicalGroups);
-
-  @override
-  int get hashCode => super.hashCode;
 }
 
 /// Extensions over [FilterGroupMap].
