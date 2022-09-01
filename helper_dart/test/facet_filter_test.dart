@@ -22,7 +22,7 @@ void main() {
         searcher: searcher,
         filterState: FilterState(),
         attribute: 'color',
-      )..select('blue');
+      )..toggle('blue');
 
       await expectLater(
         facetList.facets,
@@ -56,7 +56,7 @@ void main() {
         filterState: FilterState(),
         attribute: 'color',
         persistent: true,
-      )..select('blue');
+      )..toggle('blue');
 
       await expectLater(
         facetList.facets,
@@ -88,7 +88,7 @@ void main() {
         searcher: searcher,
         filterState: FilterState(),
         attribute: 'color',
-      )..select('blue');
+      )..toggle('blue');
 
       await expectLater(
         facetList.facets,
@@ -111,7 +111,7 @@ void main() {
         filterState: filterState,
         attribute: 'color',
         groupID: groupID,
-      ).select('red');
+      ).toggle('red');
 
       await expectLater(
         filterState.filters,
@@ -172,7 +172,7 @@ void main() {
       );
 
       await delay();
-      facetList.select('red');
+      facetList.toggle('red');
 
       await expectLater(
         filterState.filters,
@@ -199,7 +199,7 @@ void main() {
         filterState: filterState,
         attribute: 'color',
         groupID: groupID,
-      ).select('red');
+      ).toggle('red');
 
       await expectLater(
         filterState.filters,
@@ -237,7 +237,7 @@ void main() {
 
       // await for first emit, a quick select will make it skip
       await delay();
-      facetList.select('green');
+      facetList.toggle('green');
 
       await expectLater(
         facetList.facets,

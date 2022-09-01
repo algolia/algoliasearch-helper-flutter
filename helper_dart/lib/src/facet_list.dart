@@ -209,7 +209,7 @@ class _FacetList implements FacetList {
 
   @override
   void toggle(String value) {
-    _selectionsSet(selection).then((selections) {
+    _selectionsSet(value).then((selections) {
       filterState.modify((filters) async {
         final filtersSet =
             selections.map((value) => Filter.facet(attribute, value)).toSet();
