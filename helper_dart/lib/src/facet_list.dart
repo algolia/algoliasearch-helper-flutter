@@ -95,9 +95,10 @@ class _FacetList implements FacetList {
     );
 
     // Setup subject streams. Not using addStream since we can't stop subjects.
-    _responseSubscription = _responseFacets.subscribe(_searcherFacetsStream());
-    _selectionsSubscription = _selections.subscribe(_filtersSelectionsStream());
-    _facetsSubscription = _facets.subscribe(_selectableFacetsStream());
+    _subscriptions
+      ..add(_responseFacets.subscribe(_searcherFacetsStream()))
+      ..add(_selections.subscribe(_filtersSelectionsStream()))
+      ..add(_facets.subscribe(_selectableFacetsStream()));
   }
 
   /// Hits Searcher component
@@ -130,10 +131,8 @@ class _FacetList implements FacetList {
   /// Set of selected facet values from the filter state.
   final BehaviorSubject<Set<String>> _selections = BehaviorSubject();
 
-  // Streams subscriptions
-  late final StreamSubscription _facetsSubscription;
-  late final StreamSubscription _responseSubscription;
-  late final StreamSubscription _selectionsSubscription;
+  /// Streams subscriptions composite.
+  final CompositeSubscription _subscriptions = CompositeSubscription();
 
   @override
   Stream<List<SelectableFacet>> get facets => _facets.stream.distinct();
@@ -264,9 +263,7 @@ class _FacetList implements FacetList {
   void dispose() {
     _log.finest('component dispose');
     // Cancel all subscriptions
-    _responseSubscription.cancel();
-    _selectionsSubscription.cancel();
-    _facetsSubscription.cancel();
+    _subscriptions.cancel();
     // Close all subjects
     _responseFacets.close();
     _selections.close();
