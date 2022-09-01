@@ -61,8 +61,8 @@ abstract class FacetList {
   /// Snapshot of the latest [facets] value.
   List<SelectableFacet>? snapshot();
 
-  /// Select a facet by it's value.
-  void select(String selection);
+  /// Select/deselect the provided facet value depending on the current selection state.
+  void toggle(String value);
 
   /// Dispose the component.
   void dispose();
@@ -208,7 +208,7 @@ class _FacetList implements FacetList {
       );
 
   @override
-  void select(String selection) {
+  void toggle(String value) {
     _selectionsSet(selection).then((selections) {
       filterState.modify((filters) async {
         final filtersSet =
