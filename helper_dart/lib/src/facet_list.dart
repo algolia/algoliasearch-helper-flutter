@@ -136,7 +136,7 @@ class _FacetList implements FacetList {
   final CompositeSubscription _subscriptions = CompositeSubscription();
 
   @override
-  Stream<List<SelectableFacet>> get facets => _facets.stream.distinct();
+  Stream<List<SelectableFacet>> get facets => _facets.stream;
 
   @override
   List<SelectableFacet>? snapshot() => _facets.valueOrNull;
