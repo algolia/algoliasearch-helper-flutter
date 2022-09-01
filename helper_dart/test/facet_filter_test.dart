@@ -7,7 +7,7 @@ import 'hits_searcher_test.mocks.dart';
 
 void main() {
   group('Build facets list', () {
-    test('Get facet items', () async {
+    test('Get facet items and select', () async {
       final searcher = mockHitsSearcher({
         'facets': {
           'color': {
@@ -26,10 +26,17 @@ void main() {
 
       await expectLater(
         facetList.facets,
-        emits(const [
-          SelectableFacet(item: Facet('red', 1), isSelected: false),
-          SelectableFacet(item: Facet('green', 1), isSelected: false),
-          SelectableFacet(item: Facet('blue', 1), isSelected: true),
+        emitsInOrder([
+          const [
+            SelectableFacet(item: Facet('red', 1), isSelected: false),
+            SelectableFacet(item: Facet('green', 1), isSelected: false),
+            SelectableFacet(item: Facet('blue', 1), isSelected: false),
+          ],
+          const [
+            SelectableFacet(item: Facet('red', 1), isSelected: false),
+            SelectableFacet(item: Facet('green', 1), isSelected: false),
+            SelectableFacet(item: Facet('blue', 1), isSelected: true),
+          ]
         ]),
       );
     });
@@ -53,10 +60,16 @@ void main() {
 
       await expectLater(
         facetList.facets,
-        emits(const [
-          SelectableFacet(item: Facet('blue', 0), isSelected: true),
-          SelectableFacet(item: Facet('red', 1), isSelected: false),
-          SelectableFacet(item: Facet('green', 1), isSelected: false),
+        emitsInOrder([
+          const [
+            SelectableFacet(item: Facet('red', 1), isSelected: false),
+            SelectableFacet(item: Facet('green', 1), isSelected: false),
+          ],
+          const [
+            SelectableFacet(item: Facet('blue', 0), isSelected: true),
+            SelectableFacet(item: Facet('red', 1), isSelected: false),
+            SelectableFacet(item: Facet('green', 1), isSelected: false),
+          ]
         ]),
       );
     });
@@ -181,15 +194,12 @@ void main() {
           Filter.facet('color', 'green'),
         ]);
 
-      final facetList = FacetList.create(
+      FacetList.create(
         searcher: searcher,
         filterState: filterState,
         attribute: 'color',
         groupID: groupID,
-      );
-
-      await delay();
-      facetList.select('red');
+      )..select('red');
 
       await expectLater(
         filterState.filters,
@@ -225,6 +235,7 @@ void main() {
         persistent: true,
       );
 
+      // await for first emit, a quick select will make it skip
       await delay();
       facetList.select('green');
 

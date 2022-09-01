@@ -97,8 +97,8 @@ class _FacetList implements FacetList {
     // Setup subject streams.
     // Not using `addStream` because we want to be able to stop the subjects.
     _subscriptions
-      ..add(_responseFacets.subscribe(_searcherFacetsStream()))
       ..add(_selections.subscribe(_filtersSelectionsStream()))
+      ..add(_responseFacets.subscribe(_searcherFacetsStream()))
       ..add(_facets.subscribe(_selectableFacetsStream()));
   }
 
@@ -127,10 +127,10 @@ class _FacetList implements FacetList {
   final BehaviorSubject<List<SelectableFacet>> _facets = BehaviorSubject();
 
   /// List of facets lists values from search responses.
-  final BehaviorSubject<List<Facet>> _responseFacets = BehaviorSubject();
+  final Subject<List<Facet>> _responseFacets = BehaviorSubject();
 
   /// Set of selected facet values from the filter state.
-  final BehaviorSubject<Set<String>> _selections = BehaviorSubject();
+  final Subject<Set<String>> _selections = BehaviorSubject();
 
   /// Streams subscriptions composite.
   final CompositeSubscription _subscriptions = CompositeSubscription();
@@ -209,18 +209,21 @@ class _FacetList implements FacetList {
 
   @override
   void select(String selection) {
-    final selections = _selectionsSet(selection);
-    filterState.modify((filters) {
-      final filtersSet =
-          selections.map((value) => Filter.facet(attribute, value)).toSet();
-      filters = _clearFilters(filters);
-      return filters.add(groupID, filtersSet);
+    _selectionsSet(selection).then((selections) {
+      filterState.modify((filters) async {
+        final filtersSet =
+            selections.map((value) => Filter.facet(attribute, value)).toSet();
+        filters = await _clearFilters(filters);
+        return filters.add(groupID, filtersSet);
+      });
     });
   }
 
   /// Get new set of selection after a selection operation.
-  Set<String> _selectionsSet(String selection) {
-    final current = _selections.valueOrNull ?? {};
+  /// We use async operation here since [_selections] can take some time to get
+  /// current filters (just after initialization).
+  Future<Set<String>> _selectionsSet(String selection) async {
+    final current = await _selections.first;
     _log.finest('current facet selections: $current -> $selection selected');
     switch (selectionMode) {
       case SelectionMode.single:
@@ -234,29 +237,27 @@ class _FacetList implements FacetList {
   }
 
   /// Clear filters from [ImmutableFilters] depending
-  ImmutableFilters _clearFilters(ImmutableFilters filters) {
+  Future<ImmutableFilters> _clearFilters(ImmutableFilters filters) async {
     switch (selectionMode) {
       case SelectionMode.single:
         return filters.clear([groupID]);
       case SelectionMode.multiple:
         final filtersToRemove = _facetsToRemove();
-        return filters.remove(groupID, filtersToRemove);
+        return filters.remove(groupID, await filtersToRemove);
     }
   }
 
   /// Get the set of facets to remove in case of multiple selection mode.
   /// In case of persistent selection, current selections are kept.
-  Set<FilterFacet> _facetsToRemove() {
-    final currentFilters = _responseFacets.valueOrNull
-            ?.map((facet) => Filter.facet(attribute, facet.value))
-            .toSet() ??
-        {};
+  Future<Set<FilterFacet>> _facetsToRemove() async {
+    final currentFilters = (await _responseFacets.first)
+        .map((facet) => Filter.facet(attribute, facet.value))
+        .toSet();
     if (!persistent) return currentFilters;
 
-    final currentSelections = _selections.valueOrNull
-            ?.map((selection) => Filter.facet(attribute, selection))
-            .toSet() ??
-        {};
+    final currentSelections = (await _selections.first)
+        .map((selection) => Filter.facet(attribute, selection))
+        .toSet();
     return {...currentFilters, ...currentSelections};
   }
 
