@@ -199,7 +199,7 @@ void main() {
         filterState: filterState,
         attribute: 'color',
         groupID: groupID,
-      )..select('red');
+      ).select('red');
 
       await expectLater(
         filterState.filters,
