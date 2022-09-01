@@ -61,7 +61,7 @@ class HitsSearcher {
             .debounceTime(debounce)
             .distinct()
             .switchMap(searchService.search),
-        _log = algoliaLogger;
+        _log = algoliaLogger('HitsSearcher');
 
   /// Search state stream
   final BehaviorSubject<SearchState> _state;

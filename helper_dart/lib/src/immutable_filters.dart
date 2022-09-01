@@ -24,17 +24,19 @@ class ImmutableFilters extends Filters {
       switch (filter.runtimeType) {
         case FilterFacet:
           current = current.copyWith(
-            facetGroups: facetGroups.add(groupID, filter as FilterFacet),
+            facetGroups:
+                current.facetGroups.add(groupID, filter as FilterFacet),
           );
           break;
         case FilterTag:
           current = current.copyWith(
-            tagGroups: tagGroups.add(groupID, filter as FilterTag),
+            tagGroups: current.tagGroups.add(groupID, filter as FilterTag),
           );
           break;
         case FilterNumeric:
           current = current.copyWith(
-            numericGroups: numericGroups.add(groupID, filter as FilterNumeric),
+            numericGroups:
+                current.numericGroups.add(groupID, filter as FilterNumeric),
           );
           break;
       }
@@ -59,24 +61,29 @@ class ImmutableFilters extends Filters {
 
   /// Removes [filters] from [groupID].
   ImmutableFilters remove(FilterGroupID groupID, Iterable<Filter> filters) {
+    var current = this;
     for (final filter in filters) {
       switch (filter.runtimeType) {
         case FilterFacet:
-          return copyWith(
-            facetGroups: facetGroups.delete(groupID, filter as FilterFacet),
+          current = current.copyWith(
+            facetGroups:
+                current.facetGroups.delete(groupID, filter as FilterFacet),
           );
+          break;
         case FilterTag:
-          return copyWith(
-            tagGroups: tagGroups.delete(groupID, filter as FilterTag),
+          current = current.copyWith(
+            tagGroups: current.tagGroups.delete(groupID, filter as FilterTag),
           );
+          break;
         case FilterNumeric:
-          return copyWith(
+          current = current.copyWith(
             numericGroups:
-                numericGroups.delete(groupID, filter as FilterNumeric),
+                current.numericGroups.delete(groupID, filter as FilterNumeric),
           );
+          break;
       }
     }
-    return this;
+    return current;
   }
 
   /// Adds [hierarchicalFilter] to given [attribute].

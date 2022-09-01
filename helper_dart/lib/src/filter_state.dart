@@ -74,9 +74,23 @@ class FilterState {
   }
 
   /// Updates [filters] by applying [action] to current filters value.
+  /// Useful to apply multiple consecutive update operations without firing
+  /// multiple filters events.
   void _modify(ImmutableFilters Function(ImmutableFilters filters) action) {
     final current = _filters.value;
     final updated = action(current);
+    _filters.sink.add(updated);
+  }
+
+  /// **Asynchronous** updates [filters] by applying [action] to current filters
+  /// value.
+  /// Useful to apply multiple consecutive update operations without firing
+  /// multiple filters events.
+  Future<void> modify(
+    Future<ImmutableFilters> Function(ImmutableFilters filters) action,
+  ) async {
+    final current = _filters.value;
+    final updated = await action(current);
     _filters.sink.add(updated);
   }
 }
