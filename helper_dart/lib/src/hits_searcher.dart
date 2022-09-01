@@ -42,7 +42,11 @@ class HitsSearcher {
     bool disjunctiveFacetingEnabled = true,
     Duration debounce = const Duration(milliseconds: 100),
   }) {
-    final client = Algolia.init(applicationId: applicationID, apiKey: apiKey);
+    final client = Algolia.init(
+      applicationId: applicationID,
+      apiKey: apiKey,
+      extraUserAgents: ['algolia-helper-dart (0.1.0)'],
+    );
     final service = HitsSearchService(client, disjunctiveFacetingEnabled);
     return HitsSearcher.build(service, state, debounce);
   }
