@@ -94,7 +94,8 @@ class _FacetList implements FacetList {
       ),
     );
 
-    // Setup subject streams. Not using addStream since we can't stop subjects.
+    // Setup subject streams.
+    // Not using `addStream` because we want to be able to stop the subjects.
     _subscriptions
       ..add(_responseFacets.subscribe(_searcherFacetsStream()))
       ..add(_selections.subscribe(_filtersSelectionsStream()))
