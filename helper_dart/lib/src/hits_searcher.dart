@@ -67,8 +67,11 @@ class HitsSearcher {
             .switchMap(searchService.search),
         _log = algoliaLogger('HitsSearcher');
 
-  /// Search state stream
+  /// Search state subject
   final BehaviorSubject<SearchState> _state;
+
+  /// Search state stream
+  Stream<SearchState> get state => _state.stream;
 
   /// Search results stream
   final Stream<SearchResponse> responses;
