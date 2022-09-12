@@ -101,8 +101,8 @@ class QueryBuilder {
         return query.copyWith(
           facets: [facet],
           filterGroups: filterGroupsCopy,
-          attributesToRetrieve: ['objectID'],// TODO: should be [], workaround
-          attributesToHighlight: ['objectID'],// to avoid the client exception
+          attributesToRetrieve: ['objectID'], // TODO: should be [], workaround
+          attributesToHighlight: ['objectID'], // to avoid the client exception
           hitsPerPage: 0,
           analytics: false,
         );
