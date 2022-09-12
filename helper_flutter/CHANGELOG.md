@@ -1,3 +1,10 @@
+# 0.1.2
+
+## Fix
+
+- Rewrite the build disjunctive faceting queries to avoid exception  (#19)
+
+
 # 0.1.1
 
 ## Feat
