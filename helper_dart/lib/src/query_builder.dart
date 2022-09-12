@@ -97,8 +97,10 @@ class QueryBuilder {
           final Set<Filter> updatedFilters;
           if (filterGroup.groupID.operator == FilterOperator.or) {
             updatedFilters = filterGroup
-                .where((element) =>
-                    !(element is FilterFacet && element.attribute == facet))
+                .where(
+                  (element) =>
+                      !(element is FilterFacet && element.attribute == facet),
+                )
                 .toSet();
           } else {
             updatedFilters = filterGroup;
