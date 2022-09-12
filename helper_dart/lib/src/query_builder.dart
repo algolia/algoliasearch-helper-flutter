@@ -91,18 +91,26 @@ class QueryBuilder {
   /// for disjunctive facets
   Iterable<SearchState> _buildDisjunctiveFacetingQueries(SearchState query) =>
       query.disjunctiveFacets?.map((facet) {
-        final filterGroupsCopy = _copyFilterGroups();
-        for (final filterGroup in filterGroupsCopy) {
-          if (filterGroup.groupID.operator != FilterOperator.or) continue;
-          filterGroup.removeWhere(
-            (element) => element is FilterFacet && element.attribute == facet,
-          );
+        final filterGroupsCopy = <FilterGroup>{};
+        final currentFilterGroups = _searchState.filterGroups ?? {};
+        for (final filterGroup in currentFilterGroups) {
+          final Set<Filter> updatedFilters;
+          if (filterGroup.groupID.operator == FilterOperator.or) {
+            updatedFilters = filterGroup
+                .where((element) =>
+                    !(element is FilterFacet && element.attribute == facet))
+                .toSet();
+          } else {
+            updatedFilters = filterGroup;
+          }
+          filterGroupsCopy.add(filterGroup.copyWith(filters: updatedFilters));
         }
         return query.copyWith(
           facets: [facet],
           filterGroups: filterGroupsCopy,
-          attributesToRetrieve: ['objectID'], // TODO: should be [], workaround
-          attributesToHighlight: ['objectID'], // to avoid the client exception
+          attributesToRetrieve: ['objectID'],
+          // TODO: should be [], workaround to avoid the client exception
+          attributesToHighlight: ['objectID'],
           hitsPerPage: 0,
           analytics: false,
         );
