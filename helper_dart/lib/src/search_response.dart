@@ -59,10 +59,10 @@ class SearchResponse {
   /// the returned facets contains numerical values.
   Map<String, Map<String, num>> get facetsStats =>
       (raw['facets_stats'] as Map<String, dynamic>?)?.map(
-            (key, value) =>
+        (key, value) =>
             MapEntry(key, Map<String, num>.from(value as Map? ?? {})),
       ) ??
-          {};
+      {};
 
   /// Whether the nbHits is exhaustive (true) or approximate (false).
   /// An approximation is done when the query takes more than 50ms to be
