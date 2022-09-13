@@ -8,11 +8,11 @@ extension Highlightable on Hit {
   /// - [inverted] flag inverts the highlighted and non-highlighted substrings
   /// if set
   HighlightedString getHighlightedString(
-    String attribute, [
+    String attribute, {
     String preTag = '<em>',
     String postTag = '</em>',
     bool inverted = false,
-  ]) {
+  }) {
     final highlightResult = this['_highlightResult'] as Map<String, dynamic>;
     final highlightAttr = highlightResult[attribute] as Map<String, dynamic>;
     final highlighted = highlightAttr['value'] as String;
