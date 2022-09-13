@@ -1,3 +1,10 @@
+# 0.1.3
+
+## Fix
+
+- Named parameters for `Hit.getHighlightedString` (#22)
+
+
 # 0.1.2
 
 ## Fix
