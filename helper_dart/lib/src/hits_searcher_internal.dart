@@ -1,5 +1,6 @@
 import 'package:algolia/algolia.dart';
 import 'package:logging/logging.dart';
+import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'hits_searcher.dart';
@@ -14,9 +15,10 @@ import 'search_state.dart';
 ///
 /// 1. Distinct state changes (including initial state) trigger search operation
 /// 2. State changes are debounced
-class DefaultHitsSearcher implements HitsSearcher {
+@visibleForTesting
+class InternalHitsSearcher implements HitsSearcher {
   /// HitsSearcher's factory.
-  factory DefaultHitsSearcher({
+  factory InternalHitsSearcher({
     required String applicationID,
     required String apiKey,
     required SearchState state,
@@ -29,18 +31,18 @@ class DefaultHitsSearcher implements HitsSearcher {
       extraUserAgents: ['algolia-helper-dart (0.1.3)'],
     );
     final service = HitsSearchService(client, disjunctiveFacetingEnabled);
-    return DefaultHitsSearcher.create(service, state, debounce);
+    return InternalHitsSearcher.create(service, state, debounce);
   }
 
   /// HitSearcher's constructor, for internal and test use only.
-  DefaultHitsSearcher.create(
+  InternalHitsSearcher.create(
     HitsSearchService searchService,
     SearchState state, [
     Duration debounce = const Duration(milliseconds: 100),
   ]) : this._(searchService, BehaviorSubject.seeded(state), debounce);
 
   /// HitsSearcher's private constructor
-  DefaultHitsSearcher._(this.searchService, this._state, Duration debounce)
+  InternalHitsSearcher._(this.searchService, this._state, Duration debounce)
       : responses = _state.stream
             .debounceTime(debounce)
             .switchMap(searchService.search),

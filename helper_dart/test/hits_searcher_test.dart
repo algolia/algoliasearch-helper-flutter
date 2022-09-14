@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:algolia/algolia.dart';
 import 'package:algolia_helper/algolia_helper.dart';
-import 'package:algolia_helper/src/hits_searcher_default.dart';
+import 'package:algolia_helper/src/hits_searcher_internal.dart';
 import 'package:algolia_helper/src/hits_searcher_service.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -45,7 +45,7 @@ void main() {
       final initial = SearchResponse(const {});
       when(searchService.search(any)).thenAnswer((_) => Stream.value(initial));
 
-      final searcher = DefaultHitsSearcher.create(
+      final searcher = InternalHitsSearcher.create(
         searchService,
         const SearchState(indexName: 'myIndex'),
       );
@@ -55,7 +55,7 @@ void main() {
 
     test('Should emit response after query', () async {
       final searchService = MockHitsSearchService();
-      final searcher = DefaultHitsSearcher.create(
+      final searcher = InternalHitsSearcher.create(
         searchService,
         const SearchState(indexName: 'myIndex'),
       );
@@ -71,7 +71,7 @@ void main() {
       final searchService = MockHitsSearchService();
       when(searchService.search(any))
           .thenAnswer((_) => Stream.value(SearchResponse({})));
-      final searcher = DefaultHitsSearcher.create(
+      final searcher = InternalHitsSearcher.create(
         searchService,
         const SearchState(indexName: 'myIndex'),
       );
@@ -87,7 +87,7 @@ void main() {
       final searchService = MockHitsSearchService();
       when(searchService.search(any)).thenAnswer(mockResponse);
 
-      final searcher = DefaultHitsSearcher.create(
+      final searcher = InternalHitsSearcher.create(
         searchService,
         const SearchState(indexName: 'myIndex'),
       );
@@ -110,7 +110,7 @@ void main() {
       final searchService = MockHitsSearchService();
       when(searchService.search(any)).thenAnswer(mockResponse);
 
-      final searcher = DefaultHitsSearcher.create(
+      final searcher = InternalHitsSearcher.create(
         searchService,
         const SearchState(indexName: 'myIndex'),
       );
@@ -139,7 +139,7 @@ void main() {
       final searchService = MockHitsSearchService();
       when(searchService.search(any)).thenAnswer(mockResponse);
 
-      final searcher = DefaultHitsSearcher.create(
+      final searcher = InternalHitsSearcher.create(
         searchService,
         const SearchState(indexName: 'myIndex'),
       );
@@ -166,7 +166,7 @@ void main() {
     when(searchService.search(any)).thenAnswer(mockResponse);
 
     const initSearchState = SearchState(indexName: 'myIndex');
-    final searcher = DefaultHitsSearcher.create(
+    final searcher = InternalHitsSearcher.create(
       searchService,
       initSearchState,
     );

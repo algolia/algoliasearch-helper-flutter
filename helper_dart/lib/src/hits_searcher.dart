@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:meta/meta.dart';
 
 import 'filter_state.dart';
-import 'hits_searcher_default.dart';
+import 'hits_searcher_internal.dart';
 import 'search_response.dart';
 import 'search_state.dart';
 
@@ -56,7 +56,7 @@ abstract class HitsSearcher {
     bool disjunctiveFacetingEnabled = true,
     Duration debounce = const Duration(milliseconds: 100),
   }) =>
-      DefaultHitsSearcher(
+      InternalHitsSearcher(
         applicationID: applicationID,
         apiKey: apiKey,
         state: SearchState(indexName: indexName),
@@ -72,7 +72,7 @@ abstract class HitsSearcher {
     bool disjunctiveFacetingEnabled = true,
     Duration debounce = const Duration(milliseconds: 100),
   }) =>
-      DefaultHitsSearcher(
+      InternalHitsSearcher(
         applicationID: applicationID,
         apiKey: apiKey,
         state: state,
