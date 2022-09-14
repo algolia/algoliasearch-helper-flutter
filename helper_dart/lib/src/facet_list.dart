@@ -18,6 +18,7 @@ import 'selectable_item.dart';
 /// and lets the user refine their search results by filtering on specific
 /// values.
 @experimental
+@sealed
 abstract class FacetList {
   /// Create [FacetList] instance.
   factory FacetList({

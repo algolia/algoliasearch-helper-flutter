@@ -50,6 +50,7 @@ import 'search_state.dart';
 /// searcher.dispose();
 /// ```
 ///
+@sealed
 abstract class HitsSearcher {
   /// HitsSearcher's factory.
   factory HitsSearcher({
