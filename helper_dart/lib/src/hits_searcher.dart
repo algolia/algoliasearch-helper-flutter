@@ -1,23 +1,53 @@
 import 'dart:async';
 
-import 'package:algolia/algolia.dart';
-import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
-import 'package:rxdart/rxdart.dart';
 
 import 'filter_state.dart';
-import 'hits_searcher_service.dart';
-import 'logger.dart';
+import 'hits_searcher_internal.dart';
 import 'search_response.dart';
 import 'search_state.dart';
 
-/// Algolia helper main entry point.
+/// Algolia helpers main entry point.
 ///
-/// This implementation has the following behavior:
+/// The [HitsSearcher] has the following behavior:
 ///
 /// 1. Distinct state changes (including initial state) trigger search operation
 /// 2. State changes are debounced
-class HitsSearcher {
+///
+/// ## Create Hits Searcher
+/// ```dart
+/// final searcher = HitsSearcher(
+///   applicationID: 'MY_APPLICATION_ID',
+///   apiKey: 'MY_API_KEY',
+///   indexName: 'MY_INDEX_NAME',
+/// );
+/// ```
+///
+/// ## Run search requests
+/// ```dart
+/// searcher.query('book');
+/// ```
+/// ```dart
+/// searcher.applyState((state) => state.copyWith(query: 'book'));
+/// ```
+///
+/// ## Listen to search results
+/// ````dart
+/// searcher.responses.listen((response) {
+///   print('${response.nbHits} hits found');
+///   for (var hit in response.hits) {
+///     print("> ${hit['title']}");
+///   }
+/// });
+/// ```
+///
+/// ## Dispose internal resources
+/// ```dart
+/// searcher.dispose();
+/// ```
+///
+@sealed
+abstract class HitsSearcher {
   /// HitsSearcher's factory.
   factory HitsSearcher({
     required String applicationID,
@@ -26,7 +56,7 @@ class HitsSearcher {
     bool disjunctiveFacetingEnabled = true,
     Duration debounce = const Duration(milliseconds: 100),
   }) =>
-      HitsSearcher.create(
+      InternalHitsSearcher(
         applicationID: applicationID,
         apiKey: apiKey,
         state: SearchState(indexName: indexName),
@@ -41,71 +71,32 @@ class HitsSearcher {
     required SearchState state,
     bool disjunctiveFacetingEnabled = true,
     Duration debounce = const Duration(milliseconds: 100),
-  }) {
-    final client = Algolia.init(
-      applicationId: applicationID,
-      apiKey: apiKey,
-      extraUserAgents: ['algolia-helper-dart (0.1.3)'],
-    );
-    final service = HitsSearchService(client, disjunctiveFacetingEnabled);
-    return HitsSearcher.build(service, state, debounce);
-  }
-
-  /// HitSearcher's constructor, for internal and test use only.
-  @visibleForTesting
-  HitsSearcher.build(
-    HitsSearchService searchService,
-    SearchState state, [
-    Duration debounce = const Duration(milliseconds: 100),
-  ]) : this._(searchService, BehaviorSubject.seeded(state), debounce);
-
-  /// HitsSearcher's private constructor
-  HitsSearcher._(this.searchService, this._state, Duration debounce)
-      : responses = _state.stream
-            .debounceTime(debounce)
-            .switchMap(searchService.search),
-        _log = algoliaLogger('HitsSearcher');
-
-  /// Search state subject
-  final BehaviorSubject<SearchState> _state;
+  }) =>
+      InternalHitsSearcher(
+        applicationID: applicationID,
+        apiKey: apiKey,
+        state: state,
+        disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
+        debounce: debounce,
+      );
 
   /// Search state stream
-  Stream<SearchState> get state => _state.stream;
+  Stream<SearchState> get state;
 
   /// Search results stream
-  final Stream<SearchResponse> responses;
-
-  /// Service handling search requests
-  final HitsSearchService searchService;
-
-  /// Events logger
-  final Logger _log;
+  Stream<SearchResponse> get responses;
 
   /// Set query string.
-  void query(String query) {
-    _updateState((state) => state.copyWith(query: query));
-  }
+  void query(String query);
 
   /// Get current [SearchState].
-  SearchState snapshot() => _state.value;
+  SearchState snapshot();
 
   /// Apply search state configuration.
-  void applyState(SearchState Function(SearchState state) config) {
-    _updateState((state) => config(state));
-  }
-
-  /// Apply changes to the current state
-  void _updateState(SearchState Function(SearchState state) apply) {
-    final current = _state.value;
-    final newState = apply(current);
-    _state.sink.add(newState);
-  }
+  void applyState(SearchState Function(SearchState state) config);
 
   /// Dispose of underlying resources.
-  void dispose() {
-    _log.fine('helper is disposed');
-    _state.close();
-  }
+  void dispose();
 }
 
 /// Extensions over [HitsSearcher]
