@@ -1,6 +1,6 @@
 name: algolia_helper
 description: Patterns and APIs to implement advanced search features with Algolia
-version: 0.1.2
+version: 0.1.3
 homepage: https://github.com/algolia/algoliasearch-helper-flutter/tree/main/helper_dart
 
 environment:

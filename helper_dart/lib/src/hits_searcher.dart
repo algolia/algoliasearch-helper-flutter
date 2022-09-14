@@ -45,7 +45,7 @@ class HitsSearcher {
     final client = Algolia.init(
       applicationId: applicationID,
       apiKey: apiKey,
-      extraUserAgents: ['algolia-helper-dart (0.1.0)'],
+      extraUserAgents: ['algolia-helper-dart (0.1.3)'],
     );
     final service = HitsSearchService(client, disjunctiveFacetingEnabled);
     return HitsSearcher.build(service, state, debounce);
