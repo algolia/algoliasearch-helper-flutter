@@ -44,7 +44,7 @@ void main() {
       final initial = SearchResponse(const {});
       when(searchService.search(any)).thenAnswer((_) => Stream.value(initial));
 
-      final searcher = HitsSearcher.build(
+      final searcher = DefaultHitsSearcher.create(
         searchService,
         const SearchState(indexName: 'myIndex'),
       );
@@ -54,7 +54,7 @@ void main() {
 
     test('Should emit response after query', () async {
       final searchService = MockHitsSearchService();
-      final searcher = HitsSearcher.build(
+      final searcher = DefaultHitsSearcher.create(
         searchService,
         const SearchState(indexName: 'myIndex'),
       );
@@ -70,7 +70,7 @@ void main() {
       final searchService = MockHitsSearchService();
       when(searchService.search(any))
           .thenAnswer((_) => Stream.value(SearchResponse({})));
-      final searcher = HitsSearcher.build(
+      final searcher = DefaultHitsSearcher.create(
         searchService,
         const SearchState(indexName: 'myIndex'),
       );
@@ -86,7 +86,7 @@ void main() {
       final searchService = MockHitsSearchService();
       when(searchService.search(any)).thenAnswer(mockResponse);
 
-      final searcher = HitsSearcher.build(
+      final searcher = DefaultHitsSearcher.create(
         searchService,
         const SearchState(indexName: 'myIndex'),
       );
@@ -109,7 +109,7 @@ void main() {
       final searchService = MockHitsSearchService();
       when(searchService.search(any)).thenAnswer(mockResponse);
 
-      final searcher = HitsSearcher.build(
+      final searcher = DefaultHitsSearcher.create(
         searchService,
         const SearchState(indexName: 'myIndex'),
       );
@@ -138,7 +138,7 @@ void main() {
       final searchService = MockHitsSearchService();
       when(searchService.search(any)).thenAnswer(mockResponse);
 
-      final searcher = HitsSearcher.build(
+      final searcher = DefaultHitsSearcher.create(
         searchService,
         const SearchState(indexName: 'myIndex'),
       );
@@ -165,7 +165,7 @@ void main() {
     when(searchService.search(any)).thenAnswer(mockResponse);
 
     const initSearchState = SearchState(indexName: 'myIndex');
-    final searcher = HitsSearcher.build(
+    final searcher = DefaultHitsSearcher.create(
       searchService,
       initSearchState,
     );

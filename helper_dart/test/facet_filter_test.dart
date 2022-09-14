@@ -260,7 +260,7 @@ HitsSearcher mockHitsSearcher([Map<String, dynamic> json = const {}]) {
   final initial = SearchResponse(json);
   when(searchService.search(any)).thenAnswer((_) => Stream.value(initial));
 
-  return HitsSearcher.build(
+  return DefaultHitsSearcher.create(
     searchService,
     const SearchState(indexName: 'myIndex'),
   );
