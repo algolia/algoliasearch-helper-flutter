@@ -1,3 +1,10 @@
+# 0.1.4
+
+## Refactor
+
+- `HitsSearcher` and `FacetList` specification and implementation (#24) 
+
+
 # 0.1.3
 
 ## Fix
