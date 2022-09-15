@@ -12,6 +12,44 @@ import 'selectable_item.dart';
 /// FacetList (refinement list) is a filtering components that displays facets,
 /// and lets the user refine their search results by filtering on specific
 /// values.
+/// ## Create Facet List
+/// ```dart
+/// // Create a HitsSearcher
+/// final searcher = HitsSearcher(
+///  applicationID: 'MY_APPLICATION_ID',
+///  apiKey: 'MY_API_KEY',
+///  indexName: 'MY_INDEX_NAME',
+/// );
+///
+/// // Create a FilterState
+/// final filterState = FilterState();
+///
+/// // Create a FacetList
+/// final facetList = FacetList(
+///  searcher: searcher,
+///  filterState: filterState,
+///  attribute: 'MY_ATTRIBUTE',
+/// );
+/// ```
+///
+/// ## Get selectable facet lists
+/// ```dart
+/// facetList.facets.listen((facets) {
+///   for (var facet in facets) {
+///     print("${facet.item} ${facet.isSelected ? 'x' : '-'}");
+///   }
+/// });
+/// ```
+///
+/// ### Toggle facet
+/// ```dart
+/// facetList.toggle('MY_FACET_VALUE');
+/// ```
+///
+/// ## Dispose
+/// ```dart
+/// facetList.dispose();
+/// ```
 @experimental
 @sealed
 abstract class FacetList {
