@@ -1,6 +1,7 @@
 import 'package:logging/logging.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../algolia_helper.dart';
 import 'extensions.dart';
 import 'facet_list.dart';
 import 'filter.dart';
@@ -26,9 +27,10 @@ class InternalFacetList implements FacetList {
     // Setup search state by adding `attribute` to the search state
     searcher.applyState(
       (state) => state.copyWith(
-        facets: List.from(
-          (state.facets ?? [])..add(attribute),
-        ),
+        facets: List.from((state.facets ?? [])..add(attribute)),
+        disjunctiveFacets: groupID.operator == FilterOperator.or
+            ? {...?state.disjunctiveFacets, attribute}
+            : state.disjunctiveFacets,
       ),
     );
 

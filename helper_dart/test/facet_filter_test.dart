@@ -99,6 +99,59 @@ void main() {
         ]),
       );
     });
+
+    test('Build FacetList with conjunctive/disjunctive facets', () {
+      final searcher = mockHitsSearcher();
+
+      // Create a disjunctive FacetList
+      FacetList(
+        searcher: searcher,
+        filterState: FilterState(),
+        attribute: 'color',
+      );
+
+      expect(
+        searcher.snapshot(),
+        const SearchState(
+          indexName: 'myIndex',
+          facets: ['color'],
+          disjunctiveFacets: {'color'},
+        ),
+      );
+
+      // Create a conjunctive FacetList
+      FacetList(
+        searcher: searcher,
+        filterState: FilterState(),
+        attribute: 'type',
+        operator: FilterOperator.and,
+      );
+
+      expect(
+        searcher.snapshot(),
+        const SearchState(
+          indexName: 'myIndex',
+          facets: ['color', 'type'],
+          disjunctiveFacets: {'color'},
+        ),
+      );
+
+      // Create another disjunctive FacetList
+      FacetList(
+        searcher: searcher,
+        filterState: FilterState(),
+        attribute: 'brand',
+      );
+
+      expect(
+        searcher.snapshot(),
+        const SearchState(
+          indexName: 'myIndex',
+          facets: ['color', 'type', 'brand'],
+          disjunctiveFacets: {'color', 'brand'},
+        ),
+      );
+    });
   });
 
   group('Update filter state', () {
