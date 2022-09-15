@@ -31,21 +31,20 @@ import 'search_state.dart';
 /// searcher.applyState((state) => state.copyWith(query: 'book'));
 /// ```
 ///
-/// ## Listen to search results
-/// ````dart
+/// ## Get search results
+/// ```dart
 /// searcher.responses.listen((response) {
 ///   print('${response.nbHits} hits found');
 ///   for (var hit in response.hits) {
-///     print("> ${hit['title']}");
+///     print("> ${hit['objectID']}");
 ///   }
 /// });
 /// ```
 ///
-/// ## Dispose internal resources
+/// ## Dispose
 /// ```dart
 /// searcher.dispose();
 /// ```
-///
 @sealed
 abstract class HitsSearcher {
   /// HitsSearcher's factory.
