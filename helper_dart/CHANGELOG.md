@@ -1,3 +1,10 @@
+# 0.1.5
+
+### Feat
+
+- Update `HitsSearcher`'s `disjunctiveFacets` property when disjunctive `FacetList` is connected (#27)
+
+
 # 0.1.4
 
 ## Refactor

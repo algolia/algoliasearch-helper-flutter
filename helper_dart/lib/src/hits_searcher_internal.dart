@@ -28,7 +28,7 @@ class InternalHitsSearcher implements HitsSearcher {
     final client = Algolia.init(
       applicationId: applicationID,
       apiKey: apiKey,
-      extraUserAgents: ['algolia-helper-dart (0.1.4)'],
+      extraUserAgents: ['algolia-helper-dart (0.1.5)'],
     );
     final service = HitsSearchService(client, disjunctiveFacetingEnabled);
     return InternalHitsSearcher.create(service, state, debounce);
