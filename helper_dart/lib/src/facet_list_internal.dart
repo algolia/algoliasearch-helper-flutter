@@ -3,15 +3,7 @@ import 'package:rxdart/rxdart.dart';
 
 import '../algolia_helper.dart';
 import 'extensions.dart';
-import 'facet_list.dart';
-import 'filter.dart';
-import 'filter_group.dart';
-import 'filter_state.dart';
-import 'hits_searcher.dart';
-import 'immutable_filters.dart';
 import 'logger.dart';
-import 'search_response.dart';
-import 'selectable_item.dart';
 
 /// Implementation of [FacetList].
 class InternalFacetList implements FacetList {
