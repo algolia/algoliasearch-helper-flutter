@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:algolia/algolia.dart';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
@@ -42,14 +44,7 @@ class InternalHitsSearcher implements HitsSearcher {
   ]) : this._(searchService, BehaviorSubject.seeded(state), debounce);
 
   /// HitsSearcher's private constructor
-  InternalHitsSearcher._(this.searchService, this._state, Duration debounce)
-      : responses = _state.stream
-            .debounceTime(debounce)
-            .switchMap(searchService.search),
-        _log = algoliaLogger('HitsSearcher');
-
-  /// Search state subject
-  final BehaviorSubject<SearchState> _state;
+  InternalHitsSearcher._(this.searchService, this._state, this.debounce);
 
   /// Search state stream
   @override
@@ -57,13 +52,27 @@ class InternalHitsSearcher implements HitsSearcher {
 
   /// Search results stream
   @override
-  final Stream<SearchResponse> responses;
+  Stream<SearchResponse> get responses => _responses;
 
   /// Service handling search requests
   final HitsSearchService searchService;
 
+  /// Search state debounce duration
+  final Duration debounce;
+
+  /// Search state subject
+  final BehaviorSubject<SearchState> _state;
+
+  /// Search responses subject
+  late final _responses = _state.stream
+      .debounceTime(debounce)
+      .distinct()
+      .switchMap(searchService.search)
+      .publish()
+      .autoConnect();
+
   /// Events logger
-  final Logger _log;
+  final Logger _log = algoliaLogger('HitsSearcher');
 
   /// Set query string.
   @override
@@ -91,7 +100,7 @@ class InternalHitsSearcher implements HitsSearcher {
   /// Dispose of underlying resources.
   @override
   void dispose() {
-    _log.fine('helper is disposed');
+    _log.fine('HitsSearcher disposed');
     _state.close();
   }
 }
