@@ -99,5 +99,6 @@ class FilterState {
     final current = _filters.value;
     final updated = await action(current);
     _filters.sink.add(updated);
+    _log.finest('FilterState updated: $updated');
   }
 }

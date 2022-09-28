@@ -69,10 +69,13 @@ class InternalHitsSearcher implements HitsSearcher {
       .distinct()
       .switchMap(searchService.search)
       .publish()
-      .autoConnect();
+      .autoConnect(connection: subscriptions.add);
 
   /// Events logger
   final Logger _log = algoliaLogger('HitsSearcher');
+
+  /// Subscriptions composite
+  final CompositeSubscription subscriptions = CompositeSubscription();
 
   /// Set query string.
   @override
@@ -102,5 +105,6 @@ class InternalHitsSearcher implements HitsSearcher {
   void dispose() {
     _log.fine('HitsSearcher disposed');
     _state.close();
+    subscriptions.cancel();
   }
 }
