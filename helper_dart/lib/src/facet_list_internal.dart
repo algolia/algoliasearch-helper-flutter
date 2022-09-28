@@ -15,7 +15,7 @@ class InternalFacetList implements FacetList {
     required this.groupID,
     required this.selectionMode,
     required this.persistent,
-  }) : _log = algoliaLogger('FacetList') {
+  }) {
     // Setup search state by adding `attribute` to the search state
     searcher.applyState(
       (state) => state.copyWith(
@@ -53,7 +53,7 @@ class InternalFacetList implements FacetList {
   final bool persistent;
 
   /// Events logger
-  final Logger _log;
+  final Logger _log = algoliaLogger('FacetList');
 
   /// Selectable facets lists stream.
   final BehaviorSubject<List<SelectableFacet>> _facets = BehaviorSubject();
@@ -195,7 +195,7 @@ class InternalFacetList implements FacetList {
 
   @override
   void dispose() {
-    _log.finest('component dispose');
+    _log.finest('FacetList disposed');
     // Cancel all subscriptions
     _subscriptions.cancel();
     // Close all subjects
