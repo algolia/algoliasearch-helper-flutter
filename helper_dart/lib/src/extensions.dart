@@ -51,10 +51,3 @@ extension OrderedHashEqualsExt on Object? {
   /// Uses [DeepCollectionEquality] to calculate hash value.
   int hashing() => const DeepCollectionEquality().hash(this);
 }
-
-/// Extensions over [Subject]
-extension SubjectExt<T> on Subject<T> {
-  /// Subscribe to a stream, and return
-  StreamSubscription subscribe(Stream<T> source, {bool? cancelOnError}) =>
-      source.listen(add, onError: addError, cancelOnError: cancelOnError);
-}
