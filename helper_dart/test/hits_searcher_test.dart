@@ -102,8 +102,7 @@ void main() {
       searcher
         ..query('c')
         ..query('ca')
-        ..query('cat')
-        ..dispose();
+        ..query('cat');
     });
 
     test("Shouldn't debounce search state", () async {
@@ -157,7 +156,6 @@ void main() {
       await delay(50);
       searcher.query('cat');
       await delay(50);
-      searcher.dispose();
     });
   });
 

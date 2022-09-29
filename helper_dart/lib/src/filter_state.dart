@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:logging/logging.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'filter.dart';
 import 'filter_group.dart';
 import 'filters.dart';
 import 'immutable_filters.dart';
+import 'logger.dart';
 
 /// [FilterState] holds one or several filters, organized in groups.
 /// [filters] streams filters changes of added or removed filters,
@@ -13,6 +15,9 @@ import 'immutable_filters.dart';
 class FilterState {
   /// Filters groups stream (facet, tag, numeric and hierarchical).
   Stream<Filters> get filters => _filters.stream.distinct();
+
+  /// Events logger
+  final Logger _log = algoliaLogger('FilterState');
 
   /// Hot stream controller of [ImmutableFilters].
   final BehaviorSubject<ImmutableFilters> _filters =
@@ -70,6 +75,7 @@ class FilterState {
 
   /// Dispose of underlying resources.
   void dispose() {
+    _log.finest('FilterState disposed');
     _filters.close();
   }
 
@@ -80,6 +86,7 @@ class FilterState {
     final current = _filters.value;
     final updated = action(current);
     _filters.sink.add(updated);
+    _log.finest('FilterState updated: $updated');
   }
 
   /// **Asynchronous** updates [filters] by applying [action] to current filters
@@ -92,5 +99,6 @@ class FilterState {
     final current = _filters.value;
     final updated = await action(current);
     _filters.sink.add(updated);
+    _log.finest('FilterState updated: $updated');
   }
 }
