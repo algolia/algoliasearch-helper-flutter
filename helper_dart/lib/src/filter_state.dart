@@ -54,8 +54,8 @@ abstract class FilterState {
   /// Get current [filters] value.
   Filters snapshot();
 
-  /// **Asynchronous** updates [filters] by applying [builder] to current filters
-  /// value.
+  /// **Asynchronous** updates [filters] by applying [builder] to current
+  /// filters value.
   /// Useful to apply multiple consecutive update operations without firing
   /// multiple filters events.
   Future<void> modify(FiltersBuilder builder);
@@ -149,8 +149,8 @@ class _FilterState implements FilterState {
     _filters.close();
   }
 
-  /// **Asynchronous** updates [filters] by applying [action] to current filters
-  /// value.
+  /// **Asynchronous** updates [filters] by applying [builder] to current
+  /// filters value.
   /// Useful to apply multiple consecutive update operations without firing
   /// multiple filters events.
   @override

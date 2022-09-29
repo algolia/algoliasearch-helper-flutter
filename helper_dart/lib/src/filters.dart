@@ -40,12 +40,6 @@ abstract class Filters {
   /// Get all filters by [groupID].
   Set<Filter> getFilters({FilterGroupID? groupID});
 
-  /// Get all filters as a single [Set] of [Filter]s.
-  Set<Filter> _getAllFilters();
-
-  /// Get all filters by [groupID] as a single [Set] of [Filter]s.
-  Set<Filter> _getFiltersByGroupID(FilterGroupID groupID);
-
   /// Checks if [filter] with [groupID] exists.
   bool contains(FilterGroupID groupID, Filter filter);
 
@@ -169,7 +163,6 @@ class _ImmutableFilters implements ImmutableFilters {
       groupID == null ? _getAllFilters() : _getFiltersByGroupID(groupID);
 
   /// Get all filters as a single [Set] of [Filter]s.
-  @override
   Set<Filter> _getAllFilters() {
     final facetFilters = facetGroups.values.expand((element) => element);
     final tagFilters = tagGroups.values.expand((element) => element);
@@ -178,7 +171,6 @@ class _ImmutableFilters implements ImmutableFilters {
   }
 
   /// Get all filters by [groupID] as a single [Set] of [Filter]s.
-  @override
   Set<Filter> _getFiltersByGroupID(FilterGroupID groupID) {
     final facetFilters = getFacetFilters(groupID);
     final tagFilters = getTagFilters(groupID);
