@@ -58,14 +58,14 @@ abstract class FilterState {
   /// filters value.
   /// Useful to apply multiple consecutive update operations without firing
   /// multiple filters events.
-  Future<void> modify(FiltersBuilder builder);
+  Future<void> modify(AsyncFiltersBuilder builder);
 
   /// Dispose of underlying resources.
   void dispose();
 }
 
-/// Filters builder.
-typedef FiltersBuilder = Future<ImmutableFilters> Function(
+/// Asynchronous immutable filters builder.
+typedef AsyncFiltersBuilder = Future<ImmutableFilters> Function(
   ImmutableFilters filters,
 );
 
@@ -154,19 +154,19 @@ class _FilterState implements FilterState {
   /// Useful to apply multiple consecutive update operations without firing
   /// multiple filters events.
   @override
-  Future<void> modify(FiltersBuilder builder) async {
+  Future<void> modify(AsyncFiltersBuilder builder) async {
     final current = _filters.value;
     final updated = await builder(current);
     _filters.sink.add(updated);
     _log.finest('FilterState updated: $updated');
   }
 
-  /// Updates [filters] by applying [action] to current filters value.
+  /// Updates [filters] by applying [builder] to current filters value.
   /// Useful to apply multiple consecutive update operations without firing
   /// multiple filters events.
-  void _modify(ImmutableFilters Function(ImmutableFilters filters) action) {
+  void _modify(ImmutableFilters Function(ImmutableFilters) builder) {
     final current = _filters.value;
-    final updated = action(current);
+    final updated = builder(current);
     _filters.sink.add(updated);
     _log.finest('FilterState updated: $updated');
   }
