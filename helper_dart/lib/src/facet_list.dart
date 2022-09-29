@@ -8,8 +8,8 @@ import 'extensions.dart';
 import 'filter.dart';
 import 'filter_group.dart';
 import 'filter_state.dart';
+import 'filters.dart';
 import 'hits_searcher.dart';
-import 'immutable_filters.dart';
 import 'logger.dart';
 import 'search_response.dart';
 import 'selectable_item.dart';
@@ -113,7 +113,7 @@ enum SelectionMode { single, multiple }
 /// [Facet] with selection status.
 typedef SelectableFacet = SelectableItem<Facet>;
 
-/// Implementation of [FacetList].
+/// Default implementation of [FacetList].
 class _FacetList implements FacetList {
   /// Create [_FacetList] instance.
   _FacetList({

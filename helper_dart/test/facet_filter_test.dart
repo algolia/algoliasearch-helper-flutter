@@ -230,7 +230,7 @@ void main() {
 
       await expectLater(
         filterState.filters,
-        emitsThrough(const ImmutableFilters()),
+        emitsThrough(ImmutableFilters()),
       );
     });
 
