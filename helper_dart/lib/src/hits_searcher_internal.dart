@@ -44,7 +44,9 @@ class InternalHitsSearcher implements HitsSearcher {
   ]) : this._(searchService, BehaviorSubject.seeded(state), debounce);
 
   /// HitsSearcher's private constructor
-  InternalHitsSearcher._(this.searchService, this._state, this.debounce);
+  InternalHitsSearcher._(this.searchService, this._state, this.debounce) {
+    _subscription = _responses.connect();
+  }
 
   /// Search state stream
   @override
@@ -68,14 +70,13 @@ class InternalHitsSearcher implements HitsSearcher {
       .debounceTime(debounce)
       .distinct()
       .switchMap(searchService.search)
-      .publish()
-      .autoConnect(connection: subscriptions.add);
+      .publish();
 
   /// Events logger
   final Logger _log = algoliaLogger('HitsSearcher');
 
   /// Subscriptions composite
-  final CompositeSubscription subscriptions = CompositeSubscription();
+  late final StreamSubscription _subscription;
 
   /// Set query string.
   @override
@@ -95,6 +96,10 @@ class InternalHitsSearcher implements HitsSearcher {
 
   /// Apply changes to the current state
   void _updateState(SearchState Function(SearchState state) apply) {
+    if (_state.isClosed) {
+      _log.warning('modifying disposed instance');
+      return;
+    }
     final current = _state.value;
     final newState = apply(current);
     _state.sink.add(newState);
@@ -105,6 +110,6 @@ class InternalHitsSearcher implements HitsSearcher {
   void dispose() {
     _log.fine('HitsSearcher disposed');
     _state.close();
-    subscriptions.cancel();
+    _subscription.cancel();
   }
 }

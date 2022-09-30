@@ -155,6 +155,10 @@ class _FilterState implements FilterState {
   /// multiple filters events.
   @override
   Future<void> modify(AsyncFiltersBuilder builder) async {
+    if (_filters.isClosed) {
+      _log.warning('modifying disposed instance');
+      return;
+    }
     final current = _filters.value;
     final updated = await builder(current);
     _filters.sink.add(updated);
@@ -165,6 +169,10 @@ class _FilterState implements FilterState {
   /// Useful to apply multiple consecutive update operations without firing
   /// multiple filters events.
   void _modify(ImmutableFilters Function(ImmutableFilters) builder) {
+    if (_filters.isClosed) {
+      _log.warning('modifying disposed instance');
+      return;
+    }
     final current = _filters.value;
     final updated = builder(current);
     _filters.sink.add(updated);
