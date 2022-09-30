@@ -281,8 +281,8 @@ class _FacetList with DisposableMixin implements FacetList {
     }
   }
 
-  /// Clear filters from [ImmutableFilters] depending
-  Future<ImmutableFilters> _clearFilters(ImmutableFilters filters) async {
+  /// Clear filters from [StatelessFilters] depending
+  Future<StatelessFilters> _clearFilters(StatelessFilters filters) async {
     switch (selectionMode) {
       case SelectionMode.single:
         return filters.clear([groupID]);

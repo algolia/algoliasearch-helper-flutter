@@ -30,9 +30,6 @@ abstract class CompositeDisposable implements Disposable {
   /// Checks if there currently are no [Disposable]s added
   bool get isEmpty;
 
-  /// Checks if there currently are [Disposable]s added
-  bool get isNotEmpty;
-
   /// Adds [disposable] to this composite.
   /// Throws an exception if this composite was disposed
   Disposable add(Disposable disposable);
@@ -57,9 +54,6 @@ class _CompositeDisposable with DisposableMixin implements CompositeDisposable {
 
   @override
   bool get isEmpty => _disposables.isEmpty;
-
-  @override
-  bool get isNotEmpty => _disposables.isNotEmpty;
 
   @override
   Disposable add(Disposable disposable) {

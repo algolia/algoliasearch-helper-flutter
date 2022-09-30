@@ -63,9 +63,9 @@ abstract class FilterState implements Disposable {
   Future<void> modify(AsyncFiltersBuilder builder);
 }
 
-/// Asynchronous immutable filters builder.
-typedef AsyncFiltersBuilder = Future<ImmutableFilters> Function(
-  ImmutableFilters filters,
+/// Asynchronous stateless filters builder.
+typedef AsyncFiltersBuilder = Future<StatelessFilters> Function(
+  StatelessFilters filters,
 );
 
 /// Default implementation of [FilterState].
@@ -77,9 +77,9 @@ class _FilterState with DisposableMixin implements FilterState {
   /// Events logger
   final Logger _log = algoliaLogger('FilterState');
 
-  /// Hot stream controller of [ImmutableFilters].
-  final BehaviorSubject<ImmutableFilters> _filters =
-      BehaviorSubject.seeded(ImmutableFilters());
+  /// Hot stream controller of [StatelessFilters].
+  final BehaviorSubject<StatelessFilters> _filters =
+      BehaviorSubject.seeded(StatelessFilters());
 
   /// Adds [filters] to the provided [groupID].
   @override
@@ -167,7 +167,7 @@ class _FilterState with DisposableMixin implements FilterState {
   /// Updates [filters] by applying [builder] to current filters value.
   /// Useful to apply multiple consecutive update operations without firing
   /// multiple filters events.
-  void _modify(ImmutableFilters Function(ImmutableFilters) builder) {
+  void _modify(StatelessFilters Function(StatelessFilters) builder) {
     if (_filters.isClosed) {
       _log.warning('modifying disposed instance');
       return;

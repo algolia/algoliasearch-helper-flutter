@@ -56,18 +56,18 @@ abstract class Filters {
   });
 }
 
-/// Immutable filters implementation.
+/// Stateless (immutable) filters implementation.
 /// **All operations create a new object with requested changes.**
 @sealed
-abstract class ImmutableFilters implements Filters {
-  /// ImmutableFilters's factory.
-  factory ImmutableFilters({
+abstract class StatelessFilters implements Filters {
+  /// Stateless filters' factory.
+  factory StatelessFilters({
     Map<FilterGroupID, Set<FilterFacet>> facetGroups = const {},
     Map<FilterGroupID, Set<FilterTag>> tagGroups = const {},
     Map<FilterGroupID, Set<FilterNumeric>> numericGroups = const {},
     Map<String, HierarchicalFilter> hierarchicalGroups = const {},
   }) =>
-      _ImmutableFilters(
+      _StatelessFilters(
         facetGroups: facetGroups,
         tagGroups: tagGroups,
         numericGroups: numericGroups,
@@ -75,35 +75,35 @@ abstract class ImmutableFilters implements Filters {
       );
 
   /// Adds [filters] to the provided [groupID].
-  ImmutableFilters add(FilterGroupID groupID, Iterable<Filter> filters);
+  StatelessFilters add(FilterGroupID groupID, Iterable<Filter> filters);
 
   /// Get filters with the provided [map].
-  ImmutableFilters set(Map<FilterGroupID, Set<Filter>> map);
+  StatelessFilters set(Map<FilterGroupID, Set<Filter>> map);
 
   /// Toggles [filter] in given [groupID].
-  ImmutableFilters toggle(FilterGroupID groupID, Filter filter);
+  StatelessFilters toggle(FilterGroupID groupID, Filter filter);
 
   /// Removes [filters] from [groupID].
-  ImmutableFilters remove(FilterGroupID groupID, Iterable<Filter> filters);
+  StatelessFilters remove(FilterGroupID groupID, Iterable<Filter> filters);
 
   /// Adds [hierarchicalFilter] to given [attribute].
-  ImmutableFilters addHierarchical(
+  StatelessFilters addHierarchical(
     String attribute,
     HierarchicalFilter hierarchicalFilter,
   );
 
   /// Removes [HierarchicalFilter] of given [attribute].
-  ImmutableFilters removeHierarchical(String attribute);
+  StatelessFilters removeHierarchical(String attribute);
 
   /// Clears [groupIDs].
   /// If none provided, all filters will be cleared.
-  ImmutableFilters clear([Iterable<FilterGroupID>? groupIDs]);
+  StatelessFilters clear([Iterable<FilterGroupID>? groupIDs]);
 
   /// Clears all except [groupIDs].
-  ImmutableFilters clearExcept(Iterable<FilterGroupID> groupIDs);
+  StatelessFilters clearExcept(Iterable<FilterGroupID> groupIDs);
 
   @override
-  ImmutableFilters copyWith({
+  StatelessFilters copyWith({
     Map<FilterGroupID, Set<FilterFacet>>? facetGroups,
     Map<FilterGroupID, Set<FilterTag>>? tagGroups,
     Map<FilterGroupID, Set<FilterNumeric>>? numericGroups,
@@ -111,10 +111,10 @@ abstract class ImmutableFilters implements Filters {
   });
 }
 
-/// Default implementation of [ImmutableFilters].
-class _ImmutableFilters implements ImmutableFilters {
-  /// Creates [_ImmutableFilters] instance.
-  const _ImmutableFilters({
+/// Default implementation of [StatelessFilters].
+class _StatelessFilters implements StatelessFilters {
+  /// Creates [_StatelessFilters] instance.
+  const _StatelessFilters({
     this.facetGroups = const {},
     this.tagGroups = const {},
     this.numericGroups = const {},
@@ -215,8 +215,8 @@ class _ImmutableFilters implements ImmutableFilters {
 
   /// Adds [filters] to the provided [groupID].
   @override
-  ImmutableFilters add(FilterGroupID groupID, Iterable<Filter> filters) {
-    ImmutableFilters current = this;
+  StatelessFilters add(FilterGroupID groupID, Iterable<Filter> filters) {
+    StatelessFilters current = this;
     for (final filter in filters) {
       switch (filter.runtimeType) {
         case FilterFacet:
@@ -243,8 +243,8 @@ class _ImmutableFilters implements ImmutableFilters {
 
   /// Get filters with the provided [map].
   @override
-  ImmutableFilters set(Map<FilterGroupID, Set<Filter>> map) {
-    ImmutableFilters filters = const _ImmutableFilters();
+  StatelessFilters set(Map<FilterGroupID, Set<Filter>> map) {
+    StatelessFilters filters = const _StatelessFilters();
     for (final entry in map.entries) {
       filters = filters.add(entry.key, entry.value);
     }
@@ -253,15 +253,15 @@ class _ImmutableFilters implements ImmutableFilters {
 
   /// Toggles [filter] in given [groupID].
   @override
-  ImmutableFilters toggle(FilterGroupID groupID, Filter filter) =>
+  StatelessFilters toggle(FilterGroupID groupID, Filter filter) =>
       contains(groupID, filter)
           ? remove(groupID, [filter])
           : add(groupID, [filter]);
 
   /// Removes [filters] from [groupID].
   @override
-  ImmutableFilters remove(FilterGroupID groupID, Iterable<Filter> filters) {
-    ImmutableFilters current = this;
+  StatelessFilters remove(FilterGroupID groupID, Iterable<Filter> filters) {
+    StatelessFilters current = this;
     for (final filter in filters) {
       switch (filter.runtimeType) {
         case FilterFacet:
@@ -288,7 +288,7 @@ class _ImmutableFilters implements ImmutableFilters {
 
   /// Adds [hierarchicalFilter] to given [attribute].
   @override
-  ImmutableFilters addHierarchical(
+  StatelessFilters addHierarchical(
     String attribute,
     HierarchicalFilter hierarchicalFilter,
   ) {
@@ -300,7 +300,7 @@ class _ImmutableFilters implements ImmutableFilters {
 
   /// Removes [HierarchicalFilter] of given [attribute].
   @override
-  ImmutableFilters removeHierarchical(String attribute) {
+  StatelessFilters removeHierarchical(String attribute) {
     if (!hierarchicalGroups.containsKey(attribute)) return this;
     final groups = Map<String, HierarchicalFilter>.from(hierarchicalGroups)
       ..remove(attribute);
@@ -310,11 +310,11 @@ class _ImmutableFilters implements ImmutableFilters {
   /// Clears [groupIDs].
   /// If none provided, all filters will be cleared.
   @override
-  ImmutableFilters clear([Iterable<FilterGroupID>? groupIDs]) {
+  StatelessFilters clear([Iterable<FilterGroupID>? groupIDs]) {
     if (groupIDs == null || groupIDs.isEmpty) {
-      return const _ImmutableFilters();
+      return const _StatelessFilters();
     }
-    return _ImmutableFilters(
+    return _StatelessFilters(
       facetGroups: facetGroups.deleteGroups(groupIDs),
       numericGroups: numericGroups.deleteGroups(groupIDs),
       tagGroups: tagGroups.deleteGroups(groupIDs),
@@ -323,9 +323,9 @@ class _ImmutableFilters implements ImmutableFilters {
 
   /// Clears all except [groupIDs].
   @override
-  ImmutableFilters clearExcept(Iterable<FilterGroupID> groupIDs) {
-    if (groupIDs.isEmpty) return const _ImmutableFilters();
-    return _ImmutableFilters(
+  StatelessFilters clearExcept(Iterable<FilterGroupID> groupIDs) {
+    if (groupIDs.isEmpty) return const _StatelessFilters();
+    return _StatelessFilters(
       facetGroups: facetGroups.deleteGroupsExcept(groupIDs),
       numericGroups: numericGroups.deleteGroupsExcept(groupIDs),
       tagGroups: tagGroups.deleteGroupsExcept(groupIDs),
@@ -333,13 +333,13 @@ class _ImmutableFilters implements ImmutableFilters {
   }
 
   @override
-  ImmutableFilters copyWith({
+  StatelessFilters copyWith({
     Map<FilterGroupID, Set<FilterFacet>>? facetGroups,
     Map<FilterGroupID, Set<FilterTag>>? tagGroups,
     Map<FilterGroupID, Set<FilterNumeric>>? numericGroups,
     Map<String, HierarchicalFilter>? hierarchicalGroups,
   }) =>
-      _ImmutableFilters(
+      _StatelessFilters(
         facetGroups: facetGroups ?? this.facetGroups,
         tagGroups: tagGroups ?? this.tagGroups,
         numericGroups: numericGroups ?? this.numericGroups,
