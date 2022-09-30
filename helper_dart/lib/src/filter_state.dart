@@ -4,6 +4,8 @@ import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
+import 'disposable.dart';
+import 'disposable_mixin.dart';
 import 'filter.dart';
 import 'filter_group.dart';
 import 'filters.dart';
@@ -13,7 +15,7 @@ import 'logger.dart';
 /// [filters] streams filters changes of added or removed filters,
 /// which will be applied to searches performed by the connected Searcher.
 @sealed
-abstract class FilterState {
+abstract class FilterState implements Disposable {
   /// FilterState's factory.
   factory FilterState() => _FilterState();
 
@@ -59,9 +61,6 @@ abstract class FilterState {
   /// Useful to apply multiple consecutive update operations without firing
   /// multiple filters events.
   Future<void> modify(AsyncFiltersBuilder builder);
-
-  /// Dispose of underlying resources.
-  void dispose();
 }
 
 /// Asynchronous immutable filters builder.
@@ -70,7 +69,7 @@ typedef AsyncFiltersBuilder = Future<ImmutableFilters> Function(
 );
 
 /// Default implementation of [FilterState].
-class _FilterState implements FilterState {
+class _FilterState with DisposableMixin implements FilterState {
   /// Filters groups stream (facet, tag, numeric and hierarchical).
   @override
   Stream<Filters> get filters => _filters.stream.distinct();
@@ -144,7 +143,7 @@ class _FilterState implements FilterState {
 
   /// Dispose of underlying resources.
   @override
-  void dispose() {
+  void doDispose() {
     _log.finest('FilterState disposed');
     _filters.close();
   }

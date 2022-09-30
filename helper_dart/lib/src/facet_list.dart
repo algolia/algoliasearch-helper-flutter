@@ -4,6 +4,8 @@ import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
+import 'disposable.dart';
+import 'disposable_mixin.dart';
 import 'extensions.dart';
 import 'filter.dart';
 import 'filter_group.dart';
@@ -57,7 +59,7 @@ import 'selectable_item.dart';
 /// ```
 @experimental
 @sealed
-abstract class FacetList {
+abstract class FacetList implements Disposable {
   /// Create [FacetList] instance.
   factory FacetList({
     required HitsSearcher searcher,
@@ -102,9 +104,6 @@ abstract class FacetList {
 
   /// Select/deselect the provided facet value depending on the current selection state.
   void toggle(String value);
-
-  /// Dispose the component.
-  void dispose();
 }
 
 /// Elements selection mode.
@@ -114,7 +113,7 @@ enum SelectionMode { single, multiple }
 typedef SelectableFacet = SelectableItem<Facet>;
 
 /// Default implementation of [FacetList].
-class _FacetList implements FacetList {
+class _FacetList with DisposableMixin implements FacetList {
   /// Create [_FacetList] instance.
   _FacetList({
     required this.searcher,
@@ -124,6 +123,14 @@ class _FacetList implements FacetList {
     required this.selectionMode,
     required this.persistent,
   }) {
+    if (searcher.isDisposed) {
+      _log.warning('creating an instance with disposed searcher');
+    }
+
+    if (filterState.isDisposed) {
+      _log.warning('creating an instance with disposed filter state');
+    }
+
     // Setup search state by adding `attribute` to the search state
     searcher.applyState(
       (state) => state.copyWith(
@@ -300,7 +307,7 @@ class _FacetList implements FacetList {
   }
 
   @override
-  void dispose() {
+  void doDispose() {
     _log.finest('FacetList disposed');
     _subscriptions.cancel();
   }

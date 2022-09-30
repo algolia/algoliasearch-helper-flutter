@@ -5,6 +5,7 @@ import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
+import 'disposable_mixin.dart';
 import 'hits_searcher.dart';
 import 'hits_searcher_service.dart';
 import 'logger.dart';
@@ -18,7 +19,7 @@ import 'search_state.dart';
 /// 1. Distinct state changes (including initial state) trigger search operation
 /// 2. State changes are debounced
 @visibleForTesting
-class InternalHitsSearcher implements HitsSearcher {
+class InternalHitsSearcher with DisposableMixin implements HitsSearcher {
   /// HitsSearcher's factory.
   factory InternalHitsSearcher({
     required String applicationID,
@@ -105,9 +106,8 @@ class InternalHitsSearcher implements HitsSearcher {
     _state.sink.add(newState);
   }
 
-  /// Dispose of underlying resources.
   @override
-  void dispose() {
+  void doDispose() {
     _log.fine('HitsSearcher disposed');
     _state.close();
     _subscription.cancel();

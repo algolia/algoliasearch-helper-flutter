@@ -4,6 +4,7 @@
 /// experiences at a deeper level, in pure Dart.
 library algolia_helper;
 
+export 'src/disposable.dart';
 export 'src/exception.dart';
 export 'src/facet_list.dart';
 export 'src/filter.dart';
