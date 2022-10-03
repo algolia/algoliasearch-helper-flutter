@@ -170,7 +170,7 @@ void main() {
       await expectLater(
         filterState.filters,
         emitsThrough(
-          ImmutableFilters(
+          StatelessFilters(
             facetGroups: {
               groupID: {Filter.facet('color', 'red')},
             },
@@ -230,7 +230,7 @@ void main() {
 
       await expectLater(
         filterState.filters,
-        emitsThrough(const ImmutableFilters()),
+        emitsThrough(StatelessFilters()),
       );
     });
 
@@ -258,7 +258,7 @@ void main() {
       await expectLater(
         filterState.filters,
         emitsThrough(
-          ImmutableFilters(
+          StatelessFilters(
             facetGroups: {
               groupID: {Filter.facet('color', 'green')}
             },

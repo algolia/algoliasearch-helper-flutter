@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:meta/meta.dart';
 
+import 'disposable.dart';
 import 'filter_state.dart';
 import 'hits_searcher_internal.dart';
 import 'search_response.dart';
@@ -46,7 +47,7 @@ import 'search_state.dart';
 /// searcher.dispose();
 /// ```
 @sealed
-abstract class HitsSearcher {
+abstract class HitsSearcher implements Disposable {
   /// HitsSearcher's factory.
   factory HitsSearcher({
     required String applicationID,
@@ -93,9 +94,6 @@ abstract class HitsSearcher {
 
   /// Apply search state configuration.
   void applyState(SearchState Function(SearchState state) config);
-
-  /// Dispose of underlying resources.
-  void dispose();
 }
 
 /// Extensions over [HitsSearcher]
