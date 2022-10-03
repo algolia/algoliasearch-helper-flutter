@@ -56,6 +56,9 @@ abstract class Filters {
   });
 }
 
+@Deprecated("Renamed to 'StatelessFilters'")
+typedef ImmutableFilters = StatelessFilters;
+
 /// Stateless (immutable) filters implementation.
 /// **All operations create a new object with requested changes.**
 @sealed
