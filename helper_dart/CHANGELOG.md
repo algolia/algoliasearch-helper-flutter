@@ -1,9 +1,23 @@
+# 0.2.0
+
+## Feat
+
+- Add `Disposable` and `CompositeDisposable` (#31)
+
+## Fix
+
+- `HitsSearcher`'s `responses` as published stream (#30)
+
+## Changed
+
+- `ImmutableFilters` renamed to `StatelessFilters` (#32)
+
+
 # 0.1.5
 
 ### Feat
 
 - Update `HitsSearcher`'s `disjunctiveFacets` property when disjunctive `FacetList` is connected (#27)
-
 
 # 0.1.4
 

@@ -1,6 +1,6 @@
 name: algolia_helper_flutter
 description: Patterns and APIs to implement advanced search features with Algolia for Flutter
-version: 0.1.5
+version: 0.2.0
 homepage: https://github.com/algolia/algoliasearch-helper-flutter/tree/main/helper_flutter
 
 environment:
@@ -8,7 +8,7 @@ environment:
   flutter: ">=1.17.0"
 
 dependencies:
-  algolia_helper: ^0.1.5
+  algolia_helper: ^0.2.0
   flutter:
     sdk: flutter
 
