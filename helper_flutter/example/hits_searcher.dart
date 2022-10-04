@@ -34,12 +34,12 @@ class _MyHomePageState extends State<MyHomePage> {
     indexName: 'MY_INDEX_NAME',
   );
 
+  // 2. Create the component to handle the filtering logic: FilterState.
+  final filterState = FilterState();
+
   @override
   void initState() {
     super.initState();
-
-    // 2. Create the component to handle the filtering logic: FilterState.
-    final filterState = FilterState();
     final group = FilterGroupID.and('products');
     filterState
       ..add(group, {Filter.facet('genre', 'Comedy')})
