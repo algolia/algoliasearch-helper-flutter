@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
@@ -169,7 +170,9 @@ class _FacetList with DisposableMixin implements FacetList {
   final Logger _log = algoliaLogger('FacetList');
 
   /// Selectable facets lists stream.
-  late final _facets = _selectableFacetsStream().publishValue();
+  late final _facets = _selectableFacetsStream()
+      .distinct(const DeepCollectionEquality().equals)
+      .publishValue();
 
   /// List of facets lists values from search responses.
   late final _responseFacets = _searcherFacetsStream().publishValue();

@@ -20,7 +20,7 @@ void main() {
 
   // Run your search operations and listen the results!
   searcher.responses.listen((response) {
-    print('${response.nbHits} hits found');
+    print("Search query '${response.query}' (${response.nbHits} hits found)");
     for (var hit in response.hits) {
       print("> ${hit['title']}");
     }
