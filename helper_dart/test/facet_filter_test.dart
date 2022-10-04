@@ -1,5 +1,4 @@
 import 'package:algolia_helper/algolia_helper.dart';
-import 'package:algolia_helper/src/hits_searcher_internal.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
@@ -312,9 +311,9 @@ void main() {
 HitsSearcher mockHitsSearcher([Map<String, dynamic> json = const {}]) {
   final searchService = MockHitsSearchService();
   final initial = SearchResponse(json);
-  when(searchService.search(any)).thenAnswer((_) => Stream.value(initial));
+  when(searchService.search(any)).thenAnswer((_) => Future.value(initial));
 
-  return InternalHitsSearcher.create(
+  return HitsSearcher.custom(
     searchService,
     const SearchState(indexName: 'myIndex'),
   );
