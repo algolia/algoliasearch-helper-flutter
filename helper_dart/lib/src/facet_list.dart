@@ -5,6 +5,7 @@ import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../algolia_helper.dart';
 import 'disposable.dart';
 import 'disposable_mixin.dart';
 import 'extensions.dart';
@@ -20,7 +21,11 @@ import 'selectable_item.dart';
 /// FacetList (refinement list) is a filtering components that displays facets,
 /// and lets the user refine their search results by filtering on specific
 /// values.
+///
 /// ## Create Facet List
+///
+/// Create [FacetList] with given [HitsSearcher] and [FilterState]:
+///
 /// ```dart
 /// // Create a HitsSearcher
 /// final searcher = HitsSearcher(
@@ -41,6 +46,7 @@ import 'selectable_item.dart';
 /// ```
 ///
 /// ## Get selectable facet lists
+///
 /// ```dart
 /// facetList.facets.listen((facets) {
 ///   for (var facet in facets) {
@@ -50,11 +56,13 @@ import 'selectable_item.dart';
 /// ```
 ///
 /// ### Toggle facet
+///
 /// ```dart
 /// facetList.toggle('MY_FACET_VALUE');
 /// ```
 ///
 /// ## Dispose
+///
 /// ```dart
 /// facetList.dispose();
 /// ```
