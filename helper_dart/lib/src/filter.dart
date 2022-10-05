@@ -1,6 +1,51 @@
 import 'package:meta/meta.dart';
 
-/// Represents a search filter
+/// Represents a search filter:
+/// - [FilterFacet] to filter on facet values
+/// - [FilterTag] to filter on tags
+/// - [FilterNumeric] to filter on numeric attributes
+///
+/// ## Facet filter
+///
+/// Create [FilterFacet] by calling [facet] method:
+///
+/// ```dart
+/// // color:red
+/// final filter = Filter.facet('color', 'red');
+/// ```
+///
+/// ## Tag filter
+///
+/// Create [FilterTag] by calling [tag] method:
+///
+/// ```dart
+/// // _tags:book
+/// final filter = Filter.tag('book');
+/// ```
+///
+/// ## Numeric filter
+///
+/// [FilterNumeric] filters on a numeric value by range (lower/upper bounds)
+/// or by comparing it with a [NumericOperator].
+///
+/// ### Numeric comparison
+///
+/// Create [FilterNumeric] comparing a numeric value using [NumericOperator],
+/// by calling [comparison] method:
+///
+/// ```dart
+/// // 'price <= 42'
+/// final filter = Filter.comparison('price', NumericOperator.lessOrEquals, 42);
+/// ```
+///
+/// ### Numeric range
+///
+/// Create [FilterNumeric] with a numeric range by calling [range] method:
+///
+/// ```dart
+/// // rating:3 TO 5
+/// final filter = Filter.range('rating', lowerBound: 3, upperBound: 5);
+/// ```
 @sealed
 abstract class Filter {
   /// Creates [Filter] instance.
@@ -162,7 +207,26 @@ class FilterTag implements Filter {
   FilterTag not() => copyWith(isNegated: !isNegated);
 }
 
-/// A [FilterNumeric] filters on a numeric [value].
+/// A [FilterNumeric] filters on a numeric [value] by range (lower/upper bounds)
+/// or by comparing it with [NumericOperator].
+///
+/// ### Numeric comparison
+///
+/// Create [FilterNumeric] comparing a numeric value using [NumericOperator],
+/// by calling [FilterNumeric.comparison] constructor:
+///
+/// ```dart
+/// final filter = Filter.comparison('price', NumericOperator.lessOrEquals, 42);
+/// ```
+///
+/// ### Numeric range
+///
+/// Create [FilterNumeric] with a numeric range by calling [FilterNumeric.range]
+/// constructor:
+///
+/// ```dart
+/// final filter = Filter.range('rating', lowerBound: 3, upperBound: 5);
+/// ```
 class FilterNumeric implements Filter {
   /// Creates [FilterNumeric] instance.
   const FilterNumeric._(this.attribute, this.value, [this.isNegated = false]);
@@ -213,7 +277,9 @@ class FilterNumeric implements Filter {
   FilterNumeric not() => copyWith(isNegated: !isNegated);
 }
 
-/// Represents a filter numeric value.
+/// Represents a filter numeric value:
+/// - [NumericRange] for a range between lower/upper bounds
+/// - [NumericComparison] to compares a number using a numeric operator
 @sealed
 abstract class NumericValue {
   /// Creates an [NumericValue] instance.
@@ -244,7 +310,8 @@ class NumericComparison implements NumericValue {
   final num number;
 }
 
-/// Numeric comparison operators
+/// Numeric comparison operators.
+/// Supported operators are: `<`, `<=`, `=`, `!=`, `>=` and `>`.
 enum NumericOperator {
   /// Numeric operator `<`
   less('<'),
@@ -271,7 +338,22 @@ enum NumericOperator {
   final String operator;
 }
 
-/// Filter for hierarchical
+/// Filter over a hierarchy of facet attributes.
+///
+/// ## Create a hierarchical filter
+///
+/// ````dart
+/// const level0 = 'category.lvl0';
+/// const level1 = 'category.lvl1';
+/// final filterShoes = Filter.facet(level0, 'Shoes');
+/// final filterShoesRunning = Filter.facet(level1, 'Shoes > Running');
+///
+/// final hierarchicalFilter = HierarchicalFilter(
+///   [level0, level1],
+///   [filterShoes, filterShoesRunning],
+///   filterShoesRunning,
+/// );
+/// ```
 class HierarchicalFilter {
   /// Creates an [HierarchicalFilter] instance.
   HierarchicalFilter(this.attributes, this.path, this.filter);
