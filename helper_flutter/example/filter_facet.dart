@@ -1,5 +1,6 @@
 import 'package:algolia_helper_flutter/algolia_helper_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,16 +15,15 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: SearchProvider(child: const MyHomePage()),
+        home: Provider<SearchController>(
+          create: (_) => SearchController(),
+          dispose: (_, value) => value.dispose(),
+          child: const MyHomePage(),
+        ),
       );
 }
 
-class SearchProvider extends InheritedWidget {
-  SearchProvider({super.key, required super.child});
-
-  static SearchProvider? of(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<SearchProvider>();
-
+class SearchController {
   // 1. Create the component to handle the filtering logic: FilterState.
   final filterState = FilterState();
 
@@ -33,7 +33,7 @@ class SearchProvider extends InheritedWidget {
     apiKey: 'MY_API_KEY',
     indexName: 'MY_INDEX_NAME',
   )
-  // 2.2. Create a connection between the searcher and the filter state
+    // 2.2. Create a connection between the searcher and the filter state
     ..connectFilterState(filterState);
 
   // 3. Create facet list (refinement list) component.
@@ -44,8 +44,14 @@ class SearchProvider extends InheritedWidget {
     persistent: true,
   );
 
-  @override
-  bool updateShouldNotify(covariant InheritedWidget oldWidget) => false;
+  // 4.1 Components (disposables) composite
+  late final _components = CompositeDisposable()
+    ..add(searcher)
+    ..add(filterState)
+    ..add(facetList);
+
+  // 4.2 Dispose of all underlying resources when done
+  void dispose() => _components.dispose();
 }
 
 class MyHomePage extends StatefulWidget {
@@ -58,7 +64,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    final searcher = SearchProvider.of(context)!.searcher;
+    final searcher = context.read<SearchController>().searcher;
     return Scaffold(
       appBar: AppBar(
         title: Container(
@@ -128,7 +134,7 @@ class FiltersPage extends StatefulWidget {
 class _FiltersPageState extends State<FiltersPage> {
   @override
   Widget build(BuildContext context) {
-    final facetList = SearchProvider.of(context)!.facetList;
+    final facetList = context.read<SearchController>().facetList;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Genre'),

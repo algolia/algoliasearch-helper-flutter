@@ -9,6 +9,15 @@ void main() {
     indexName: 'MY_INDEX_NAME',
   );
 
+  // Create the component to handle the filtering logic: FilterState.
+  final group = FilterGroupID.and('products');
+  final filterState = FilterState()
+    ..add(group, {Filter.facet('genre', 'Comedy')})
+    ..add(group, {Filter.range('rating', lowerBound: 3, upperBound: 5)});
+
+  // Create a connection between the searcher and the filter state
+  searcher.connectFilterState(filterState);
+
   // Run your search operations and listen the results!
   searcher.responses.listen((response) {
     print("Search query '${response.query}' (${response.nbHits} hits found)");
