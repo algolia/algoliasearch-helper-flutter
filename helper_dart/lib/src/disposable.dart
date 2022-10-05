@@ -62,7 +62,7 @@ abstract class CompositeDisposable implements Disposable {
 
   /// Adds [disposable] to this composite.
   /// Throws an exception if this composite was disposed
-  Disposable add(Disposable disposable);
+  T add<T extends Disposable>(T disposable);
 
   /// Remove [disposable] from this composite and cancel it if it has been
   /// removed.
@@ -86,7 +86,7 @@ class _CompositeDisposable with DisposableMixin implements CompositeDisposable {
   bool get isEmpty => _disposables.isEmpty;
 
   @override
-  Disposable add(Disposable disposable) {
+  T add<T extends Disposable>(T disposable) {
     if (isDisposed) {
       throw StateError(
           'This $runtimeType was disposed, consider checking `isDisposed` or'
