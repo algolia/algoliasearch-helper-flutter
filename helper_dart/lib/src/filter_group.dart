@@ -383,20 +383,6 @@ class NumericFilterGroup extends DelegatingSet<FilterNumeric>
   int get hashCode => groupID.hashCode ^ _filters.hashCode;
 }
 
-void ok() {
-  const groupName = 'categories';
-  const level0 = 'category.lvl0';
-  const level1 = 'category.lvl1';
-  final shoes = Filter.facet(level0, 'Shoes');
-  final shoesRunning = Filter.facet(level1, 'Shoes > Running');
-  final filterGroup = FilterGroup.hierarchical(
-    name: groupName,
-    attributes: [level0, level1],
-    path: [shoes, shoesRunning],
-    filters: {shoesRunning},
-  );
-}
-
 /// Filter group of hierarchical filters.
 ///
 /// The filter group is always conjunctive, meaning the group's filter operator
