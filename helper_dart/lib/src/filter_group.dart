@@ -31,7 +31,7 @@ import 'filter.dart';
 ///   operator: FilterOperator.or,
 ///   filters: {
 ///     Filter.tag('fantasy'),
-///     Filter.tag('science fiction'),
+///     Filter.tag('comedy'),
 ///   },
 /// );
 /// ```
@@ -184,6 +184,34 @@ enum FilterOperator {
 }
 
 /// Filter group of [FilterFacet] filters.
+///
+/// ## Example
+///
+/// Conjunctive facets group, optionally named 'colors',
+/// corresponding to `(color:red AND color:blue)`:
+///
+/// ```dart
+/// final filterGroup = FacetFilterGroup(
+///   const FilterGroupID('colors', FilterOperator.and),
+///   {
+///     Filter.facet('color', 'red'),
+///     Filter.facet('color', 'blue'),
+///   },
+/// );
+/// ```
+///
+/// The same example can be created using [FilterGroup.facet] :
+///
+/// ```dart
+/// final filterGroup = FilterGroup.facet(
+///   name: 'colors',
+///   filters: {
+///     Filter.facet('color', 'red'),
+///     Filter.facet('color', 'blue'),
+///   },
+///   operator: FilterOperator.and,
+/// );
+/// ```
 class FacetFilterGroup extends DelegatingSet<FilterFacet>
     implements FilterGroup<FilterFacet> {
   /// Creates a [FilterGroup] instance.
@@ -223,6 +251,34 @@ class FacetFilterGroup extends DelegatingSet<FilterFacet>
 }
 
 /// Filter group of [FilterTag] filters.
+///
+/// ## Example
+///
+/// Disjunctive tags group, optionally named 'colors',
+/// corresponding to `(_tags:fantasy OR _tags:comedy)`:
+///
+/// ```dart
+/// final filterGroup = TagFilterGroup(
+///   const FilterGroupID('genres', FilterOperator.or),
+///   {
+///     Filter.tag('fantasy'),
+///     Filter.tag('comedy'),
+///   },
+/// );
+/// ```
+///
+/// The same example can be created using [FilterGroup.tag]
+///
+/// ```dart
+/// final filterGroup = FilterGroup.tag(
+///   name: 'genres',
+///   operator: FilterOperator.or,
+///   filters: {
+///     Filter.tag('fantasy'),
+///     Filter.tag('comedy'),
+///   },
+/// );
+/// ```
 class TagFilterGroup extends DelegatingSet<FilterTag>
     implements FilterGroup<FilterTag> {
   /// Creates a [TagFilterGroup] instance.
@@ -261,6 +317,34 @@ class TagFilterGroup extends DelegatingSet<FilterTag>
 }
 
 /// Filter group of [FilterNumeric] filters.
+///
+/// ## Example
+///
+/// Conjunctive numeric filters group, optionally named 'products',
+/// corresponding to `(rating:3 TO 5 AND price <= 100)`:
+///
+/// ```dart
+/// final filterGroup = NumericFilterGroup(
+///   const FilterGroupID('products', FilterOperator.and),
+///   {
+///     Filter.range('rating', lowerBound: 3, upperBound: 5),
+///     Filter.comparison('price', NumericOperator.lessOrEquals, 100),
+///   },
+/// );
+/// ```
+///
+/// The same example can be created using [FilterGroup.numeric]
+///
+/// ```dart
+/// final filterGroup = FilterGroup.numeric(
+///   name: 'products',
+///   operator: FilterOperator.and,
+///   filters: {
+///     Filter.range('rating', lowerBound: 3, upperBound: 5),
+///     Filter.comparison('price', NumericOperator.lessOrEquals, 100),
+///   },
+/// );
+/// ```
 class NumericFilterGroup extends DelegatingSet<FilterNumeric>
     implements FilterGroup<FilterNumeric> {
   /// Creates a [NumericFilterGroup] instance.
@@ -299,7 +383,57 @@ class NumericFilterGroup extends DelegatingSet<FilterNumeric>
   int get hashCode => groupID.hashCode ^ _filters.hashCode;
 }
 
-/// Filter group of hierarchical filters
+void ok() {
+  const groupName = 'categories';
+  const level0 = 'category.lvl0';
+  const level1 = 'category.lvl1';
+  final shoes = Filter.facet(level0, 'Shoes');
+  final shoesRunning = Filter.facet(level1, 'Shoes > Running');
+  final filterGroup = FilterGroup.hierarchical(
+    name: groupName,
+    attributes: [level0, level1],
+    path: [shoes, shoesRunning],
+    filters: {shoesRunning},
+  );
+}
+
+/// Filter group of hierarchical filters.
+///
+/// The filter group is always conjunctive, meaning the group's filter operator
+/// should always be [FilterOperator.and].
+///
+/// ## Example
+///
+/// Hierarchical filter group, optionally named 'categories':
+///
+/// - Attributes: `category.lvl0` and `category.lvl1`
+/// - Paths: `Shoes` and `Shoes > Running`
+/// - Filters: `Shoes > Running`
+///
+/// ```dart
+///   const groupName = 'categories';
+///   const level0 = 'category.lvl0';
+///   const level1 = 'category.lvl1';
+///   final shoes = Filter.facet(level0, 'Shoes');
+///   final shoesRunning = Filter.facet(level1, 'Shoes > Running');
+///
+///   final filterGroup = HierarchicalFilterGroup(
+///     const FilterGroupID(groupName),
+///     {shoesRunning},
+///     [shoes, shoesRunning],
+///     [level0, level1],
+///   );
+/// ```
+/// The same example can be created using [FilterGroup.hierarchical]
+///
+/// ```dart
+///   final filterGroup = FilterGroup.hierarchical(
+///     name: groupName,
+///     attributes: [level0, level1],
+///     path: [shoes, shoesRunning],
+///     filters: {shoesRunning},
+///   );
+/// ```
 class HierarchicalFilterGroup extends DelegatingSet<FilterFacet>
     implements FilterGroup<FilterFacet> {
   /// Creates an [HierarchicalFilterGroup] instance.
