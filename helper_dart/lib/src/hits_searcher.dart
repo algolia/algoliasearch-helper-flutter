@@ -50,10 +50,18 @@ import 'search_state.dart';
 /// searcher.query('book');
 /// ```
 ///
-/// Or, using [applyState] for more parameters :
+/// Or, using [applyState] for more parameters:
 ///
 /// ```dart
 /// searcher.applyState((state) => state.copyWith(query: 'book', page: 0));
+/// ```
+///
+/// ## Get search state
+///
+/// Listen to [state] to get search state changes:
+///
+/// ```dart
+/// hitsSearcher.state.listen((searchState) => print(searchState.query));
 /// ```
 ///
 /// ## Get search results

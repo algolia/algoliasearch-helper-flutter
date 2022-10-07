@@ -1,7 +1,19 @@
 import 'extensions.dart';
 import 'filter_group.dart';
 
-/// Representation of search state.
+/// Represents a search operation state, and an abstraction over search queries.
+///
+/// ## Example
+///
+/// ```dart
+/// const searchState = SearchState(
+///   indexName: 'MY_INDEX_NAME',
+///   query: 'shoes',
+///   page: 1,
+///   hitsPerPage: 20,
+///   attributesToRetrieve: ['name', 'description', 'price'],
+/// );
+/// ```
 class SearchState {
   /// Creates [SearchState] instance.
   const SearchState({
