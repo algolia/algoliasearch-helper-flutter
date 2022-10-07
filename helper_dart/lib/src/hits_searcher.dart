@@ -12,14 +12,19 @@ import 'logger.dart';
 import 'search_response.dart';
 import 'search_state.dart';
 
-/// Algolia helpers main entry point.
+/// Algolia Helpers main entry point, the component handling search requests
+/// and managing search sessions.
 ///
-/// The [HitsSearcher] has the following behavior:
+/// [HitsSearcher] component has the following behavior:
 ///
 /// 1. Distinct state changes (including initial state) trigger search operation
 /// 2. State changes are debounced
+/// 3. On new search request, previous ongoing search calls are cancelled
 ///
 /// ## Create Hits Searcher
+///
+/// Instantiate [HitsSearcher] using default constructor:
+///
 /// ```dart
 /// final searcher = HitsSearcher(
 ///   applicationID: 'MY_APPLICATION_ID',
@@ -27,16 +32,34 @@ import 'search_state.dart';
 ///   indexName: 'MY_INDEX_NAME',
 /// );
 /// ```
+/// Or, using [HitsSearcher.create] factory:
+///
+/// ```dart
+/// final searcher = HitsSearcher.create(
+///   applicationID: 'MY_APPLICATION_ID',
+///   apiKey: 'MY_API_KEY',
+///   state: const SearchState(indexName: 'MY_INDEX_NAME', query: 'shoes'),
+/// );
+/// ```
 ///
 /// ## Run search requests
+///
+/// Execute search queries using [query] method:
+///
 /// ```dart
 /// searcher.query('book');
 /// ```
+///
+/// Or, using [applyState] for more parameters :
+///
 /// ```dart
-/// searcher.applyState((state) => state.copyWith(query: 'book'));
+/// searcher.applyState((state) => state.copyWith(query: 'book', page: 0));
 /// ```
 ///
 /// ## Get search results
+///
+/// Listen to [responses] to get search responses:
+///
 /// ```dart
 /// searcher.responses.listen((response) {
 ///   print('${response.nbHits} hits found');
@@ -46,7 +69,17 @@ import 'search_state.dart';
 /// });
 /// ```
 ///
+/// Use [snapshot] to get the latest search response value submitted
+/// by [responses] stream:
+///
+/// ```dart
+/// var response = hitsSearcher.snapshot();
+/// ```
+///
 /// ## Dispose
+///
+/// Call [dispose] to release underlying resources:
+///
 /// ```dart
 /// searcher.dispose();
 /// ```
@@ -120,12 +153,7 @@ extension SearcherExt on HitsSearcher {
       );
 }
 
-/// Algolia helpers main entry point.
-///
-/// This implementation has the following behavior:
-///
-/// 1. Distinct state changes (including initial state) trigger search operation
-/// 2. State changes are debounced
+/// Default implementation of [HitsSearcher].
 class _HitsSearcher with DisposableMixin implements HitsSearcher {
   /// HitsSearcher's factory.
   factory _HitsSearcher({
