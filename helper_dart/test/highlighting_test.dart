@@ -5,7 +5,7 @@ void main() {
   test('Highlight tokens generation', () {
     const string = 'This <em>John</em> Doe looks like <em>John</em>athan.';
     final highlighted = HighlightedString.of(string);
-
+    print(highlighted);
     expect(highlighted.tokens.length, 5);
   });
 }
