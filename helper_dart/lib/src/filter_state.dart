@@ -83,8 +83,10 @@ abstract class FilterState implements Disposable {
   bool contains(FilterGroupID groupID, Filter filter);
 
   /// Adds [hierarchicalFilter] to given [attribute].
-  void addHierarchical(String attribute,
-      HierarchicalFilter hierarchicalFilter,);
+  void addHierarchical(
+    String attribute,
+    HierarchicalFilter hierarchicalFilter,
+  );
 
   /// Removes [HierarchicalFilter] of given [attribute].
   void removeHierarchical(String attribute);
@@ -108,8 +110,8 @@ abstract class FilterState implements Disposable {
 
 /// Asynchronous stateless filters builder.
 typedef AsyncFiltersBuilder = Future<StatelessFilters> Function(
-    StatelessFilters filters,
-    );
+  StatelessFilters filters,
+);
 
 /// Default implementation of [FilterState].
 class _FilterState with DisposableMixin implements FilterState {
@@ -121,7 +123,7 @@ class _FilterState with DisposableMixin implements FilterState {
 
   /// Hot stream controller of [StatelessFilters].
   final BehaviorSubject<StatelessFilters> _filters =
-  BehaviorSubject.seeded(StatelessFilters());
+      BehaviorSubject.seeded(StatelessFilters());
 
   @override
   void add(FilterGroupID groupID, Iterable<Filter> filters) {
@@ -147,8 +149,10 @@ class _FilterState with DisposableMixin implements FilterState {
       _filters.value.contains(groupID, filter);
 
   @override
-  void addHierarchical(String attribute,
-      HierarchicalFilter hierarchicalFilter,) {
+  void addHierarchical(
+    String attribute,
+    HierarchicalFilter hierarchicalFilter,
+  ) {
     _modify((it) => it.addHierarchical(attribute, hierarchicalFilter));
   }
 
