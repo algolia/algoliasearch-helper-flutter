@@ -7,7 +7,15 @@ import 'package:flutter/widgets.dart';
 extension HighlightingExt on HighlightedString {
   /// Converts [HighlightedString] to [TextSpan].
   /// Applies [regularTextStyle] and [highlightedTextStyle] styles to
-  /// to non-highlighted and highlighted sub-spans accordingly
+  /// to non-highlighted and highlighted sub-spans accordingly.
+  ///
+  /// ## Example
+  ///
+  /// ```dart
+  /// Text.rich(
+  ///   hit.getHighlightedString('title').toTextSpan(),
+  /// );
+  /// ```
   TextSpan toTextSpan({
     TextStyle? style,
     TextStyle regularTextStyle = const TextStyle(fontWeight: FontWeight.normal),
@@ -38,7 +46,18 @@ extension HighlightingExt on HighlightedString {
 
   /// Converts [HighlightedString] to list of [InlineSpan].
   /// Applies [regularTextStyle] and [highlightedTextStyle] styles to
-  /// to non-highlighted and highlighted spans accordingly
+  /// to non-highlighted and highlighted spans accordingly.
+  ///
+  /// ## Example
+  ///
+  /// ```dart
+  /// Text.rich(
+  ///   TextSpan(
+  ///     style: DefaultTextStyle.of(context).style,
+  ///     children: hit.getHighlightedString('title').toInlineSpans(),
+  ///   ),
+  /// );
+  /// ```
   List<InlineSpan> toInlineSpans({
     TextStyle regularTextStyle = const TextStyle(fontWeight: FontWeight.normal),
     TextStyle highlightedTextStyle =
