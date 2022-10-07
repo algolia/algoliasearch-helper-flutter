@@ -16,3 +16,18 @@ framework**.
 * Search query and hits list
 * Filters and facets handling, disjunctive faceting
 * Search metadata (i.e. highlighting)
+
+## Components
+
+| Component         | Description                                                                                                    |
+|-------------------|----------------------------------------------------------------------------------------------------------------|
+| [HitsSearcher][0] | Component handling search requests.                                                                            |
+| [FilterState][1]  | Component providing a friendly interface to manage search filters.                                             |
+| [FacetList][2]    | Component to get and manage facets, lets the user refine their search results by filtering on specific values. |
+| [Highlighting][3] | Set of tools to highlight relevant parts of the search results.                                                |
+
+
+[0]: ../helper_dart/lib/src/hits_searcher.dart
+[1]: ../helper_dart/lib/src/filter_state.dart
+[2]: ../helper_dart/lib/src/facet_list.dart
+[3]: lib/src/highlighting.dart
