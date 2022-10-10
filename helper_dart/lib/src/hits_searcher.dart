@@ -26,7 +26,7 @@ import 'search_state.dart';
 /// Instantiate [HitsSearcher] using default constructor:
 ///
 /// ```dart
-/// final searcher = HitsSearcher(
+/// final hitsSearcher = HitsSearcher(
 ///   applicationID: 'MY_APPLICATION_ID',
 ///   apiKey: 'MY_API_KEY',
 ///   indexName: 'MY_INDEX_NAME',
@@ -35,7 +35,7 @@ import 'search_state.dart';
 /// Or, using [HitsSearcher.create] factory:
 ///
 /// ```dart
-/// final searcher = HitsSearcher.create(
+/// final hitsSearcher = HitsSearcher.create(
 ///   applicationID: 'MY_APPLICATION_ID',
 ///   apiKey: 'MY_API_KEY',
 ///   state: const SearchState(indexName: 'MY_INDEX_NAME', query: 'shoes'),
@@ -47,13 +47,13 @@ import 'search_state.dart';
 /// Execute search queries using [query] method:
 ///
 /// ```dart
-/// searcher.query('book');
+/// hitsSearcher.query('book');
 /// ```
 ///
 /// Or, using [applyState] for more parameters:
 ///
 /// ```dart
-/// searcher.applyState((state) => state.copyWith(query: 'book', page: 0));
+/// hitsSearcher.applyState((state) => state.copyWith(query: 'book', page: 0));
 /// ```
 ///
 /// ## Get search state
@@ -69,7 +69,7 @@ import 'search_state.dart';
 /// Listen to [responses] to get search responses:
 ///
 /// ```dart
-/// searcher.responses.listen((response) {
+/// hitsSearcher.responses.listen((response) {
 ///   print('${response.nbHits} hits found');
 ///   for (var hit in response.hits) {
 ///     print("> ${hit['objectID']}");
@@ -89,7 +89,7 @@ import 'search_state.dart';
 /// Call [dispose] to release underlying resources:
 ///
 /// ```dart
-/// searcher.dispose();
+/// hitsSearcher.dispose();
 /// ```
 @sealed
 abstract class HitsSearcher implements Disposable {
