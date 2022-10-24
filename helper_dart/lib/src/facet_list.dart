@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
@@ -19,7 +20,11 @@ import 'selectable_item.dart';
 /// FacetList (refinement list) is a filtering components that displays facets,
 /// and lets the user refine their search results by filtering on specific
 /// values.
+///
 /// ## Create Facet List
+///
+/// Create [FacetList] with given [HitsSearcher] and [FilterState] components :
+///
 /// ```dart
 /// // Create a HitsSearcher
 /// final searcher = HitsSearcher(
@@ -40,6 +45,9 @@ import 'selectable_item.dart';
 /// ```
 ///
 /// ## Get selectable facet lists
+///
+/// Get selectable facets changes by listening to [facets] submissions:
+///
 /// ```dart
 /// facetList.facets.listen((facets) {
 ///   for (var facet in facets) {
@@ -49,11 +57,17 @@ import 'selectable_item.dart';
 /// ```
 ///
 /// ### Toggle facet
+///
+/// Call [toggle] to selected/deselect a facet value:
+///
 /// ```dart
 /// facetList.toggle('MY_FACET_VALUE');
 /// ```
 ///
 /// ## Dispose
+///
+/// Call [dispose] to release underlying resources:
+///
 /// ```dart
 /// facetList.dispose();
 /// ```
@@ -102,7 +116,8 @@ abstract class FacetList implements Disposable {
   /// Snapshot of the latest [facets] value.
   List<SelectableFacet>? snapshot();
 
-  /// Select/deselect the provided facet value depending on the current selection state.
+  /// Select/deselect the provided facet value depending on the current
+  /// selection state.
   void toggle(String value);
 }
 
@@ -169,7 +184,9 @@ class _FacetList with DisposableMixin implements FacetList {
   final Logger _log = algoliaLogger('FacetList');
 
   /// Selectable facets lists stream.
-  late final _facets = _selectableFacetsStream().publishValue();
+  late final _facets = _selectableFacetsStream()
+      .distinct(const DeepCollectionEquality().equals)
+      .publishValue();
 
   /// List of facets lists values from search responses.
   late final _responseFacets = _searcherFacetsStream().publishValue();

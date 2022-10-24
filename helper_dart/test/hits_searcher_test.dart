@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:algolia/algolia.dart';
 import 'package:algolia_helper/algolia_helper.dart';
-import 'package:algolia_helper/src/hits_searcher_internal.dart';
 import 'package:algolia_helper/src/hits_searcher_service.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -43,9 +42,9 @@ void main() {
     test('Should emit initial response', () async {
       final searchService = MockHitsSearchService();
       final initial = SearchResponse(const {});
-      when(searchService.search(any)).thenAnswer((_) => Stream.value(initial));
+      when(searchService.search(any)).thenAnswer((_) => Future.value(initial));
 
-      final searcher = InternalHitsSearcher.create(
+      final searcher = HitsSearcher.custom(
         searchService,
         const SearchState(indexName: 'myIndex'),
       );
@@ -55,7 +54,7 @@ void main() {
 
     test('Should emit response after query', () async {
       final searchService = MockHitsSearchService();
-      final searcher = InternalHitsSearcher.create(
+      final searcher = HitsSearcher.custom(
         searchService,
         const SearchState(indexName: 'myIndex'),
       );
@@ -70,14 +69,14 @@ void main() {
     test('Should emit error after failure', () async {
       final searchService = MockHitsSearchService();
       when(searchService.search(any))
-          .thenAnswer((_) => Stream.value(SearchResponse({})));
-      final searcher = InternalHitsSearcher.create(
+          .thenAnswer((_) => Future.value(SearchResponse({})));
+      final searcher = HitsSearcher.custom(
         searchService,
         const SearchState(indexName: 'myIndex'),
       );
 
       when(searchService.search(any))
-          .thenAnswer((Invocation inv) => Stream.error(SearchError({}, 500)));
+          .thenAnswer((Invocation inv) => throw SearchError({}, 500));
       searcher.query('cat');
 
       await expectLater(searcher.responses, emitsError(isA<SearchError>()));
@@ -87,7 +86,7 @@ void main() {
       final searchService = MockHitsSearchService();
       when(searchService.search(any)).thenAnswer(mockResponse);
 
-      final searcher = InternalHitsSearcher.create(
+      final searcher = HitsSearcher.custom(
         searchService,
         const SearchState(indexName: 'myIndex'),
       );
@@ -109,7 +108,7 @@ void main() {
       final searchService = MockHitsSearchService();
       when(searchService.search(any)).thenAnswer(mockResponse);
 
-      final searcher = InternalHitsSearcher.create(
+      final searcher = HitsSearcher.custom(
         searchService,
         const SearchState(indexName: 'myIndex'),
       );
@@ -138,7 +137,7 @@ void main() {
       final searchService = MockHitsSearchService();
       when(searchService.search(any)).thenAnswer(mockResponse);
 
-      final searcher = InternalHitsSearcher.create(
+      final searcher = HitsSearcher.custom(
         searchService,
         const SearchState(indexName: 'myIndex'),
       );
@@ -164,7 +163,7 @@ void main() {
     when(searchService.search(any)).thenAnswer(mockResponse);
 
     const initSearchState = SearchState(indexName: 'myIndex');
-    final searcher = InternalHitsSearcher.create(
+    final searcher = HitsSearcher.custom(
       searchService,
       initSearchState,
     );
@@ -220,10 +219,10 @@ void main() {
   });
 }
 
-Stream<SearchResponse> mockResponse(Invocation inv) async* {
+Future<SearchResponse> mockResponse(Invocation inv) async {
   final state = inv.positionalArguments[0] as SearchState;
   await delay(100);
-  yield SearchResponse({'query': state.query});
+  return SearchResponse({'query': state.query});
 }
 
 /// Return future with a delay

@@ -1,4 +1,7 @@
 import 'disposable_mixin.dart';
+import 'facet_list.dart';
+import 'filter_state.dart';
+import 'hits_searcher.dart';
 
 /// Represents an object able to release it's resources.
 abstract class Disposable {
@@ -12,14 +15,41 @@ abstract class Disposable {
 /// Acts as a container for multiple disposables that can be canceled at once.
 ///
 /// Can be cleared or disposed. When disposed, cannot be used again.
-/// ### Example
-/// // init your subscriptions
-/// composite.add(hitsSearcher)
-/// ..add(filterState)
-/// ..add(facetList);
 ///
-/// // clear them all at once
+/// ## Build composite disposable
+///
+/// Create a `CompositeDisposable` and add `Disposable` components
+/// (e.g [HitsSearcher], [FilterState], [FacetList]) to it:
+///
+/// ```dart
+/// final composite = CompositeDisposable()
+///     ..add(searcher)
+///     ..add(filterState)
+///     ..add(facetList);
+/// ```
+///
+/// Remove previously added `Disposable`:
+///
+/// ```dart
+/// composite.remove(facetList);
+/// ```
+///
+/// ## Cancel and clear
+///
+/// Cancel and remove all [Disposable]s added to the composite, and keep
+/// the composite reusable:
+///
+/// ```dart
 /// composite.clear();
+/// ```
+///
+/// ## Dispose
+///
+/// Releases the resources of all [Disposable]s added to the composite:
+///
+/// ```dart
+/// composite.dispose()
+/// ```
 abstract class CompositeDisposable implements Disposable {
   /// Creates [CompositeDisposable] instance.
   factory CompositeDisposable() => _CompositeDisposable();
@@ -32,7 +62,7 @@ abstract class CompositeDisposable implements Disposable {
 
   /// Adds [disposable] to this composite.
   /// Throws an exception if this composite was disposed
-  Disposable add(Disposable disposable);
+  T add<T extends Disposable>(T disposable);
 
   /// Remove [disposable] from this composite and cancel it if it has been
   /// removed.
@@ -56,7 +86,7 @@ class _CompositeDisposable with DisposableMixin implements CompositeDisposable {
   bool get isEmpty => _disposables.isEmpty;
 
   @override
-  Disposable add(Disposable disposable) {
+  T add<T extends Disposable>(T disposable) {
     if (isDisposed) {
       throw StateError(
           'This $runtimeType was disposed, consider checking `isDisposed` or'

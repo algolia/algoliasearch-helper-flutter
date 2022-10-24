@@ -2,11 +2,17 @@ import 'search_response.dart';
 
 /// Extension over [Hit].
 extension Highlightable on Hit {
-  /// Get [HighlightedString] of an attribute
+  /// Get [HighlightedString] of an attribute from a [Hit].
   /// - [preTag] and [postTag] indicate the highlighted substrings
   /// (default values: <em> and </em> accordingly)
   /// - [inverted] flag inverts the highlighted and non-highlighted substrings
   /// if set
+  ///
+  /// ## Example
+  ///
+  /// ```dart
+  /// var highlightedString = hit.getHighlightedString('title');
+  /// ```
   HighlightedString getHighlightedString(
     String attribute, {
     String preTag = '<em>',
@@ -25,7 +31,26 @@ extension Highlightable on Hit {
   }
 }
 
-/// Highlighted string as a list of tokens.
+/// Highlighted string as a list of [tokens].
+///
+/// ## Example
+///
+/// ```dart
+/// const string = 'This <em>John</em> Doe looks like <em>John</em>athan.';
+/// final highlighted = HighlightedString.of(string);
+/// ```
+///
+/// `highlighted` should contain the following [tokens] :
+///
+/// ```
+/// tokens: [
+///    HighlightToken{content: 'This' , highlighted: false},
+///    HighlightToken{content: 'John', highlighted: true},
+///    HighlightToken{content:  'Doe looks like' , highlighted: false},
+///    HighlightToken{content: 'John', highlighted: true},
+///    HighlightToken{content: 'athan.', highlighted: false},
+/// ]
+/// ```
 class HighlightedString {
   /// Creates [HighlightedString] instance.
   HighlightedString._(
@@ -96,6 +121,7 @@ HighlightedString _highlightTokenizer(
 }
 
 /// Highlightable string token.
+/// [isHighlighted] returning `true` indicates that [content] is highlighted.
 class HighlightableToken {
   HighlightableToken._(this.content, this.isHighlighted);
 

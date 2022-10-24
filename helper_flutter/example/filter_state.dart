@@ -10,7 +10,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-        title: 'Algolia',
+        title: 'Algolia Helpers for Flutter',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
@@ -26,7 +26,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  // 1. Create a hits searcher.
+  // Create a hits searcher.
   // The Searcher performs search requests and obtains search result
   final searcher = HitsSearcher(
     applicationID: 'MY_APPLICATION_ID',
@@ -34,18 +34,19 @@ class _MyHomePageState extends State<MyHomePage> {
     indexName: 'MY_INDEX_NAME',
   );
 
+  // Create the component to handle the filtering logic: FilterState.
+  final filterState = FilterState();
+
   @override
   void initState() {
     super.initState();
-
-    // 2. Create the component to handle the filtering logic: FilterState.
-    final filterState = FilterState();
+    // Create a filter group, and set filters (e.g. facets, ranges)
     final group = FilterGroupID.and('products');
     filterState
       ..add(group, {Filter.facet('genre', 'Comedy')})
       ..add(group, {Filter.range('rating', lowerBound: 3, upperBound: 5)});
 
-    // 3. Create a connection between the searcher and the filter state
+    // Create a connection between the searcher and the filter state
     searcher.connectFilterState(filterState);
   }
 
@@ -103,4 +104,11 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       );
+
+  @override
+  void dispose() {
+    super.dispose();
+    filterState.dispose();
+    searcher.dispose();
+  }
 }

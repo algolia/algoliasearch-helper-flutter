@@ -10,10 +10,31 @@ import 'query_builder.dart';
 import 'search_response.dart';
 import 'search_state.dart';
 
-/// Service handling search requests.
-class HitsSearchService {
+/// A contract search Service handling search requests and responses.
+abstract class HitsSearchService {
+  /// Send a search request [state] and asynchronously get a [SearchResponse].
+  Future<SearchResponse> search(SearchState state);
+}
+
+/// Implementation of [HitsSearchService] using [Algolia] client.
+class AlgoliaSearchService implements HitsSearchService {
   /// Creates [HitsSearchService] instance.
-  HitsSearchService(this._client, this._disjunctiveFacetingEnabled)
+  AlgoliaSearchService({
+    required String applicationID,
+    required String apiKey,
+    required List<String> extraUserAgents,
+    required bool disjunctiveFacetingEnabled,
+  }) : this.create(
+          Algolia.init(
+            applicationId: applicationID,
+            apiKey: apiKey,
+            extraUserAgents: extraUserAgents,
+          ),
+          disjunctiveFacetingEnabled,
+        );
+
+  /// Creates [HitsSearchService] instance.
+  AlgoliaSearchService.create(this._client, this._disjunctiveFacetingEnabled)
       : _log = algoliaLogger('SearchService');
 
   /// Algolia API client
@@ -25,12 +46,9 @@ class HitsSearchService {
   /// Search events logger.
   final Logger _log;
 
-  /// Search responses as a stream.
-  Stream<SearchResponse> search(SearchState state) =>
-      Stream.fromFuture(_search(state));
-
   /// Run search query using [state] and get a search result.
-  Future<SearchResponse> _search(SearchState state) =>
+  @override
+  Future<SearchResponse> search(SearchState state) =>
       _disjunctiveFacetingEnabled
           ? _disjunctiveSearch(state)
           : _singleQuerySearch(state);

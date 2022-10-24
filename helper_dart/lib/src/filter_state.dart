@@ -14,6 +14,51 @@ import 'logger.dart';
 /// [FilterState] holds one or several filters, organized in groups.
 /// [filters] streams filters changes of added or removed filters,
 /// which will be applied to searches performed by the connected Searcher.
+///
+/// ## Create
+///
+/// The following is an example of creating and setting up a [FilterState]
+/// with different filters (facets, tags and numerical):
+///
+/// ```dart
+/// const authors = FilterGroupID('author', FilterOperator.or);
+/// const genres = FilterGroupID('genres');
+/// const numbers = FilterGroupID('numbers');
+///
+/// final filterState = FilterState()
+///   ..add(authors, [Filter.facet('author', 'Shakespeare')])
+///   ..add(genres, [Filter.tag('drama')])
+///   ..add(numbers, [Filter.range('rating', lowerBound: 3, upperBound: 5)])
+///   ..add(numbers, [Filter.comparison('price', NumericOperator.less, 50)]);
+/// ```
+///
+/// The code snippet above corresponds to the following SQL-like expression:
+/// `(author:Shakespeare) AND (_tags:drama) AND (rating:3 TO 5 AND price < 50)`
+///
+/// ## Update
+///
+/// [FilterState] can be updated using methods such as [add], [set]
+/// and [remove], each modification triggers a [filters] submission.
+///
+/// Running multiple modifications (atomically), and trigger a single [filters]
+/// submission can be done using [modify] method:
+///
+/// ```dart
+///   filterState.modify((filters) async =>
+///       filters
+///           .add(authors, [Filter.facet('author', 'J. K. Rowling')])
+///           .remove(authors, [Filter.facet('author', 'Shakespeare')]));
+/// ```
+///
+/// ## Delete
+///
+/// Remove all or some filter groups using [clear] and [clearExcept]
+///
+/// ```dart
+///   filterState.clear(); // removes all filter groups
+///   filterState.clear(authors); // clears filter group 'authors'
+///   filterState.clearExcept([authors]); // clears all filter groups except 'authors'
+/// ```
 @sealed
 abstract class FilterState implements Disposable {
   /// FilterState's factory.
@@ -70,7 +115,6 @@ typedef AsyncFiltersBuilder = Future<StatelessFilters> Function(
 
 /// Default implementation of [FilterState].
 class _FilterState with DisposableMixin implements FilterState {
-  /// Filters groups stream (facet, tag, numeric and hierarchical).
   @override
   Stream<Filters> get filters => _filters.stream.distinct();
 
@@ -81,35 +125,29 @@ class _FilterState with DisposableMixin implements FilterState {
   final BehaviorSubject<StatelessFilters> _filters =
       BehaviorSubject.seeded(StatelessFilters());
 
-  /// Adds [filters] to the provided [groupID].
   @override
   void add(FilterGroupID groupID, Iterable<Filter> filters) {
     _modify((it) => it.add(groupID, filters));
   }
 
-  /// Overrides [filters] with the provided [map].
   @override
   void set(Map<FilterGroupID, Set<Filter>> map) {
     _modify((it) => it.set(map));
   }
 
-  /// Removes [filters] from [groupID].
   @override
   void remove(FilterGroupID groupID, Iterable<Filter> filters) {
     _modify((it) => it.remove(groupID, filters));
   }
 
-  /// Toggles [filter] in given [groupID].
   @override
   void toggle(FilterGroupID groupID, Filter filter) =>
       _modify((it) => it.toggle(groupID, filter));
 
-  /// Checks if [filter] exists in [groupID].
   @override
   bool contains(FilterGroupID groupID, Filter filter) =>
       _filters.value.contains(groupID, filter);
 
-  /// Adds [hierarchicalFilter] to given [attribute].
   @override
   void addHierarchical(
     String attribute,
@@ -118,40 +156,30 @@ class _FilterState with DisposableMixin implements FilterState {
     _modify((it) => it.addHierarchical(attribute, hierarchicalFilter));
   }
 
-  /// Removes [HierarchicalFilter] of given [attribute].
   @override
   void removeHierarchical(String attribute) {
     _modify((it) => it.removeHierarchical(attribute));
   }
 
-  /// Clears [groupIDs].
-  /// If none provided, all filters will be cleared.
   @override
   void clear([Iterable<FilterGroupID>? groupIDs]) {
     _modify((it) => it.clear(groupIDs));
   }
 
-  /// Clears all except [groupIDs].
   @override
   void clearExcept(Iterable<FilterGroupID> groupIDs) {
     _modify((it) => it.clearExcept(groupIDs));
   }
 
-  /// Get current [filters] value.
   @override
   Filters snapshot() => _filters.value;
 
-  /// Dispose of underlying resources.
   @override
   void doDispose() {
     _log.finest('FilterState disposed');
     _filters.close();
   }
 
-  /// **Asynchronous** updates [filters] by applying [builder] to current
-  /// filters value.
-  /// Useful to apply multiple consecutive update operations without firing
-  /// multiple filters events.
   @override
   Future<void> modify(AsyncFiltersBuilder builder) async {
     if (_filters.isClosed) {
