@@ -16,14 +16,14 @@ void main() {
 
   // Create facet list components that displays facets, and lets the user refine
   // their search results by filtering on specific values.
-  final facetFilter = FacetList(
+  final facetList = FacetList(
     searcher: searcher,
     filterState: filterState,
     attribute: 'actors',
   );
 
   // Listen to facet lists with selection status.
-  facetFilter.facets.listen((facets) {
+  facetList.facets.listen((facets) {
     print('${facets.length} facets found');
     for (var facet in facets) {
       final item = facet.item;
@@ -44,5 +44,5 @@ void main() {
   searcher.query('a');
 
   // Apply a facet filter
-  facetFilter.toggle('Samuel L. Jackson');
+  facetList.toggle('Samuel L. Jackson');
 }
