@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://www.algolia.com/doc/guides/building-search-ui/what-is-instantsearch/flutter/">
-    <img alt="Algolia Dart Helper" src="https://raw.githubusercontent.com/algolia/algoliasearch-helper-flutter/main/docs/assets/helper-flutter-banner.png">
+    <img alt="Algolia Flutter Helper" src="https://raw.githubusercontent.com/algolia/algoliasearch-helper-flutter/main/docs/assets/helper-flutter-banner.png">
   </a>
 </p>
 
