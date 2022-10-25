@@ -1,4 +1,8 @@
-# Algolia Helpers for Flutter
+<p align="center">
+  <a href="https://www.algolia.com/doc/guides/building-search-ui/what-is-instantsearch/flutter/">
+    <img alt="Algolia Dart Helper" src="https://raw.githubusercontent.com/algolia/algoliasearch-helper-flutter/main/docs/assets/helper-flutter-banner.png">
+  </a>
+</p>
 
 [![pub package](https://img.shields.io/pub/v/algolia_helper_flutter.svg)](https://pub.dev/packages/algolia_helper_flutter)
 
