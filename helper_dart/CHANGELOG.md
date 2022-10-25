@@ -1,3 +1,13 @@
+# 0.2.1
+
+## Fix
+
+- `FacetList` redundant `facets` submissions (#33)
+
+## Changed
+
+- `CompositeDisposable#add` method generic (#33)
+
 # 0.2.0
 
 ## Feat
