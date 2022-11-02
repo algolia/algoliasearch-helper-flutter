@@ -156,6 +156,34 @@ void main() {
       searcher.query('cat');
       await delay(50);
     });
+
+    test('Should trigger search operation on same search state', () async {
+      final searchService = MockHitsSearchService();
+      when(searchService.search(any)).thenAnswer(mockResponse);
+
+      final searcher = HitsSearcher.custom(
+        searchService,
+        const SearchState(indexName: 'myIndex'),
+      );
+      unawaited(
+        expectLater(
+          searcher.responses,
+          emitsInOrder([
+            emits(matchesQuery('c')),
+            emits(matchesQuery('c')),
+            emits(matchesQuery('cat'))
+          ]),
+        ),
+      );
+
+      searcher.query('c');
+      await delay();
+      searcher.query('c');
+      await delay();
+      searcher.query('cat');
+      await delay();
+      searcher.dispose();
+    });
   });
 
   test('FilterState connect HitsSearcher', () async {

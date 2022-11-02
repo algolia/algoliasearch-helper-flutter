@@ -17,7 +17,7 @@ import 'search_state.dart';
 ///
 /// [HitsSearcher] component has the following behavior:
 ///
-/// 1. Distinct state changes (including initial state) trigger search operation
+/// 1. Search state changes (including initial state) trigger search operation
 /// 2. State changes are debounced
 /// 3. On new search request, previous ongoing search calls are cancelled
 ///
@@ -129,9 +129,9 @@ abstract class HitsSearcher implements Disposable {
   @internal
   factory HitsSearcher.custom(
     HitsSearchService searchService,
-    SearchState state, [
+    SearchState state, {
     Duration debounce = const Duration(milliseconds: 100),
-  ]) =>
+  }) =>
       _HitsSearcher.create(searchService, state, debounce);
 
   /// Search state stream
@@ -210,9 +210,8 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   final BehaviorSubject<SearchState> _state;
 
   /// Search responses subject
-  late final _responses = _state.stream
+  late final ConnectableStream<SearchResponse> _responses = _state.stream
       .debounceTime(debounce)
-      .distinct()
       .switchMap((state) => Stream.fromFuture(searchService.search(state)))
       .publish();
 
