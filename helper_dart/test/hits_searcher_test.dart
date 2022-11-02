@@ -245,6 +245,73 @@ void main() {
       'AND (_tags:"unknown") AND ("attributeA":0 TO 1)',
     );
   });
+
+  group('Search conditions', () {
+    test('Trigger for all', () async {
+      final searchService = MockHitsSearchService();
+      final initial = SearchResponse(const {});
+      when(searchService.search(any)).thenAnswer((_) => Future.value(initial));
+
+      final searcher = HitsSearcher.custom(
+        searchService,
+        const SearchState(indexName: 'myIndex'),
+        // ignore: avoid_redundant_argument_values
+        condition: const SearchCondition.none(),
+      );
+
+      await expectLater(searcher.responses, emits(initial)); // i
+    });
+
+    test('Trigger for length', () async {
+      final searchService = MockHitsSearchService();
+      when(searchService.search(any)).thenAnswer(mockResponse);
+
+      final searcher = HitsSearcher.custom(
+        searchService,
+        const SearchState(indexName: 'myIndex'),
+        condition: const SearchCondition.lengthAtLeast(3),
+      );
+      unawaited(
+        expectLater(
+          searcher.responses,
+          emitsInOrder([emits(matchesQuery('cat'))]),
+        ),
+      );
+
+      searcher.query('c');
+      await delay();
+      searcher.query('c');
+      await delay();
+      searcher.query('cat');
+      await delay();
+      searcher.dispose();
+    });
+
+    test('Trigger for custom condition', () async {
+      final searchService = MockHitsSearchService();
+      when(searchService.search(any)).thenAnswer(mockResponse);
+
+      final searcher = HitsSearcher.custom(
+        searchService,
+        const SearchState(indexName: 'myIndex'),
+        condition: SearchCondition(
+          (state) => state.query?.startsWith('c') ?? false,
+        ),
+      );
+      unawaited(
+        expectLater(
+          searcher.responses,
+          emitsInOrder([emits(matchesQuery('cat'))]),
+        ),
+      );
+
+      searcher.query('bat');
+      await delay();
+      searcher.query('cat');
+      await delay();
+      searcher.dispose();
+    });
+  });
 }
 
 Future<SearchResponse> mockResponse(Invocation inv) async {

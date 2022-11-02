@@ -9,6 +9,7 @@ import 'disposable_mixin.dart';
 import 'filter_state.dart';
 import 'hits_searcher_service.dart';
 import 'logger.dart';
+import 'search_for_query.dart';
 import 'search_response.dart';
 import 'search_state.dart';
 
@@ -100,6 +101,7 @@ abstract class HitsSearcher implements Disposable {
     required String indexName,
     bool disjunctiveFacetingEnabled = true,
     Duration debounce = const Duration(milliseconds: 100),
+    SearchCondition condition = const SearchCondition.none(),
   }) =>
       _HitsSearcher(
         applicationID: applicationID,
@@ -107,6 +109,7 @@ abstract class HitsSearcher implements Disposable {
         state: SearchState(indexName: indexName),
         disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
         debounce: debounce,
+        condition: condition,
       );
 
   /// HitsSearcher's factory.
@@ -116,6 +119,7 @@ abstract class HitsSearcher implements Disposable {
     required SearchState state,
     bool disjunctiveFacetingEnabled = true,
     Duration debounce = const Duration(milliseconds: 100),
+    SearchCondition condition = const SearchCondition.none(),
   }) =>
       _HitsSearcher(
         applicationID: applicationID,
@@ -123,6 +127,7 @@ abstract class HitsSearcher implements Disposable {
         state: state,
         disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
         debounce: debounce,
+        condition: condition,
       );
 
   /// Creates [HitsSearcher] using a custom [HitsSearchService].
@@ -131,8 +136,14 @@ abstract class HitsSearcher implements Disposable {
     HitsSearchService searchService,
     SearchState state, {
     Duration debounce = const Duration(milliseconds: 100),
+    SearchCondition condition = const SearchCondition.none(),
   }) =>
-      _HitsSearcher.create(searchService, state, debounce);
+      _HitsSearcher.create(
+        searchService,
+        state,
+        debounce,
+        condition,
+      );
 
   /// Search state stream
   Stream<SearchState> get state;
@@ -168,8 +179,9 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
     required String applicationID,
     required String apiKey,
     required SearchState state,
-    bool disjunctiveFacetingEnabled = true,
-    Duration debounce = const Duration(milliseconds: 100),
+    required bool disjunctiveFacetingEnabled,
+    required Duration debounce,
+    required SearchCondition condition,
   }) {
     final service = AlgoliaSearchService(
       applicationID: applicationID,
@@ -177,18 +189,29 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
       extraUserAgents: ['algolia-helper-dart (0.2.1)'],
       disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
     );
-    return _HitsSearcher.create(service, state, debounce);
+    return _HitsSearcher.create(service, state, debounce, condition);
   }
 
   /// HitSearcher's constructor, for internal and test use only.
   _HitsSearcher.create(
     HitsSearchService searchService,
-    SearchState state, [
-    Duration debounce = const Duration(milliseconds: 100),
-  ]) : this._(searchService, BehaviorSubject.seeded(state), debounce);
+    SearchState state,
+    Duration debounce,
+    SearchCondition condition,
+  ) : this._(
+          searchService,
+          BehaviorSubject.seeded(state),
+          debounce,
+          condition,
+        );
 
   /// HitsSearcher's private constructor
-  _HitsSearcher._(this.searchService, this._state, this.debounce) {
+  _HitsSearcher._(
+    this.searchService,
+    this._state,
+    this.debounce,
+    this.condition,
+  ) {
     _subscription = _responses.connect();
   }
 
@@ -209,9 +232,13 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   /// Search state subject
   final BehaviorSubject<SearchState> _state;
 
+  /// Search query execution condition logic.
+  final SearchCondition condition;
+
   /// Search responses subject
   late final ConnectableStream<SearchResponse> _responses = _state.stream
       .debounceTime(debounce)
+      .where(condition.isValid)
       .switchMap((state) => Stream.fromFuture(searchService.search(state)))
       .publish();
 
