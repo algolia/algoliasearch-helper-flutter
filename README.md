@@ -6,10 +6,10 @@
 
 ## 📦 Packages
 
-| Package                                  | Description                 | Version                                                                                                                    |
-|------------------------------------------|-----------------------------|----------------------------------------------------------------------------------------------------------------------------|
-| [algolia_helper](helper_dart)            | Algolia Helpers for Dart    | [![pub package](https://img.shields.io/pub/v/algolia_helper.svg)](https://pub.dev/packages/algolia_helper)                 |
-| [algolia_helper_flutter](helper_flutter) | Algolia Helpers for Flutter | [![pub package](https://img.shields.io/pub/v/algolia_helper_flutter.svg)](https://pub.dev/packages/algolia_helper_flutter) |
+| Package                                  | Description                 | Version                | Release stage                                                                                                           |
+|------------------------------------------|-----------------------------|-----------------------------|----------------------------------------------------------------------------------------------------------------------------|
+| [algolia_helper](helper_dart)            | Algolia Helpers for Dart    | [![pub package](https://img.shields.io/pub/v/algolia_helper.svg)](https://pub.dev/packages/algolia_helper)                 | alpha version| 
+| [algolia_helper_flutter](helper_flutter) | Algolia Helpers for Flutter | [![pub package](https://img.shields.io/pub/v/algolia_helper_flutter.svg)](https://pub.dev/packages/algolia_helper_flutter) | alpha version | 
 
 ## 📄 Documentation
 
@@ -19,7 +19,7 @@
 
 ## ❓Getting Help
 
-- **Need help**? Ask a question on [Stack Overflow](http://stackoverflow.com/questions/tagged/algolia)
+- **Need help**? Ask a question on [Stack Overflow](https://stackoverflow.com/search?tab=Newest&pagesize=50&q=%5balgolia%5d%20%5bflutter%5d&searchOn=3)
 - **Found a bug?** You can open a [GitHub issue](https://github.com/algolia/algoliasearch-helper-flutter/issues)
 - **Questions about Algolia?** You can search our [FAQ in our website](https://www.algolia.com/doc/faq/)
 
