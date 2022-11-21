@@ -212,7 +212,6 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   /// Search responses subject
   late final _responses = _state.stream
       .debounceTime(debounce)
-      .distinct()
       .switchMap((state) => Stream.fromFuture(searchService.search(state)))
       .publish();
 
