@@ -98,7 +98,7 @@ HighlightedString _highlightTokenizer(
 ) {
   final tokens = <HighlightableToken>[];
 
-  final re = RegExp('$preTag(\\w+)$postTag');
+  final re = RegExp('${RegExp.escape(preTag)}(.*?)${RegExp.escape(postTag)}');
   final matches = re.allMatches(string).toList();
 
   void append(String string, bool isHighlighted) {
