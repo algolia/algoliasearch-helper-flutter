@@ -1,6 +1,6 @@
 ---
-name: Bug report
-about: Create a report to help us improve our libraries
+name: Feature request
+about: Suggest an idea for this project
 
 ---
 
@@ -8,27 +8,14 @@ about: Create a report to help us improve our libraries
   Thanks for participating in this project! We will try to answer as soon as possible 🙏
 -->
 
-**Describe the bug 🐛**  
-A clear and concise description of what the bug is.
+**Is your feature request related to a problem? Please describe 🙏**  
+A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
 
-**To Reproduce 🔍**  
-Steps to reproduce the behavior:
+**Describe the solution you'd like 🤔**  
+A clear and concise description of what you want to happen.
 
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
-
-**Expected behavior 💭**  
-A clear and concise description of what you expected to happen.
-
-**Screenshots 🖥**  
-If applicable, add screenshots to help explain your problem.
-
-**Environment:**
-
-- OS: [e.g. iOS, android, web]
-- Library Version [e.g. 1.1.0]
+**Describe alternatives you've considered ✨**  
+A clear and concise description of any alternative solutions or features you've considered.
 
 **Additional context**  
-Add any other context about the problem here.
+Add any other context or screenshots about the feature request here.
