@@ -4,6 +4,7 @@ import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
+import 'constants.dart';
 import 'disposable.dart';
 import 'disposable_mixin.dart';
 import 'filter_state.dart';
@@ -11,7 +12,6 @@ import 'hits_searcher_service.dart';
 import 'logger.dart';
 import 'search_response.dart';
 import 'search_state.dart';
-import 'constants.dart';
 
 /// Algolia Dart Helper main entry point, the component handling search requests
 /// and managing search sessions.

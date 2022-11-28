@@ -1,7 +1,7 @@
 import 'package:algolia_helper/algolia_helper.dart' as dart;
 
-import 'delegate_searcher.dart';
 import 'constants.dart';
+import 'delegate_searcher.dart';
 
 /// Algolia Flutter Helper main entry point, the component handling search
 /// requests and managing search sessions.
