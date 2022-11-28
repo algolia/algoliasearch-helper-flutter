@@ -11,8 +11,9 @@ import 'hits_searcher_service.dart';
 import 'logger.dart';
 import 'search_response.dart';
 import 'search_state.dart';
+import 'constants.dart';
 
-/// Algolia Helpers main entry point, the component handling search requests
+/// Algolia Dart Helper main entry point, the component handling search requests
 /// and managing search sessions.
 ///
 /// [HitsSearcher] component has the following behavior:
@@ -91,7 +92,6 @@ import 'search_state.dart';
 /// ```dart
 /// hitsSearcher.dispose();
 /// ```
-@sealed
 abstract class HitsSearcher implements Disposable {
   /// HitsSearcher's factory.
   factory HitsSearcher({
@@ -100,6 +100,7 @@ abstract class HitsSearcher implements Disposable {
     required String indexName,
     bool disjunctiveFacetingEnabled = true,
     Duration debounce = const Duration(milliseconds: 100),
+    List<String> extraUserAgents = const [],
   }) =>
       _HitsSearcher(
         applicationID: applicationID,
@@ -107,6 +108,7 @@ abstract class HitsSearcher implements Disposable {
         state: SearchState(indexName: indexName),
         disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
         debounce: debounce,
+        extraUserAgents: extraUserAgents,
       );
 
   /// HitsSearcher's factory.
@@ -116,6 +118,7 @@ abstract class HitsSearcher implements Disposable {
     required SearchState state,
     bool disjunctiveFacetingEnabled = true,
     Duration debounce = const Duration(milliseconds: 100),
+    List<String> extraUserAgents = const [],
   }) =>
       _HitsSearcher(
         applicationID: applicationID,
@@ -123,6 +126,7 @@ abstract class HitsSearcher implements Disposable {
         state: state,
         disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
         debounce: debounce,
+        extraUserAgents: extraUserAgents,
       );
 
   /// Creates [HitsSearcher] using a custom [HitsSearchService].
@@ -147,8 +151,11 @@ abstract class HitsSearcher implements Disposable {
   SearchState snapshot();
 
   /// Apply search state configuration.
-  void applyState(SearchState Function(SearchState state) config);
+  void applyState(StateConfig config);
 }
+
+/// [SearchState] configuration builder.
+typedef StateConfig = SearchState Function(SearchState state);
 
 /// Extensions over [HitsSearcher]
 extension SearcherExt on HitsSearcher {
@@ -168,13 +175,14 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
     required String applicationID,
     required String apiKey,
     required SearchState state,
-    bool disjunctiveFacetingEnabled = true,
-    Duration debounce = const Duration(milliseconds: 100),
+    required bool disjunctiveFacetingEnabled,
+    required Duration debounce,
+    required List<String> extraUserAgents,
   }) {
     final service = AlgoliaSearchService(
       applicationID: applicationID,
       apiKey: apiKey,
-      extraUserAgents: ['algolia-helper-dart (0.2.1)'],
+      extraUserAgents: [...extraUserAgents, libUserAgent],
       disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
     );
     return _HitsSearcher.create(service, state, debounce);
@@ -234,9 +242,7 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
 
   /// Apply search state configuration.
   @override
-  void applyState(SearchState Function(SearchState state) config) {
-    _updateState((state) => config(state));
-  }
+  void applyState(StateConfig config) => _updateState((state) => config(state));
 
   /// Apply changes to the current state
   void _updateState(SearchState Function(SearchState state) apply) {
