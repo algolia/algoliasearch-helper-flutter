@@ -4,6 +4,8 @@
 /// experiences at a deeper level for Flutter framework.
 library algolia_helper_flutter;
 
-export 'package:algolia_helper/algolia_helper.dart'; // expose dart helpers
+export 'package:algolia_helper/algolia_helper.dart'
+    hide HitsSearcher; // expose dart helpers
 
 export 'src/highlighting.dart';
+export 'src/hits_searcher.dart';
