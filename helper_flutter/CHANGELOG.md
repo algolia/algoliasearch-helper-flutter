@@ -1,3 +1,10 @@
+# 0.2.2
+
+## Fix
+
+- Allow same search query to be executed (#48)
+- Highlighting of strings with non-alphanumeric characters (#46)
+
 # 0.2.1
 
 ## Fix
