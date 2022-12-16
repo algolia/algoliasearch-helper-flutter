@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:algolia_helper/src/search_request.dart';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
@@ -10,6 +9,7 @@ import 'disposable_mixin.dart';
 import 'filter_state.dart';
 import 'hits_searcher_service.dart';
 import 'logger.dart';
+import 'search_request.dart';
 import 'search_response.dart';
 import 'search_state.dart';
 
