@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:algolia_helper/src/search_request.dart';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
@@ -148,6 +149,9 @@ abstract class HitsSearcher implements Disposable {
 
   /// Apply search state configuration.
   void applyState(SearchState Function(SearchState state) config);
+
+  /// Re-run the last search query
+  void rerun();
 }
 
 /// Extensions over [HitsSearcher]
@@ -185,16 +189,21 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
     HitsSearchService searchService,
     SearchState state, [
     Duration debounce = const Duration(milliseconds: 100),
-  ]) : this._(searchService, BehaviorSubject.seeded(state), debounce);
+  ]) : this._(
+          searchService,
+          BehaviorSubject.seeded(SearchRequest(state)),
+          debounce,
+        );
 
   /// HitsSearcher's private constructor
-  _HitsSearcher._(this.searchService, this._state, this.debounce) {
+  _HitsSearcher._(this.searchService, this._request, this.debounce) {
     _subscription = _responses.connect();
   }
 
   /// Search state stream
   @override
-  Stream<SearchState> get state => _state.stream;
+  Stream<SearchState> get state =>
+      _request.stream.map((request) => request.state);
 
   /// Search results stream
   @override
@@ -207,12 +216,13 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   final Duration debounce;
 
   /// Search state subject
-  final BehaviorSubject<SearchState> _state;
+  final BehaviorSubject<SearchRequest> _request;
 
   /// Search responses subject
-  late final _responses = _state.stream
+  late final _responses = _request.stream
       .debounceTime(debounce)
-      .switchMap((state) => Stream.fromFuture(searchService.search(state)))
+      .distinct()
+      .switchMap((req) => Stream.fromFuture(searchService.search(req.state)))
       .publish();
 
   /// Events logger
@@ -229,7 +239,7 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
 
   /// Get current [SearchState].
   @override
-  SearchState snapshot() => _state.value;
+  SearchState snapshot() => _request.value.state;
 
   /// Apply search state configuration.
   @override
@@ -239,19 +249,28 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
 
   /// Apply changes to the current state
   void _updateState(SearchState Function(SearchState state) apply) {
-    if (_state.isClosed) {
+    if (_request.isClosed) {
       _log.warning('modifying disposed instance');
       return;
     }
-    final current = _state.value;
-    final newState = apply(current);
-    _state.sink.add(newState);
+    final current = _request.value;
+    final newState = apply(current.state);
+    _request.sink.add(SearchRequest(newState));
+  }
+
+  @override
+  void rerun() {
+    final request = _request.value;
+    _request.value = request.copyWith(
+      state: request.state,
+      attempts: request.attempts + 1,
+    );
   }
 
   @override
   void doDispose() {
     _log.fine('HitsSearcher disposed');
-    _state.close();
+    _request.close();
     _subscription.cancel();
   }
 }
