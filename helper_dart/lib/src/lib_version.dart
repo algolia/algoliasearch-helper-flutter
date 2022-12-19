@@ -1,2 +1,2 @@
 // This is generated file. Don't modify it manually.
-const libVersion = '3.2.1';
+const libVersion = '0.2.2';
