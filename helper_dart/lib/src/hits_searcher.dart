@@ -260,11 +260,13 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
 
   @override
   void rerun() {
-    final request = _request.value;
-    _request.value = request.copyWith(
-      state: request.state,
-      attempts: request.attempts + 1,
+    final current = _request.value;
+    final request = current.copyWith(
+      state: current.state,
+      attempts: current.attempts + 1,
     );
+    _log.fine('Rerun request: $request');
+    _request.sink.add(request);
   }
 
   @override
