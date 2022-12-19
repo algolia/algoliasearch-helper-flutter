@@ -1,15 +1,21 @@
 name: Deployment
 on: 
-  push:
-    tags: 
-     - patch
-     - minor
-     - major
+  workflow_dispatch:
+    inputs:
+      releaseType:
+        description: 'The type of semantic release'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
 jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
       GITHUB_PERSONAL_ACCESS_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+      RELEASE_TYPE: ${{ inputs.releaseType }}
     steps:
       - uses: actions/setup-go@v2
         with:
@@ -26,30 +32,15 @@ jobs:
           make install
           export PATH="$GOPATH/bin:$PATH"
 
-      - name: Set release type environment
-        run: |
-          echo "RELEASE_TYPE=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-
-      - name: Delete trigger tag
-        uses: actions/github-script@v6
-        with:
-           script: |
-             github.rest.git.deleteRef({
-               owner: context.repo.owner,
-               repo: context.repo.repo,
-               ref: 'tags/${{ env.RELEASE_TYPE }}',
-               sha: context.sha
-             })
 
       - name: Bump library version based on the tag
         uses: fwilhe2/bump-version@main
         id: bump
         with:
-          component: ${{ env.RELEASE_TYPE }}
+          component: ${{ inputs.releaseType }}
 
       - name: Update Dart Helper version
         uses: fjogeleit/yaml-update-action@main
@@ -134,17 +125,6 @@ jobs:
         run: |
           pana --no-warning
           flutter pub publish --dry-run
-
-      - name: Delete trigger tag
-        uses: actions/github-script@v6
-        with:
-           script: |
-             github.rest.git.deleteRef({
-               owner: context.repo.owner,
-               repo: context.repo.repo,
-               ref: 'tags/${{ env.RELEASE_TYPE }}',
-               sha: context.sha
-             })
 
       
 
