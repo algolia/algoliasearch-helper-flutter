@@ -8,6 +8,7 @@ import 'disposable.dart';
 import 'disposable_mixin.dart';
 import 'filter_state.dart';
 import 'hits_searcher_service.dart';
+import 'lib_version.dart';
 import 'logger.dart';
 import 'search_response.dart';
 import 'search_state.dart';
