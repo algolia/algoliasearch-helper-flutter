@@ -5,6 +5,7 @@ import 'exception.dart';
 import 'extensions.dart';
 import 'filter_group.dart';
 import 'filter_group_converter.dart';
+import 'lib_version.dart';
 import 'logger.dart';
 import 'query_builder.dart';
 import 'search_response.dart';
@@ -22,13 +23,14 @@ class AlgoliaSearchService implements HitsSearchService {
   AlgoliaSearchService({
     required String applicationID,
     required String apiKey,
-    required List<String> extraUserAgents,
     required bool disjunctiveFacetingEnabled,
   }) : this.create(
           Algolia.init(
             applicationId: applicationID,
             apiKey: apiKey,
-            extraUserAgents: extraUserAgents,
+            extraHeaders: {
+              'x-algolia-agent': 'algolia-helper-dart ($libVersion)'
+            },
           ),
           disjunctiveFacetingEnabled,
         );
