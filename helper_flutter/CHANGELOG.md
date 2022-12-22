@@ -1,3 +1,12 @@
+# ChangeLog
+
+## [0.2.3](https://github.com/algolia/algoliasearch-helper-flutter/compare/0.2.2...0.2.3) (2022-12-22)
+
+### Feat
+
+- add rerun search query (#51) ([5348341](https://github.com/algolia/algoliasearch-helper-flutter/commit/5348341))
+
+
 # 0.2.2
 
 ## Fix
