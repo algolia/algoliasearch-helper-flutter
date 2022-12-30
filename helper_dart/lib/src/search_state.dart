@@ -39,6 +39,7 @@ class SearchState {
     this.sumOrFiltersScore,
     this.tagFilters,
     this.userToken,
+    this.clickAnalytics,
   });
 
   /// Index name
@@ -114,6 +115,10 @@ class SearchState {
   /// Whether the current query will be taken into account in the Analytics.
   final bool? analytics;
 
+  /// Add a query ID parameter to the response for tracking click and conversion
+  /// events.
+  final bool? clickAnalytics;
+
   /// Make a copy of the search state.
   SearchState copyWith({
     List<String>? attributesToHighlight,
@@ -138,6 +143,7 @@ class SearchState {
     int? maxFacetHits,
     int? maxValuesPerFacet,
     int? page,
+    bool? clickAnalytics,
   }) =>
       SearchState(
         attributesToHighlight:
@@ -163,6 +169,7 @@ class SearchState {
         maxFacetHits: maxFacetHits ?? this.maxFacetHits,
         maxValuesPerFacet: maxValuesPerFacet ?? this.maxValuesPerFacet,
         page: page ?? this.page,
+        clickAnalytics: clickAnalytics ?? this.clickAnalytics,
       );
 
   @override
@@ -191,7 +198,8 @@ class SearchState {
           sumOrFiltersScore == other.sumOrFiltersScore &&
           tagFilters.equals(other.tagFilters) &&
           analytics == other.analytics &&
-          userToken == other.userToken;
+          userToken == other.userToken &&
+          clickAnalytics == other.clickAnalytics;
 
   @override
   int get hashCode =>
@@ -216,7 +224,8 @@ class SearchState {
       sumOrFiltersScore.hashCode ^
       tagFilters.hashing() ^
       analytics.hashCode ^
-      userToken.hashCode;
+      userToken.hashCode ^
+      clickAnalytics.hashCode;
 
   @override
   String toString() => 'SearchState{'
@@ -241,5 +250,6 @@ class SearchState {
       'ruleContexts: $ruleContexts, '
       'sumOrFiltersScore: $sumOrFiltersScore, '
       'tagFilters: $tagFilters, '
-      'userToken: $userToken}';
+      'userToken: $userToken, '
+      'clickAnalytics: $clickAnalytics}';
 }
