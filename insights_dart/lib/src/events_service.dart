@@ -22,24 +22,47 @@ class EventsService {
   final Algolia _client;
   final Logger _log;
 
-  Future<void> view(ViewEvent event) {
+  Future<void> view(HitViewEvent event) {
+    final events = [event.toViewEvent()];
+    return _sendEvents(events);
+  }
+
+  Future<void> click(HitClickEvent event) {
+    final events = [event.toClickEvent()];
+    return _sendEvents(events);
+  }
+
+  Future<void> _sendEvents(List<AlgoliaEvent> events) {
     try {
-      _log.fine('Event upload: $event');
-      return _client.pushEvents([event.toAlgoliaEvent()]);
+      _log.fine('Events upload: $events');
+      return _client.pushEvents(events);
     } catch (exception) {
-      _log.severe('Event upload error: $exception');
+      _log.severe('Events upload error: $exception');
       rethrow; // TODO: wrap the error
     }
   }
 }
 
-extension ViewEventExt on ViewEvent {
-  AlgoliaEvent toAlgoliaEvent() => AlgoliaEvent(
+extension HitViewEventExt on HitViewEvent {
+  AlgoliaEvent toViewEvent() => AlgoliaEvent(
         eventType: AlgoliaEventType.view,
         eventName: eventName,
         index: indexName,
         userToken: userToken,
         timestamp: timestamp,
         objectIDs: objectIDs.toList(),
+      );
+}
+
+extension HitClickEventExt on HitClickEvent {
+  AlgoliaEvent toClickEvent() => AlgoliaEvent(
+        eventType: AlgoliaEventType.click,
+        eventName: eventName,
+        index: indexName,
+        userToken: userToken,
+        timestamp: timestamp,
+        objectIDs: objectIDs?.toList(),
+        queryID: queryID,
+        positions: positions?.toList(),
       );
 }

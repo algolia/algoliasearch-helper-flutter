@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'event.dart';
 import 'events_service.dart';
 
@@ -20,12 +22,31 @@ abstract class HitsTracker {
       );
 
   /// Track a hit click event.
-  /// Optional hit [position] and custom [eventName] can be provided.
-  void click(String objectID, {int position, String eventName});
+  /// Optional custom [timestamp] can be provided.
+  void click({
+    required Iterable<String> objectIDs,
+    required String eventName,
+    DateTime? timestamp,
+  });
+
+  /// Track a hit click event.
+  /// Optional custom [timestamp] can be provided.
+  void clickAfterQuery({
+    required Iterable<String> objectIDs,
+    required String eventName,
+    required String queryID,
+    required Iterable<int> positions,
+    DateTime? timestamp,
+  });
 
   /// Track a hit view event.
-  /// Optional custom [eventName] can be provided.
-  void view(Iterable<String> objectIDs, String eventName, {DateTime? timestamp});
+  /// Optional custom [eventName] and [timestamp] can be provided.
+  void view({
+    required Iterable<String> objectIDs,
+    required String eventName,
+    String? queryID,
+    DateTime? timestamp,
+  });
 
   /// Track a hit convert event.
   /// Optional custom [eventName] can be provided.
@@ -40,8 +61,39 @@ class _HitTracker implements HitsTracker {
   _HitTracker(this._service, this._indexName, this._userToken);
 
   @override
-  void click(String objectID, {int? position, String? eventName}) {
-    // TODO: implement click
+  void clickAfterQuery({
+    required Iterable<String> objectIDs,
+    required String eventName,
+    required String queryID,
+    required Iterable<int> positions,
+    DateTime? timestamp,
+  }) {
+    final event = HitClickEvent(
+      eventName: eventName,
+      indexName: _indexName,
+      userToken: _userToken,
+      timestamp: timestamp ?? DateTime.now(),
+      objectIDs: objectIDs,
+      positions: positions,
+      queryID: queryID,
+    );
+    unawaited(_service.click(event));
+  }
+
+  @override
+  void click({
+    required Iterable<String> objectIDs,
+    required String eventName,
+    DateTime? timestamp,
+  }) {
+    final event = HitClickEvent(
+      eventName: eventName,
+      indexName: _indexName,
+      userToken: _userToken,
+      timestamp: timestamp ?? DateTime.now(),
+      objectIDs: objectIDs,
+    );
+    unawaited(_service.click(event));
   }
 
   @override
@@ -50,14 +102,19 @@ class _HitTracker implements HitsTracker {
   }
 
   @override
-  void view(Iterable<String> objectIDs, String eventName, {DateTime? timestamp}) {
-    final event = ViewEvent(
+  void view({
+    required Iterable<String> objectIDs,
+    required String eventName,
+    String? queryID,
+    DateTime? timestamp,
+  }) {
+    final event = HitViewEvent(
       eventName: eventName,
       indexName: _indexName,
       userToken: _userToken,
       timestamp: timestamp ?? DateTime.now(),
       objectIDs: objectIDs,
     );
-    _service.view(event);
+    unawaited(_service.view(event));
   }
 }
