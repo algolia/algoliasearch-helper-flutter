@@ -6,6 +6,7 @@ import 'package:rxdart/rxdart.dart';
 
 import 'disposable.dart';
 import 'disposable_mixin.dart';
+import 'event_tracker.dart';
 import 'filter_state.dart';
 import 'hits_searcher_service.dart';
 import 'insights.dart';
@@ -104,6 +105,7 @@ abstract class HitsSearcher implements Disposable {
     bool disjunctiveFacetingEnabled = true,
     Duration debounce = const Duration(milliseconds: 100),
     String viewEventName = 'view',
+    bool eventTrackingOn = true,
   }) =>
       _HitsSearcher(
           applicationID: applicationID,
@@ -111,7 +113,8 @@ abstract class HitsSearcher implements Disposable {
           state: SearchState(indexName: indexName),
           disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
           debounce: debounce,
-          viewEventName: viewEventName);
+          viewEventName: viewEventName,
+          eventTrackingOn: eventTrackingOn);
 
   /// HitsSearcher's factory.
   factory HitsSearcher.create({
@@ -121,6 +124,7 @@ abstract class HitsSearcher implements Disposable {
     bool disjunctiveFacetingEnabled = true,
     Duration debounce = const Duration(milliseconds: 100),
     String viewEventName = 'view',
+    bool eventTrackingOn = true,
   }) =>
       _HitsSearcher(
         applicationID: applicationID,
@@ -129,6 +133,7 @@ abstract class HitsSearcher implements Disposable {
         disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
         debounce: debounce,
         viewEventName: viewEventName,
+        eventTrackingOn: eventTrackingOn,
       );
 
   /// Creates [HitsSearcher] using a custom [HitsSearchService].
@@ -139,11 +144,20 @@ abstract class HitsSearcher implements Disposable {
     SearchState state, [
     Duration debounce = const Duration(milliseconds: 100),
     String viewEventName = 'view',
+    bool eventTrackingOn = true,
   ]) =>
       _HitsSearcher.create(
-          searchService, eventTracker, state, debounce, viewEventName);
+        searchService,
+        eventTracker,
+        state,
+        debounce,
+        viewEventName,
+        eventTrackingOn,
+      );
 
   EventTracker get eventTracker;
+
+  bool get eventTrackingOn;
 
   /// Search state stream
   Stream<SearchState> get state;
@@ -185,6 +199,7 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
     bool disjunctiveFacetingEnabled = true,
     Duration debounce = const Duration(milliseconds: 100),
     String viewEventName = 'view',
+    required bool eventTrackingOn,
   }) {
     final service = AlgoliaSearchService(
       applicationID: applicationID,
@@ -194,7 +209,13 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
     );
     final insights = Insights(state.indexName);
     return _HitsSearcher.create(
-        service, insights, state, debounce, viewEventName);
+      service,
+      insights,
+      state,
+      debounce,
+      viewEventName,
+      eventTrackingOn,
+    );
   }
 
   /// HitSearcher's constructor, for internal and test use only.
@@ -203,24 +224,22 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
     EventTracker eventTracker,
     SearchState state, [
     Duration debounce = const Duration(milliseconds: 100),
-    String viewEventName = 'view',
+    String viewEventName = 'view', // ask what's the js name
+    bool eventTrackingOn = true,
   ]) : this._(
           searchService,
           eventTracker,
           BehaviorSubject.seeded(SearchRequest(state)),
           debounce,
           viewEventName,
+          eventTrackingOn,
         );
 
   /// HitsSearcher's private constructor
-  _HitsSearcher._(
-    this.searchService,
-    this.eventTracker,
-    this._request,
-    this.debounce,
-    this.viewEventName,
-  ) {
+  _HitsSearcher._(this.searchService, this.eventTracker, this._request,
+      this.debounce, this.viewEventName, this.eventTrackingOn) {
     _subscription = _responses.connect();
+    // use composite subscription
     _eventSubscription = _responses.listen((value) {
       eventTracker.trackViews(
         viewEventName,
@@ -249,6 +268,9 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
 
   /// Name of the tracked view event for incoming hits
   String viewEventName;
+
+  @override
+  bool eventTrackingOn;
 
   /// Search state subject
   final BehaviorSubject<SearchRequest> _request;

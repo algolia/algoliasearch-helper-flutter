@@ -7,7 +7,7 @@ import 'package:rxdart/rxdart.dart';
 
 import 'disposable.dart';
 import 'disposable_mixin.dart';
-import 'insights.dart';
+import 'event_tracker.dart';
 import 'extensions.dart';
 import 'filter.dart';
 import 'filter_group.dart';
@@ -84,17 +84,18 @@ abstract class FacetList implements Disposable {
     SelectionMode selectionMode = SelectionMode.multiple,
     bool persistent = false,
     String? clickEventName,
+    bool eventTrackingOn = true,
   }) =>
       _FacetList(
-        searcher: searcher,
-        filterState: filterState,
-        attribute: attribute,
-        groupID: FilterGroupID(attribute, operator),
-        selectionMode: selectionMode,
-        persistent: persistent,
-        eventTracker: searcher.eventTracker,
-        clickEventName: clickEventName ?? 'click$attribute',
-      );
+          searcher: searcher,
+          filterState: filterState,
+          attribute: attribute,
+          groupID: FilterGroupID(attribute, operator),
+          selectionMode: selectionMode,
+          persistent: persistent,
+          eventTracker: searcher.eventTracker,
+          clickEventName: clickEventName ?? 'click$attribute',
+          eventTrackingOn: eventTrackingOn);
 
   /// Create [FacetList] instance.
   factory FacetList.create({
@@ -105,6 +106,7 @@ abstract class FacetList implements Disposable {
     SelectionMode selectionMode = SelectionMode.multiple,
     bool persistent = false,
     String? clickEventName,
+    bool eventTrackingOn = true,
   }) =>
       _FacetList(
         searcher: searcher,
@@ -115,6 +117,7 @@ abstract class FacetList implements Disposable {
         persistent: persistent,
         eventTracker: searcher.eventTracker,
         clickEventName: clickEventName ?? 'click$attribute',
+        eventTrackingOn: eventTrackingOn,
       );
 
   /// Stream of [Facet] list with selection status.
@@ -146,6 +149,7 @@ class _FacetList with DisposableMixin implements FacetList {
     required this.persistent,
     required this.eventTracker,
     required this.clickEventName,
+    required this.eventTrackingOn,
   }) {
     if (searcher.isDisposed) {
       _log.warning('creating an instance with disposed searcher');
@@ -193,6 +197,9 @@ class _FacetList with DisposableMixin implements FacetList {
 
   /// Should the selection be kept even if it does not match current results.
   final bool persistent;
+
+  /// Should the
+  final bool eventTrackingOn;
 
   /// Events logger
   final Logger _log = algoliaLogger('FacetList');
@@ -296,12 +303,16 @@ class _FacetList with DisposableMixin implements FacetList {
     });
   }
 
-  Future<void> _trackClickIfNeeded(String selection) async {
-    final current = await _selections.first;
-    if (current.contains(selection)) {
+  void _trackClickIfNeeded(String selection) {
+    if (!eventTrackingOn) {
       return;
     }
-    eventTracker.trackClick(clickEventName, attribute, selection);
+    _selections.first.then((selections) {
+      if (selections.contains(selection)) {
+        return;
+      }
+      eventTracker.trackClick(clickEventName, attribute, selection);
+    });
   }
 
   /// Get new set of selection after a selection operation.

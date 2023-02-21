@@ -307,6 +307,44 @@ void main() {
       );
     });
   });
+
+  test('Should pass clicked facet values to event tracker', () async {
+    final searchService = MockHitsSearchService();
+    final initial = SearchResponse({
+      'facets': {
+        'color': {'red': 1}
+      }
+    });
+    when(searchService.search(any)).thenAnswer((_) => Future.value(initial));
+    final eventTracker = MockEventTracker();
+
+    when(eventTracker.trackClick(any, any, any)).thenAnswer((realInvocation) {
+      expect(realInvocation.positionalArguments[0], 'customClickName');
+      expect(realInvocation.positionalArguments[1], 'color');
+      expect(realInvocation.positionalArguments[2], 'red');
+    });
+
+    final searcher = HitsSearcher.custom(
+      searchService,
+      eventTracker,
+      const SearchState(indexName: 'myIndex'),
+    );
+
+    const groupID = FilterGroupID('color', FilterOperator.or);
+    final filterState = FilterState()
+      ..add(groupID, [
+        Filter.facet('color', 'green'),
+      ]);
+
+    final facetList = FacetList.create(
+      searcher: searcher,
+      filterState: filterState,
+      attribute: 'color',
+      groupID: groupID,
+      persistent: true,
+      clickEventName: 'customClickName',
+    )..toggle('red');
+  });
 }
 
 HitsSearcher mockHitsSearcher([Map<String, dynamic> json = const {}]) {
