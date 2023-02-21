@@ -220,7 +220,6 @@ void main() {
       'customViewName',
     )..query('q');
 
-    // searcher.query('q');
     await delay();
   });
 

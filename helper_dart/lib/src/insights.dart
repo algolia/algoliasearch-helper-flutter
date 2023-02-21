@@ -8,26 +8,27 @@ class Insights implements EventTracker {
   String indexName;
   String userToken;
   @override
-  bool enabled;
+  bool isEnabled;
 
-  final _maxObjectIDsPerEvent = 20;
-  final _maxFiltersPerEvent = 10;
+  static const _maxObjectIDsPerEvent = 20;
+  static const _maxFiltersPerEvent = 10;
 
   Insights(this.indexName)
       : userToken = _generateUserToken(),
-        enabled = true;
+        isEnabled = true;
+
+  static String _generateUserToken() => 'userToken'; // ask how it's done for js
 
   void setUserToken(String userToken) {
     this.userToken = userToken;
   }
 
-  void send(List<AlgoliaEvent> event) {
-    if (enabled) {
-      // send event to Algolia
+  void send(List<AlgoliaEvent> events) {
+    if (!isEnabled) {
+      return;
     }
+    // send events to Algolia
   }
-
-  static String _generateUserToken() => 'userToken'; // ask how it's done for js
 
   @override
   void trackClick(String eventName, String attribute, String filterValue) {

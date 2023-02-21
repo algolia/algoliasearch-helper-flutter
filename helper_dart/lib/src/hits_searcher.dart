@@ -105,16 +105,15 @@ abstract class HitsSearcher implements Disposable {
     bool disjunctiveFacetingEnabled = true,
     Duration debounce = const Duration(milliseconds: 100),
     String viewEventName = 'view',
-    bool eventTrackingOn = true,
   }) =>
       _HitsSearcher(
-          applicationID: applicationID,
-          apiKey: apiKey,
-          state: SearchState(indexName: indexName),
-          disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
-          debounce: debounce,
-          viewEventName: viewEventName,
-          eventTrackingOn: eventTrackingOn);
+        applicationID: applicationID,
+        apiKey: apiKey,
+        state: SearchState(indexName: indexName),
+        disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
+        debounce: debounce,
+        viewEventName: viewEventName,
+      );
 
   /// HitsSearcher's factory.
   factory HitsSearcher.create({
@@ -124,7 +123,6 @@ abstract class HitsSearcher implements Disposable {
     bool disjunctiveFacetingEnabled = true,
     Duration debounce = const Duration(milliseconds: 100),
     String viewEventName = 'view',
-    bool eventTrackingOn = true,
   }) =>
       _HitsSearcher(
         applicationID: applicationID,
@@ -133,7 +131,6 @@ abstract class HitsSearcher implements Disposable {
         disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
         debounce: debounce,
         viewEventName: viewEventName,
-        eventTrackingOn: eventTrackingOn,
       );
 
   /// Creates [HitsSearcher] using a custom [HitsSearchService].
@@ -144,7 +141,6 @@ abstract class HitsSearcher implements Disposable {
     SearchState state, [
     Duration debounce = const Duration(milliseconds: 100),
     String viewEventName = 'view',
-    bool eventTrackingOn = true,
   ]) =>
       _HitsSearcher.create(
         searchService,
@@ -152,12 +148,9 @@ abstract class HitsSearcher implements Disposable {
         state,
         debounce,
         viewEventName,
-        eventTrackingOn,
       );
 
   EventTracker get eventTracker;
-
-  bool get eventTrackingOn;
 
   /// Search state stream
   Stream<SearchState> get state;
@@ -199,7 +192,6 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
     bool disjunctiveFacetingEnabled = true,
     Duration debounce = const Duration(milliseconds: 100),
     String viewEventName = 'view',
-    required bool eventTrackingOn,
   }) {
     final service = AlgoliaSearchService(
       applicationID: applicationID,
@@ -214,7 +206,6 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
       state,
       debounce,
       viewEventName,
-      eventTrackingOn,
     );
   }
 
@@ -224,28 +215,33 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
     EventTracker eventTracker,
     SearchState state, [
     Duration debounce = const Duration(milliseconds: 100),
-    String viewEventName = 'view', // ask what's the js name
-    bool eventTrackingOn = true,
+    String viewEventName = 'view',
   ]) : this._(
           searchService,
           eventTracker,
           BehaviorSubject.seeded(SearchRequest(state)),
           debounce,
           viewEventName,
-          eventTrackingOn,
         );
 
   /// HitsSearcher's private constructor
-  _HitsSearcher._(this.searchService, this.eventTracker, this._request,
-      this.debounce, this.viewEventName, this.eventTrackingOn) {
-    _subscription = _responses.connect();
-    // use composite subscription
-    _eventSubscription = _responses.listen((value) {
-      eventTracker.trackViews(
-        viewEventName,
-        value.hits.map((e) => e['objectID'].toString()).toList(),
+  _HitsSearcher._(
+    this.searchService,
+    this.eventTracker,
+    this._request,
+    this.debounce,
+    this.viewEventName,
+  ) {
+    _subscriptions
+      ..add(_responses.connect())
+      ..add(
+        _responses.listen((value) {
+          eventTracker.trackViews(
+            viewEventName,
+            value.hits.map((hit) => hit['objectID'].toString()).toList(),
+          );
+        }),
       );
-    });
   }
 
   /// Search state stream
@@ -269,9 +265,6 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   /// Name of the tracked view event for incoming hits
   String viewEventName;
 
-  @override
-  bool eventTrackingOn;
-
   /// Search state subject
   final BehaviorSubject<SearchRequest> _request;
 
@@ -285,10 +278,8 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   /// Events logger
   final Logger _log = algoliaLogger('HitsSearcher');
 
-  /// Subscriptions composite
-  late final StreamSubscription _subscription;
-
-  late final StreamSubscription _eventSubscription;
+  /// Streams subscriptions composite.
+  final CompositeSubscription _subscriptions = CompositeSubscription();
 
   /// Set query string.
   @override
@@ -332,7 +323,6 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   void doDispose() {
     _log.fine('HitsSearcher disposed');
     _request.close();
-    _eventSubscription.cancel();
-    _subscription.cancel();
+    _subscriptions.cancel();
   }
 }

@@ -1,5 +1,5 @@
 abstract class EventTracker {
-  bool get enabled;
+  bool get isEnabled;
 
   void trackClick(String eventName, String attribute, String value);
 

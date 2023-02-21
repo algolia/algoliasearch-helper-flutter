@@ -5,8 +5,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i4;
 
+import 'package:algolia_helper/src/event_tracker.dart' as _i6;
 import 'package:algolia_helper/src/hits_searcher_service.dart' as _i3;
-import 'package:algolia_helper/src/insights.dart' as _i6;
 import 'package:algolia_helper/src/search_response.dart' as _i2;
 import 'package:algolia_helper/src/search_state.dart' as _i5;
 import 'package:mockito/mockito.dart' as _i1;
@@ -54,13 +54,19 @@ class MockEventTracker extends _i1.Mock implements _i6.EventTracker {
   }
 
   @override
-  bool get isOn =>
-      (super.noSuchMethod(Invocation.getter(#isOn), returnValue: false)
+  bool get isEnabled =>
+      (super.noSuchMethod(Invocation.getter(#enabled), returnValue: false)
           as bool);
   @override
   void trackClick(String? eventName, String? attribute, String? value) =>
       super.noSuchMethod(
           Invocation.method(#trackClick, [eventName, attribute, value]),
+          returnValueForMissingStub: null);
+  @override
+  void trackClicks(
+          String? eventName, String? attribute, List<String>? values) =>
+      super.noSuchMethod(
+          Invocation.method(#trackClicks, [eventName, attribute, values]),
           returnValueForMissingStub: null);
   @override
   void trackView(String? eventName, String? objectID) =>
