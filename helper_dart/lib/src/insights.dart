@@ -45,13 +45,15 @@ class Insights implements EventTracker {
         .map((value) => '$attribute:$value')
         .toList()
         .slices(_maxFiltersPerEvent)
-        .map((filters) => AlgoliaEvent(
-              eventType: AlgoliaEventType.view,
-              eventName: eventName,
-              index: indexName,
-              userToken: userToken,
-              filters: filters,
-            ),)
+        .map(
+          (filters) => AlgoliaEvent(
+            eventType: AlgoliaEventType.view,
+            eventName: eventName,
+            index: indexName,
+            userToken: userToken,
+            filters: filters,
+          ),
+        )
         .toList();
     send(events);
   }
@@ -65,13 +67,15 @@ class Insights implements EventTracker {
   void trackViews(String eventName, List<String> objectIDs) {
     final events = objectIDs
         .slices(_maxObjectIDsPerEvent)
-        .map((filters) => AlgoliaEvent(
-              eventType: AlgoliaEventType.view,
-              eventName: eventName,
-              index: indexName,
-              userToken: userToken,
-              objectIDs: objectIDs,
-            ),)
+        .map(
+          (filters) => AlgoliaEvent(
+            eventType: AlgoliaEventType.view,
+            eventName: eventName,
+            index: indexName,
+            userToken: userToken,
+            objectIDs: objectIDs,
+          ),
+        )
         .toList();
     send(events);
   }
