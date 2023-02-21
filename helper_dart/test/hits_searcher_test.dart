@@ -221,6 +221,7 @@ void main() {
     )..query('q');
 
     await delay();
+    searcher.dispose();
   });
 
   test('FilterState connect HitsSearcher', () async {

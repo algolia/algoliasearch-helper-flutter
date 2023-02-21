@@ -1,5 +1,4 @@
 import 'package:algolia_helper/algolia_helper.dart';
-import 'package:algolia_helper/src/insights.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
@@ -336,14 +335,14 @@ void main() {
         Filter.facet('color', 'green'),
       ]);
 
-    final facetList = FacetList.create(
+    FacetList.create(
       searcher: searcher,
       filterState: filterState,
       attribute: 'color',
       groupID: groupID,
       persistent: true,
       clickEventName: 'customClickName',
-    )..toggle('red');
+    ).toggle('red');
   });
 }
 

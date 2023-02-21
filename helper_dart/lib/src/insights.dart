@@ -51,7 +51,7 @@ class Insights implements EventTracker {
               index: indexName,
               userToken: userToken,
               filters: filters,
-            ))
+            ),)
         .toList();
     send(events);
   }
@@ -71,7 +71,7 @@ class Insights implements EventTracker {
               index: indexName,
               userToken: userToken,
               objectIDs: objectIDs,
-            ))
+            ),)
         .toList();
     send(events);
   }
