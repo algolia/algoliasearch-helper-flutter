@@ -6,6 +6,7 @@
 import 'dart:async' as _i4;
 
 import 'package:algolia_helper/src/hits_searcher_service.dart' as _i3;
+import 'package:algolia_helper/src/insights.dart' as _i6;
 import 'package:algolia_helper/src/search_response.dart' as _i2;
 import 'package:algolia_helper/src/search_state.dart' as _i5;
 import 'package:mockito/mockito.dart' as _i1;
@@ -42,4 +43,31 @@ class MockHitsSearchService extends _i1.Mock implements _i3.HitsSearchService {
                   _FakeSearchResponse_0(
                       this, Invocation.method(#search, [state]))))
           as _i4.Future<_i2.SearchResponse>);
+}
+
+/// A class which mocks [EventTracker].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockEventTracker extends _i1.Mock implements _i6.EventTracker {
+  MockEventTracker() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  bool get isOn =>
+      (super.noSuchMethod(Invocation.getter(#isOn), returnValue: false)
+          as bool);
+  @override
+  void trackClick(String? eventName, String? attribute, String? value) =>
+      super.noSuchMethod(
+          Invocation.method(#trackClick, [eventName, attribute, value]),
+          returnValueForMissingStub: null);
+  @override
+  void trackView(String? eventName, String? objectID) =>
+      super.noSuchMethod(Invocation.method(#trackView, [eventName, objectID]),
+          returnValueForMissingStub: null);
+  @override
+  void trackViews(String? eventName, List<String>? objectIDs) =>
+      super.noSuchMethod(Invocation.method(#trackViews, [eventName, objectIDs]),
+          returnValueForMissingStub: null);
 }

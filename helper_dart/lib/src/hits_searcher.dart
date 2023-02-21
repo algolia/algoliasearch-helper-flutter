@@ -8,6 +8,7 @@ import 'disposable.dart';
 import 'disposable_mixin.dart';
 import 'filter_state.dart';
 import 'hits_searcher_service.dart';
+import 'insights.dart';
 import 'lib_version.dart';
 import 'logger.dart';
 import 'search_request.dart';
@@ -102,14 +103,15 @@ abstract class HitsSearcher implements Disposable {
     required String indexName,
     bool disjunctiveFacetingEnabled = true,
     Duration debounce = const Duration(milliseconds: 100),
+    String viewEventName = 'view',
   }) =>
       _HitsSearcher(
-        applicationID: applicationID,
-        apiKey: apiKey,
-        state: SearchState(indexName: indexName),
-        disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
-        debounce: debounce,
-      );
+          applicationID: applicationID,
+          apiKey: apiKey,
+          state: SearchState(indexName: indexName),
+          disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
+          debounce: debounce,
+          viewEventName: viewEventName);
 
   /// HitsSearcher's factory.
   factory HitsSearcher.create({
@@ -118,6 +120,7 @@ abstract class HitsSearcher implements Disposable {
     required SearchState state,
     bool disjunctiveFacetingEnabled = true,
     Duration debounce = const Duration(milliseconds: 100),
+    String viewEventName = 'view',
   }) =>
       _HitsSearcher(
         applicationID: applicationID,
@@ -125,16 +128,22 @@ abstract class HitsSearcher implements Disposable {
         state: state,
         disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
         debounce: debounce,
+        viewEventName: viewEventName,
       );
 
   /// Creates [HitsSearcher] using a custom [HitsSearchService].
   @internal
   factory HitsSearcher.custom(
     HitsSearchService searchService,
+    EventTracker eventTracker,
     SearchState state, [
     Duration debounce = const Duration(milliseconds: 100),
+    String viewEventName = 'view',
   ]) =>
-      _HitsSearcher.create(searchService, state, debounce);
+      _HitsSearcher.create(
+          searchService, eventTracker, state, debounce, viewEventName);
+
+  EventTracker get eventTracker;
 
   /// Search state stream
   Stream<SearchState> get state;
@@ -175,6 +184,7 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
     required SearchState state,
     bool disjunctiveFacetingEnabled = true,
     Duration debounce = const Duration(milliseconds: 100),
+    String viewEventName = 'view',
   }) {
     final service = AlgoliaSearchService(
       applicationID: applicationID,
@@ -182,23 +192,41 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
       extraUserAgents: ['algolia-helper-dart ($libVersion)'],
       disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
     );
-    return _HitsSearcher.create(service, state, debounce);
+    final insights = Insights(state.indexName);
+    return _HitsSearcher.create(
+        service, insights, state, debounce, viewEventName);
   }
 
   /// HitSearcher's constructor, for internal and test use only.
   _HitsSearcher.create(
     HitsSearchService searchService,
+    EventTracker eventTracker,
     SearchState state, [
     Duration debounce = const Duration(milliseconds: 100),
+    String viewEventName = 'view',
   ]) : this._(
           searchService,
+          eventTracker,
           BehaviorSubject.seeded(SearchRequest(state)),
           debounce,
+          viewEventName,
         );
 
   /// HitsSearcher's private constructor
-  _HitsSearcher._(this.searchService, this._request, this.debounce) {
+  _HitsSearcher._(
+    this.searchService,
+    this.eventTracker,
+    this._request,
+    this.debounce,
+    this.viewEventName,
+  ) {
     _subscription = _responses.connect();
+    _eventSubscription = _responses.listen((value) {
+      eventTracker.trackViews(
+        viewEventName,
+        value.hits.map((e) => e['objectID'].toString()).toList(),
+      );
+    });
   }
 
   /// Search state stream
@@ -213,8 +241,14 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   /// Service handling search requests
   final HitsSearchService searchService;
 
+  @override
+  final EventTracker eventTracker;
+
   /// Search state debounce duration
   final Duration debounce;
+
+  /// Name of the tracked view event for incoming hits
+  String viewEventName;
 
   /// Search state subject
   final BehaviorSubject<SearchRequest> _request;
@@ -231,6 +265,8 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
 
   /// Subscriptions composite
   late final StreamSubscription _subscription;
+
+  late final StreamSubscription _eventSubscription;
 
   /// Set query string.
   @override
@@ -274,6 +310,7 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   void doDispose() {
     _log.fine('HitsSearcher disposed');
     _request.close();
+    _eventSubscription.cancel();
     _subscription.cancel();
   }
 }

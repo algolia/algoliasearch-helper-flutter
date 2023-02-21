@@ -7,6 +7,7 @@ import 'package:rxdart/rxdart.dart';
 
 import 'disposable.dart';
 import 'disposable_mixin.dart';
+import 'insights.dart';
 import 'extensions.dart';
 import 'filter.dart';
 import 'filter_group.dart';
@@ -82,6 +83,7 @@ abstract class FacetList implements Disposable {
     FilterOperator operator = FilterOperator.or,
     SelectionMode selectionMode = SelectionMode.multiple,
     bool persistent = false,
+    String? clickEventName,
   }) =>
       _FacetList(
         searcher: searcher,
@@ -90,6 +92,8 @@ abstract class FacetList implements Disposable {
         groupID: FilterGroupID(attribute, operator),
         selectionMode: selectionMode,
         persistent: persistent,
+        eventTracker: searcher.eventTracker,
+        clickEventName: clickEventName ?? 'click$attribute',
       );
 
   /// Create [FacetList] instance.
@@ -100,6 +104,7 @@ abstract class FacetList implements Disposable {
     required FilterGroupID groupID,
     SelectionMode selectionMode = SelectionMode.multiple,
     bool persistent = false,
+    String? clickEventName,
   }) =>
       _FacetList(
         searcher: searcher,
@@ -108,6 +113,8 @@ abstract class FacetList implements Disposable {
         groupID: groupID,
         selectionMode: selectionMode,
         persistent: persistent,
+        eventTracker: searcher.eventTracker,
+        clickEventName: clickEventName ?? 'click$attribute',
       );
 
   /// Stream of [Facet] list with selection status.
@@ -137,6 +144,8 @@ class _FacetList with DisposableMixin implements FacetList {
     required this.groupID,
     required this.selectionMode,
     required this.persistent,
+    required this.eventTracker,
+    required this.clickEventName,
   }) {
     if (searcher.isDisposed) {
       _log.warning('creating an instance with disposed searcher');
@@ -168,8 +177,13 @@ class _FacetList with DisposableMixin implements FacetList {
   /// FilterState component.
   final FilterState filterState;
 
+  final EventTracker eventTracker;
+
   /// Facet filter attribute
   final String attribute;
+
+  /// Name of the click filter event
+  final String clickEventName;
 
   /// Filter group ID.
   final FilterGroupID groupID;
@@ -271,6 +285,7 @@ class _FacetList with DisposableMixin implements FacetList {
 
   @override
   void toggle(String value) {
+    _trackClickIfNeeded(value);
     _selectionsSet(value).then((selections) {
       filterState.modify((filters) async {
         final filtersSet =
@@ -279,6 +294,14 @@ class _FacetList with DisposableMixin implements FacetList {
         return filters.add(groupID, filtersSet);
       });
     });
+  }
+
+  Future<void> _trackClickIfNeeded(String selection) async {
+    final current = await _selections.first;
+    if (current.contains(selection)) {
+      return;
+    }
+    eventTracker.trackClick(clickEventName, attribute, selection);
   }
 
   /// Get new set of selection after a selection operation.
