@@ -1,7 +1,9 @@
 import 'package:algolia/algolia.dart';
 import 'event_service.dart';
 
+/// EventService interface adapter for unofficial client instance
 class AlgoliaEventServiceAdapter implements EventService {
+  /// Client instance
   Algolia algolia;
 
   AlgoliaEventServiceAdapter(

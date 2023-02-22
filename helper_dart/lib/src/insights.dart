@@ -5,11 +5,19 @@ import 'algolia_event_service_adapter.dart';
 import 'event_service.dart';
 import 'event_tracker.dart';
 
+/// Insights is the component responsible for sending events related to
+/// the user to personalize his search
 class Insights implements EventTracker {
+  /// Index name
   String indexName;
+
+  /// A pseudonymous or anonymous user identifier.
   String userToken;
+
   @override
   bool isEnabled;
+
+  /// Service sending event packets
   EventService service;
 
   static const _maxObjectIDsPerEvent = 20;
@@ -25,8 +33,9 @@ class Insights implements EventTracker {
       : userToken = _generateUserToken(),
         isEnabled = true;
 
-  static String _generateUserToken() => 'userToken'; // ask how it's done for js
+  static String _generateUserToken() => 'userToken';
 
+  /// Set custom user token
   void setUserToken(String userToken) {
     this.userToken = userToken;
   }
