@@ -199,7 +199,7 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
       extraUserAgents: ['algolia-helper-dart ($libVersion)'],
       disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
     );
-    final insights = Insights(state.indexName);
+    final insights = Insights(applicationID, apiKey, state.indexName);
     return _HitsSearcher.create(
       service,
       insights,

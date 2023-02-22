@@ -1,19 +1,27 @@
 import 'package:algolia/algolia.dart';
 import 'package:collection/collection.dart';
 
+import 'algolia_event_service_adapter.dart';
+import 'event_service.dart';
 import 'event_tracker.dart';
 
-// package insights-dart
 class Insights implements EventTracker {
   String indexName;
   String userToken;
   @override
   bool isEnabled;
+  EventService service;
 
   static const _maxObjectIDsPerEvent = 20;
   static const _maxFiltersPerEvent = 10;
 
-  Insights(this.indexName)
+  Insights(String applicationID, String apiKey, String indexName)
+      : this.custom(
+          AlgoliaEventServiceAdapter(applicationID, apiKey),
+          indexName,
+        );
+
+  Insights.custom(this.service, this.indexName)
       : userToken = _generateUserToken(),
         isEnabled = true;
 
@@ -21,13 +29,6 @@ class Insights implements EventTracker {
 
   void setUserToken(String userToken) {
     this.userToken = userToken;
-  }
-
-  void send(List<AlgoliaEvent> events) {
-    if (!isEnabled) {
-      return;
-    }
-    // send events to Algolia
   }
 
   @override
@@ -55,7 +56,7 @@ class Insights implements EventTracker {
           ),
         )
         .toList();
-    send(events);
+    _send(events);
   }
 
   @override
@@ -77,6 +78,13 @@ class Insights implements EventTracker {
           ),
         )
         .toList();
-    send(events);
+    _send(events);
+  }
+
+  void _send(List<AlgoliaEvent> events) {
+    if (!isEnabled) {
+      return;
+    }
+    service.send(events);
   }
 }
