@@ -33,6 +33,7 @@ class Insights implements EventTracker {
       : userToken = _generateUserToken(),
         isEnabled = true;
 
+  // TODO: user token generation implementation
   static String _generateUserToken() => 'userToken';
 
   /// Set custom user token
