@@ -83,7 +83,6 @@ abstract class FacetList implements Disposable {
     FilterOperator operator = FilterOperator.or,
     SelectionMode selectionMode = SelectionMode.multiple,
     bool persistent = false,
-    String? clickEventName,
   }) =>
       _FacetList(
         searcher: searcher,
@@ -93,7 +92,6 @@ abstract class FacetList implements Disposable {
         selectionMode: selectionMode,
         persistent: persistent,
         eventTracker: searcher.eventTracker,
-        clickEventName: clickEventName ?? 'click$attribute',
       );
 
   /// Create [FacetList] instance.
@@ -104,7 +102,6 @@ abstract class FacetList implements Disposable {
     required FilterGroupID groupID,
     SelectionMode selectionMode = SelectionMode.multiple,
     bool persistent = false,
-    String? clickEventName,
   }) =>
       _FacetList(
         searcher: searcher,
@@ -114,7 +111,6 @@ abstract class FacetList implements Disposable {
         selectionMode: selectionMode,
         persistent: persistent,
         eventTracker: searcher.eventTracker,
-        clickEventName: clickEventName ?? 'click$attribute',
       );
 
   /// Stream of [Facet] list with selection status.
@@ -145,7 +141,6 @@ class _FacetList with DisposableMixin implements FacetList {
     required this.selectionMode,
     required this.persistent,
     required this.eventTracker,
-    required this.clickEventName,
   }) {
     if (searcher.isDisposed) {
       _log.warning('creating an instance with disposed searcher');
@@ -181,9 +176,6 @@ class _FacetList with DisposableMixin implements FacetList {
 
   /// Facet filter attribute
   final String attribute;
-
-  /// Name of the click filter event
-  final String clickEventName;
 
   /// Filter group ID.
   final FilterGroupID groupID;
@@ -299,7 +291,7 @@ class _FacetList with DisposableMixin implements FacetList {
   void _trackClickIfNeeded(String selection) {
     _selections.first.then((selections) {
       if (!selections.contains(selection)) {
-        eventTracker.trackClick(clickEventName, attribute, selection);
+        eventTracker.trackClick('Filter Applied', attribute, selection);
       }
     });
   }

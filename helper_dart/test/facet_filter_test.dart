@@ -318,7 +318,7 @@ void main() {
     final eventTracker = MockEventTracker();
 
     when(eventTracker.trackClick(any, any, any)).thenAnswer((realInvocation) {
-      expect(realInvocation.positionalArguments[0], 'customClickName');
+      expect(realInvocation.positionalArguments[0], 'Filter Applied');
       expect(realInvocation.positionalArguments[1], 'color');
       expect(realInvocation.positionalArguments[2], 'red');
     });
@@ -341,7 +341,6 @@ void main() {
       attribute: 'color',
       groupID: groupID,
       persistent: true,
-      clickEventName: 'customClickName',
     ).toggle('red');
   });
 }
