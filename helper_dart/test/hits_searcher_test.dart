@@ -207,7 +207,7 @@ void main() {
 
     final eventTracker = MockEventTracker();
     when(eventTracker.trackViews(any, any)).thenAnswer((realInvocation) {
-      expect(realInvocation.positionalArguments[0], 'customViewName');
+      expect(realInvocation.positionalArguments[0], 'Hits Viewed');
       expect(realInvocation.positionalArguments[1], ['h1', 'h2']);
     });
 
@@ -216,8 +216,6 @@ void main() {
       searchService,
       eventTracker,
       initSearchState,
-      const Duration(milliseconds: 100),
-      'customViewName',
     )..query('q');
 
     await delay();
