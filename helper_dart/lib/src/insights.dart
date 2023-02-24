@@ -1,5 +1,6 @@
 import 'package:algolia/algolia.dart';
 import 'package:collection/collection.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'algolia_event_service_adapter.dart';
 import 'event_service.dart';
@@ -22,6 +23,7 @@ class Insights implements EventTracker {
 
   static const _maxObjectIDsPerEvent = 20;
   static const _maxFiltersPerEvent = 10;
+  static const _userTokenKey = 'insights-user-token';
 
   Insights(String applicationID, String apiKey, String indexName)
       : this.custom(
@@ -30,16 +32,36 @@ class Insights implements EventTracker {
         );
 
   Insights.custom(this.service, this.indexName)
-      : userToken = _generateUserToken(),
+      : userToken = _fetchUserToken(),
         isEnabled = true;
 
   // TODO: user token generation implementation
   static String _generateUserToken() => 'userToken';
 
+  _fetchUserToken() {
+    SharedPreferences.getInstance().then((sharedPreferences) {
+      final String? storedUserToken = sharedPreferences.getString(_userTokenKey);
+      if (storedUserToken != null) {
+        userToken = storedUserToken;
+      } else {
+        userToken = _generateUserToken();
+      }
+    });
+  }
+
   /// Set custom user token
   void setUserToken(String userToken) {
     this.userToken = userToken;
+    SharedPreferences.getInstance().then((sharedPreferences) => {
+      sharedPreferences.setString('_userTokenKey', userToken)
+    },);
   }
+  /*
+      final String? action = prefs.getString('insights-usertoken');
+    if (action != null) {
+
+    }
+   */
 
   @override
   void trackClick(String eventName, String attribute, String filterValue) {
