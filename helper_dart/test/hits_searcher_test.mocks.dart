@@ -55,25 +55,31 @@ class MockEventTracker extends _i1.Mock implements _i6.EventTracker {
 
   @override
   bool get isEnabled =>
-      (super.noSuchMethod(Invocation.getter(#enabled), returnValue: false)
+      (super.noSuchMethod(Invocation.getter(#isEnabled), returnValue: false)
           as bool);
   @override
-  void trackClick(String? eventName, String? attribute, String? value) =>
+  void trackClick(String? indexName, String? eventName, String? attribute,
+          String? value) =>
       super.noSuchMethod(
-          Invocation.method(#trackClick, [eventName, attribute, value]),
+          Invocation.method(
+              #trackClick, [indexName, eventName, attribute, value]),
           returnValueForMissingStub: null);
   @override
-  void trackClicks(
-          String? eventName, String? attribute, List<String>? values) =>
+  void trackClicks(String? indexName, String? eventName, String? attribute,
+          List<String>? values) =>
       super.noSuchMethod(
-          Invocation.method(#trackClicks, [eventName, attribute, values]),
+          Invocation.method(
+              #trackClicks, [indexName, eventName, attribute, values]),
           returnValueForMissingStub: null);
   @override
-  void trackView(String? eventName, String? objectID) =>
-      super.noSuchMethod(Invocation.method(#trackView, [eventName, objectID]),
+  void trackView(String? indexName, String? eventName, String? objectID) =>
+      super.noSuchMethod(
+          Invocation.method(#trackView, [indexName, eventName, objectID]),
           returnValueForMissingStub: null);
   @override
-  void trackViews(String? eventName, List<String>? objectIDs) =>
-      super.noSuchMethod(Invocation.method(#trackViews, [eventName, objectIDs]),
+  void trackViews(
+          String? indexName, String? eventName, List<String>? objectIDs) =>
+      super.noSuchMethod(
+          Invocation.method(#trackViews, [indexName, eventName, objectIDs]),
           returnValueForMissingStub: null);
 }

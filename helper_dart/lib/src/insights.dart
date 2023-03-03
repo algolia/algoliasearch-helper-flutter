@@ -1,20 +1,13 @@
 import 'package:algolia/algolia.dart';
 import 'package:collection/collection.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'algolia_event_service_adapter.dart';
 import 'event_service.dart';
 import 'event_tracker.dart';
+import 'user-token-controller.dart';
 
 /// Insights is the component responsible for sending events related to
 /// the user to personalize his search
 class Insights implements EventTracker {
-  /// Index name
-  String indexName;
-
-  /// A pseudonymous or anonymous user identifier.
-  String userToken;
-
   @override
   bool isEnabled;
 
@@ -23,53 +16,45 @@ class Insights implements EventTracker {
 
   static const _maxObjectIDsPerEvent = 20;
   static const _maxFiltersPerEvent = 10;
-  static const _userTokenKey = 'insights-user-token';
 
-  Insights(String applicationID, String apiKey, String indexName)
-      : this.custom(
-          AlgoliaEventServiceAdapter(applicationID, apiKey),
-          indexName,
-        );
+  /// Map storing Insights instances per application ID.
+  static final Map<String, Insights> _insightsPool = <String, Insights>{};
 
-  Insights.custom(this.service, this.indexName)
-      : userToken = _fetchUserToken(),
-        isEnabled = true;
+  /// Entity managing the user token generation and storage
+  static final _userTokenController = UserTokenController();
 
-  // TODO: user token generation implementation
-  static String _generateUserToken() => 'userToken';
-
-  _fetchUserToken() {
-    SharedPreferences.getInstance().then((sharedPreferences) {
-      final String? storedUserToken = sharedPreferences.getString(_userTokenKey);
-      if (storedUserToken != null) {
-        userToken = storedUserToken;
-      } else {
-        userToken = _generateUserToken();
-      }
-    });
+  factory Insights(String applicationID, String apiKey) {
+    if (_insightsPool.containsKey(applicationID)) {
+      return _insightsPool[applicationID]!;
+    }
+    final insights = Insights._custom(
+      AlgoliaEventServiceAdapter(applicationID, apiKey),
+    );
+    _insightsPool[applicationID] = insights;
+    return insights;
   }
+
+  Insights._custom(this.service) : isEnabled = true;
 
   /// Set custom user token
-  void setUserToken(String userToken) {
-    this.userToken = userToken;
-    SharedPreferences.getInstance().then((sharedPreferences) => {
-      sharedPreferences.setString('_userTokenKey', userToken)
-    },);
+  static void setUserToken(String userToken) {
+    _userTokenController.setUserToken(userToken);
   }
-  /*
-      final String? action = prefs.getString('insights-usertoken');
-    if (action != null) {
 
-    }
-   */
+  /// Determines whether the value is stored in memory or persistent storage.
+  static set allowPersistentUserTokenStorage(bool isAllowed) {
+    _userTokenController.allowPersistentUserTokenStorage = isAllowed;
+  }
 
   @override
-  void trackClick(String eventName, String attribute, String filterValue) {
-    trackClicks(eventName, attribute, [filterValue]);
+  void trackClick(String indexName, String eventName, String attribute,
+      String filterValue) {
+    trackClicks(indexName, eventName, attribute, [filterValue]);
   }
 
   @override
   void trackClicks(
+    String indexName,
     String eventName,
     String attribute,
     List<String> filterValues,
@@ -83,7 +68,7 @@ class Insights implements EventTracker {
             eventType: AlgoliaEventType.view,
             eventName: eventName,
             index: indexName,
-            userToken: userToken,
+            userToken: _userTokenController.userToken,
             filters: filters,
           ),
         )
@@ -92,12 +77,12 @@ class Insights implements EventTracker {
   }
 
   @override
-  void trackView(String eventName, String objectID) {
-    trackViews(eventName, [objectID]);
+  void trackView(String indexName, String eventName, String objectID) {
+    trackViews(indexName, eventName, [objectID]);
   }
 
   @override
-  void trackViews(String eventName, List<String> objectIDs) {
+  void trackViews(String indexName, String eventName, List<String> objectIDs) {
     final events = objectIDs
         .slices(_maxObjectIDsPerEvent)
         .map(
@@ -105,7 +90,7 @@ class Insights implements EventTracker {
             eventType: AlgoliaEventType.view,
             eventName: eventName,
             index: indexName,
-            userToken: userToken,
+            userToken: _userTokenController.userToken,
             objectIDs: objectIDs,
           ),
         )

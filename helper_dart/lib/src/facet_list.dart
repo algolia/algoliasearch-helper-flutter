@@ -291,7 +291,12 @@ class _FacetList with DisposableMixin implements FacetList {
   void _trackClickIfNeeded(String selection) {
     _selections.first.then((selections) {
       if (!selections.contains(selection)) {
-        eventTracker.trackClick('Filter Applied', attribute, selection);
+        eventTracker.trackClick(
+          searcher.snapshot().indexName,
+          'Filter Applied',
+          attribute,
+          selection,
+        );
       }
     });
   }
