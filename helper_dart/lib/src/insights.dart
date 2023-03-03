@@ -3,7 +3,7 @@ import 'package:collection/collection.dart';
 import 'algolia_event_service_adapter.dart';
 import 'event_service.dart';
 import 'event_tracker.dart';
-import 'user-token-controller.dart';
+import 'user_token_controller.dart';
 
 /// Insights is the component responsible for sending events related to
 /// the user to personalize his search
@@ -47,8 +47,12 @@ class Insights implements EventTracker {
   }
 
   @override
-  void trackClick(String indexName, String eventName, String attribute,
-      String filterValue) {
+  void trackClick(
+    String indexName,
+    String eventName,
+    String attribute,
+    String filterValue,
+  ) {
     trackClicks(indexName, eventName, attribute, [filterValue]);
   }
 
