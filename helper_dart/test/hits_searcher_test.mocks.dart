@@ -5,6 +5,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i4;
 
+import 'package:algolia/algolia.dart' as _i8;
+import 'package:algolia_helper/src/event_service.dart' as _i7;
 import 'package:algolia_helper/src/event_tracker.dart' as _i6;
 import 'package:algolia_helper/src/hits_searcher_service.dart' as _i3;
 import 'package:algolia_helper/src/search_response.dart' as _i2;
@@ -81,5 +83,19 @@ class MockEventTracker extends _i1.Mock implements _i6.EventTracker {
           String? indexName, String? eventName, List<String>? objectIDs) =>
       super.noSuchMethod(
           Invocation.method(#trackViews, [indexName, eventName, objectIDs]),
+          returnValueForMissingStub: null);
+}
+
+/// A class which mocks [EventService].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockEventService extends _i1.Mock implements _i7.EventService {
+  MockEventService() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  void send(List<_i8.AlgoliaEvent>? events) =>
+      super.noSuchMethod(Invocation.method(#send, [events]),
           returnValueForMissingStub: null);
 }
