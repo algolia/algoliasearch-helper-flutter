@@ -1,8 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
-import 'extensions.dart';
-
 class UserTokenStorage {
   static const _boxName = 'userToken';
   static const _userTokenKey = 'insights-user-token';
@@ -60,15 +58,19 @@ class UserTokenStorage {
   void _write(String userToken) {
     final expirationDate =
         DateTime.now().millisecondsSinceEpoch + leaseTime * 60 * 1000;
-    _box.then((box) => box
-      ..put(_userTokenKey, userToken)
-      ..put(_expirationDateKey, expirationDate));
+    _box.then(
+      (box) => box
+        ..put(_userTokenKey, userToken)
+        ..put(_expirationDateKey, expirationDate),
+    );
   }
 
   void _remove() {
-    _box.then((box) => box
-      ..delete(_userTokenKey)
-      ..delete(_leaseTime));
+    _box.then(
+      (box) => box
+        ..delete(_userTokenKey)
+        ..delete(_leaseTime),
+    );
   }
 
   Future<String?> read() async {
