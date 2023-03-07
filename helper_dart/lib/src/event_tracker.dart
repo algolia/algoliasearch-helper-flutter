@@ -1,8 +1,8 @@
 abstract class EventTracker {
-  /// Switch that blocks the sending of event packets when set to false
+  /// Flag that blocks the sending of event packets when set to false
   bool get isEnabled;
 
-  /// Track filter click event
+  /// Send filter click event
   void trackClick(
     String indexName,
     String eventName,
@@ -10,7 +10,7 @@ abstract class EventTracker {
     String value,
   );
 
-  /// Track filter click events
+  /// Send filter click events
   void trackClicks(
     String indexName,
     String eventName,
@@ -18,14 +18,14 @@ abstract class EventTracker {
     List<String> values,
   );
 
-  /// Track hit view event
+  /// Send hit view event
   void trackView(
     String indexName,
     String eventName,
     String objectID,
   );
 
-  /// Track hit view events
+  /// Send hit view events
   void trackViews(
     String indexName,
     String eventName,

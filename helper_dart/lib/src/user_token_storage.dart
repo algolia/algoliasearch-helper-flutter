@@ -1,18 +1,39 @@
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
-class UserTokenController {
+import 'extensions.dart';
+
+class UserTokenStorage {
+  static const _boxName = 'userToken';
   static const _userTokenKey = 'insights-user-token';
   static const _expirationDateKey = 'insights-user-token-expiration-date';
 
+  String _userToken = 'anonymous-${const Uuid().v4()}';
+
   /// A pseudonymous or anonymous user identifier.
-  String userToken = _generateUserToken();
+  String get userToken => _userToken;
+
+  set userToken(String userToken) {
+    _userToken = userToken;
+    if (allowPersistentUserTokenStorage) {
+      _write(userToken);
+    }
+  }
+
+  int _leaseTime = 1440;
 
   /// Token storage lease time in minutes. Ignored in case of in-memory storage.
   /// Default value is 1440 minutes (1 day)
-  int leaseTime = 1440;
+  int get leaseTime => _leaseTime;
 
-  late Box _box;
+  set leaseTime(int leaseTime) {
+    _leaseTime = leaseTime;
+    if (allowPersistentUserTokenStorage) {
+      _write(userToken);
+    }
+  }
+
+  Future<Box> get _box => Hive.openBox(_boxName, path: './');
   bool _allowPersistentUserTokenStorage = false;
 
   /// Determines whether the value is stored in memory or persistent storage.
@@ -28,45 +49,34 @@ class UserTokenController {
     }
   }
 
-  UserTokenController() {
-    Hive.openBox('userToken', path: './').then((box) {
-      _box = box;
-      final storedUserToken = _read();
+  UserTokenStorage() {
+    read().then((storedUserToken) {
       if (storedUserToken != null) {
         userToken = storedUserToken;
       }
     });
   }
 
-  void setUserToken(String userToken) {
-    this.userToken = userToken;
-    if (allowPersistentUserTokenStorage) {
-      _write(userToken);
-    }
-  }
-
-  static String _generateUserToken() => 'anonymous-${const Uuid().v4()}';
-
   void _write(String userToken) {
     final expirationDate =
         DateTime.now().millisecondsSinceEpoch + leaseTime * 60 * 1000;
-    _box
+    _box.then((box) => box
       ..put(_userTokenKey, userToken)
-      ..put(
-        _expirationDateKey,
-        expirationDate,
-      );
+      ..put(_expirationDateKey, expirationDate));
   }
 
   void _remove() {
-    _box
+    _box.then((box) => box
       ..delete(_userTokenKey)
-      ..delete(_expirationDateKey);
+      ..delete(_leaseTime));
   }
 
-  String? _read() {
-    final storedUserToken = _box.get(_userTokenKey) as String?;
-    final storedUserTokenExpirationDate = _box.get(_expirationDateKey) as int?;
+  Future<String?> read() async {
+    final box = await _box;
+    final storedUserToken = await box.get(_userTokenKey) as String?;
+    final storedUserTokenExpirationDate = await box.get(
+      _expirationDateKey,
+    ) as int?;
     if (storedUserToken != null &&
         storedUserTokenExpirationDate != null &&
         DateTime.now().millisecondsSinceEpoch < storedUserTokenExpirationDate) {
