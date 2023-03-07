@@ -24,9 +24,16 @@ class Insights implements EventTracker {
     _userTokenController.userToken = userToken;
   }
 
-  /// Determines whether the value is stored in memory or persistent storage.
-  static set allowPersistentUserTokenStorage(bool isAllowed) {
-    _userTokenController.allowPersistentUserTokenStorage = isAllowed;
+  /// Determines how long a user token can be stored in the persistent storage.
+  /// If set to 0 or a negative value, the user token will not be stored in
+  /// persistent storage and will remain in memory.
+  static set userTokenLeaseTime(int leaseTime) {
+    if (leaseTime <= 0) {
+      _userTokenController.allowPersistentUserTokenStorage = false;
+    } else {
+      _userTokenController.allowPersistentUserTokenStorage = true;
+      _userTokenController.leaseTime = leaseTime;
+    }
   }
 
   /// Map storing Insights instances per application ID.

@@ -20,7 +20,7 @@ void main() {
   test(
     'check generated user token format',
     () {
-      Insights.allowPersistentUserTokenStorage = false;
+      Insights.userTokenLeaseTime = 0;
       final eventService = MockEventService();
       when(eventService.send(any)).thenAnswer((realInvocation) {
         final event =
