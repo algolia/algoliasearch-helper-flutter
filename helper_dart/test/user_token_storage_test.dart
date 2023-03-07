@@ -2,7 +2,6 @@ import 'package:algolia_helper/src/user_token_storage.dart';
 import 'package:test/test.dart';
 
 void main() {
-
   test('check user token persistent storage', () async {
     final userTokenController = UserTokenStorage()
       ..allowPersistentUserTokenStorage = true
@@ -29,5 +28,4 @@ void main() {
     final storedUserToken = await userTokenController.read();
     expect(storedUserToken, null);
   });
-
 }
