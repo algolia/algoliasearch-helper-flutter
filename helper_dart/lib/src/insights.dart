@@ -24,7 +24,8 @@ class Insights implements EventTracker {
     _userTokenController.userToken = userToken;
   }
 
-  /// Determines how long a user token can be stored in the persistent storage.
+  /// Determines how long (in minutes) a user token can be stored in
+  /// the persistent storage. Default value is 1440 minutes (1 day).
   /// If set to 0 or a negative value, the user token will not be stored in
   /// persistent storage and will remain in memory.
   static set userTokenLeaseTime(int leaseTime) {
