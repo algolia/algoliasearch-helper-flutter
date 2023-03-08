@@ -18,9 +18,9 @@ class Insights implements EventTracker {
   static const _maxFiltersPerEvent = 10;
 
   /// Set custom user token
-  static String get userToken => _userTokenStorage.userToken;
+  String get userToken => _userTokenStorage.userToken;
 
-  static set userToken(String userToken) {
+  set userToken(String userToken) {
     _userTokenStorage.userToken = userToken;
   }
 
@@ -28,7 +28,7 @@ class Insights implements EventTracker {
   /// the persistent storage. Default value is 1440 minutes (1 day).
   /// If set to 0 or a negative value, the user token will not be stored in
   /// persistent storage and will remain in memory.
-  static set userTokenLeaseTime(int leaseTime) {
+  set userTokenLeaseTime(int leaseTime) {
     if (leaseTime <= 0) {
       _userTokenStorage.allowPersistentUserTokenStorage = false;
     } else {
@@ -41,7 +41,7 @@ class Insights implements EventTracker {
   static final Map<String, Insights> _insightsPool = <String, Insights>{};
 
   /// Entity managing the user token generation and storage
-  static final _userTokenStorage = UserTokenStorage();
+  final UserTokenStorage _userTokenStorage;
 
   factory Insights(String applicationID, String apiKey) {
     if (_insightsPool.containsKey(applicationID)) {
@@ -49,12 +49,13 @@ class Insights implements EventTracker {
     }
     final insights = Insights.custom(
       AlgoliaEventServiceAdapter(applicationID, apiKey),
+      UserTokenStorage(),
     );
     _insightsPool[applicationID] = insights;
     return insights;
   }
 
-  Insights.custom(this.service) : isEnabled = true;
+  Insights.custom(this.service, this._userTokenStorage) : isEnabled = true;
 
   @override
   void trackClick(

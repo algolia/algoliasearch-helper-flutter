@@ -6,6 +6,8 @@ class UserTokenStorage {
   static const _userTokenKey = 'insights-user-token';
   static const _expirationDateKey = 'insights-user-token-expiration-date';
 
+  /// Private value storing the actual value of the user-token
+  /// lease time.
   String _userToken = 'anonymous-${const Uuid().v4()}';
 
   /// A pseudonymous or anonymous user identifier.
@@ -18,6 +20,8 @@ class UserTokenStorage {
     }
   }
 
+  /// Private value storing the actual value of the user-token lease time in
+  /// the persistent storage.
   int _leaseTime = 1440;
 
   /// Token storage lease time in minutes. Ignored in case of in-memory storage.
@@ -31,7 +35,11 @@ class UserTokenStorage {
     }
   }
 
+  /// Box value persistently storing the user token and its lease time
   Future<Box> get _box => Hive.openBox(_boxName, path: './');
+
+  /// Private value storing the actual value of the persistent storage allowance
+  /// flag
   bool _allowPersistentUserTokenStorage = false;
 
   /// Determines whether the value is stored in memory or persistent storage.
@@ -47,7 +55,14 @@ class UserTokenStorage {
     }
   }
 
-  UserTokenStorage() {
+  /// Value storing the unique UserTokenStorage instance
+  static final UserTokenStorage _sharedInstance = UserTokenStorage._();
+
+  /// Factory constructor returning the unique UserTokenStorage instance
+  factory UserTokenStorage() => _sharedInstance;
+
+  /// UserTokenStorage's private constructor
+  UserTokenStorage._() {
     read().then((storedUserToken) {
       if (storedUserToken != null) {
         userToken = storedUserToken;
@@ -55,6 +70,7 @@ class UserTokenStorage {
     });
   }
 
+  /// Write the user token value to the persistent storage
   void _write(String userToken) {
     final expirationDate =
         DateTime.now().millisecondsSinceEpoch + leaseTime * 60 * 1000;
@@ -65,6 +81,7 @@ class UserTokenStorage {
     );
   }
 
+  /// Remove user token and its expiration date from persistent storage
   void _remove() {
     _box.then(
       (box) => box
@@ -73,6 +90,8 @@ class UserTokenStorage {
     );
   }
 
+  /// Read user token value from the persistent storage.
+  /// Shouldn't be called directly, use the `userToken` getter method instead.
   Future<String?> read() async {
     final box = await _box;
     final storedUserToken = await box.get(_userTokenKey) as String?;
