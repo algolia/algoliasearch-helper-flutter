@@ -6,8 +6,10 @@ import 'package:rxdart/rxdart.dart';
 
 import 'disposable.dart';
 import 'disposable_mixin.dart';
+import 'event_tracker.dart';
 import 'filter_state.dart';
 import 'hits_searcher_service.dart';
+import 'insights.dart';
 import 'lib_version.dart';
 import 'logger.dart';
 import 'search_request.dart';
@@ -131,10 +133,18 @@ abstract class HitsSearcher implements Disposable {
   @internal
   factory HitsSearcher.custom(
     HitsSearchService searchService,
+    EventTracker eventTracker,
     SearchState state, [
     Duration debounce = const Duration(milliseconds: 100),
   ]) =>
-      _HitsSearcher.create(searchService, state, debounce);
+      _HitsSearcher.create(
+        searchService,
+        eventTracker,
+        state,
+        debounce,
+      );
+
+  EventTracker get eventTracker;
 
   /// Search state stream
   Stream<SearchState> get state;
@@ -182,23 +192,45 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
       extraUserAgents: ['algolia-helper-dart ($libVersion)'],
       disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
     );
-    return _HitsSearcher.create(service, state, debounce);
+    final insights = Insights(applicationID, apiKey, state.indexName);
+    return _HitsSearcher.create(
+      service,
+      insights,
+      state,
+      debounce,
+    );
   }
 
   /// HitSearcher's constructor, for internal and test use only.
   _HitsSearcher.create(
     HitsSearchService searchService,
+    EventTracker eventTracker,
     SearchState state, [
     Duration debounce = const Duration(milliseconds: 100),
   ]) : this._(
           searchService,
+          eventTracker,
           BehaviorSubject.seeded(SearchRequest(state)),
           debounce,
         );
 
   /// HitsSearcher's private constructor
-  _HitsSearcher._(this.searchService, this._request, this.debounce) {
-    _subscription = _responses.connect();
+  _HitsSearcher._(
+    this.searchService,
+    this.eventTracker,
+    this._request,
+    this.debounce,
+  ) {
+    _subscriptions
+      ..add(_responses.connect())
+      ..add(
+        _responses.listen((value) {
+          eventTracker.trackViews(
+            'Hits Viewed',
+            value.hits.map((hit) => hit['objectID'].toString()).toList(),
+          );
+        }),
+      );
   }
 
   /// Search state stream
@@ -212,6 +244,9 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
 
   /// Service handling search requests
   final HitsSearchService searchService;
+
+  @override
+  final EventTracker eventTracker;
 
   /// Search state debounce duration
   final Duration debounce;
@@ -229,8 +264,8 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   /// Events logger
   final Logger _log = algoliaLogger('HitsSearcher');
 
-  /// Subscriptions composite
-  late final StreamSubscription _subscription;
+  /// Streams subscriptions composite.
+  final CompositeSubscription _subscriptions = CompositeSubscription();
 
   /// Set query string.
   @override
@@ -274,6 +309,6 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   void doDispose() {
     _log.fine('HitsSearcher disposed');
     _request.close();
-    _subscription.cancel();
+    _subscriptions.cancel();
   }
 }

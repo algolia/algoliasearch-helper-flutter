@@ -7,6 +7,7 @@ import 'package:rxdart/rxdart.dart';
 
 import 'disposable.dart';
 import 'disposable_mixin.dart';
+import 'event_tracker.dart';
 import 'extensions.dart';
 import 'filter.dart';
 import 'filter_group.dart';
@@ -90,6 +91,7 @@ abstract class FacetList implements Disposable {
         groupID: FilterGroupID(attribute, operator),
         selectionMode: selectionMode,
         persistent: persistent,
+        eventTracker: searcher.eventTracker,
       );
 
   /// Create [FacetList] instance.
@@ -108,6 +110,7 @@ abstract class FacetList implements Disposable {
         groupID: groupID,
         selectionMode: selectionMode,
         persistent: persistent,
+        eventTracker: searcher.eventTracker,
       );
 
   /// Stream of [Facet] list with selection status.
@@ -137,6 +140,7 @@ class _FacetList with DisposableMixin implements FacetList {
     required this.groupID,
     required this.selectionMode,
     required this.persistent,
+    required this.eventTracker,
   }) {
     if (searcher.isDisposed) {
       _log.warning('creating an instance with disposed searcher');
@@ -167,6 +171,8 @@ class _FacetList with DisposableMixin implements FacetList {
 
   /// FilterState component.
   final FilterState filterState;
+
+  final EventTracker eventTracker;
 
   /// Facet filter attribute
   final String attribute;
@@ -271,6 +277,7 @@ class _FacetList with DisposableMixin implements FacetList {
 
   @override
   void toggle(String value) {
+    _trackClickIfNeeded(value);
     _selectionsSet(value).then((selections) {
       filterState.modify((filters) async {
         final filtersSet =
@@ -278,6 +285,14 @@ class _FacetList with DisposableMixin implements FacetList {
         filters = await _clearFilters(filters);
         return filters.add(groupID, filtersSet);
       });
+    });
+  }
+
+  void _trackClickIfNeeded(String selection) {
+    _selections.first.then((selections) {
+      if (!selections.contains(selection)) {
+        eventTracker.trackClick('Filter Applied', attribute, selection);
+      }
     });
   }
 
