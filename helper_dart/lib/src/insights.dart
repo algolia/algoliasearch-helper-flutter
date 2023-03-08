@@ -18,10 +18,10 @@ class Insights implements EventTracker {
   static const _maxFiltersPerEvent = 10;
 
   /// Set custom user token
-  static String get userToken => _userTokenController.userToken;
+  static String get userToken => _userTokenStorage.userToken;
 
   static set userToken(String userToken) {
-    _userTokenController.userToken = userToken;
+    _userTokenStorage.userToken = userToken;
   }
 
   /// Determines how long (in minutes) a user token can be stored in
@@ -30,10 +30,10 @@ class Insights implements EventTracker {
   /// persistent storage and will remain in memory.
   static set userTokenLeaseTime(int leaseTime) {
     if (leaseTime <= 0) {
-      _userTokenController.allowPersistentUserTokenStorage = false;
+      _userTokenStorage.allowPersistentUserTokenStorage = false;
     } else {
-      _userTokenController.allowPersistentUserTokenStorage = true;
-      _userTokenController.leaseTime = leaseTime;
+      _userTokenStorage.allowPersistentUserTokenStorage = true;
+      _userTokenStorage.leaseTime = leaseTime;
     }
   }
 
@@ -41,7 +41,7 @@ class Insights implements EventTracker {
   static final Map<String, Insights> _insightsPool = <String, Insights>{};
 
   /// Entity managing the user token generation and storage
-  static final _userTokenController = UserTokenStorage();
+  static final _userTokenStorage = UserTokenStorage();
 
   factory Insights(String applicationID, String apiKey) {
     if (_insightsPool.containsKey(applicationID)) {
@@ -81,7 +81,7 @@ class Insights implements EventTracker {
             eventType: AlgoliaEventType.view,
             eventName: eventName,
             index: indexName,
-            userToken: _userTokenController.userToken,
+            userToken: _userTokenStorage.userToken,
             filters: filters,
           ),
         )
@@ -102,7 +102,7 @@ class Insights implements EventTracker {
             eventType: AlgoliaEventType.view,
             eventName: eventName,
             index: indexName,
-            userToken: _userTokenController.userToken,
+            userToken: _userTokenStorage.userToken,
             objectIDs: objectIDs,
           ),
         )
