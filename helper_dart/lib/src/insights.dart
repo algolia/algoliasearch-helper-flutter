@@ -32,8 +32,9 @@ class Insights implements EventTracker {
     if (leaseTime <= 0) {
       _userTokenStorage.allowPersistentUserTokenStorage = false;
     } else {
-      _userTokenStorage.allowPersistentUserTokenStorage = true;
-      _userTokenStorage.leaseTime = leaseTime;
+      _userTokenStorage
+        ..allowPersistentUserTokenStorage = true
+        ..leaseTime = leaseTime;
     }
   }
 
