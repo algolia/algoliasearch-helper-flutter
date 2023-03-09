@@ -226,9 +226,10 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
       ..add(
         _responses.listen((value) {
           eventTracker.trackViews(
-            snapshot().indexName,
-            'Hits Viewed',
-            value.hits.map((hit) => hit['objectID'].toString()).toList(),
+            indexName: snapshot().indexName,
+            eventName: 'Hits Viewed',
+            objectIDs:
+                value.hits.map((hit) => hit['objectID'].toString()).toList(),
           );
         }),
       );

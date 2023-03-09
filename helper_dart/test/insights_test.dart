@@ -36,10 +36,10 @@ void main() {
       )
         ..userTokenLeaseTime = 0
         ..trackClick(
-          'test_index',
-          'test_event_name',
-          'test_attribute',
-          'test_filter_value',
+          indexName: 'test_index',
+          eventName: 'test_event_name',
+          attribute: 'test_attribute',
+          value: 'test_filter_value',
         );
     },
   );
@@ -63,10 +63,10 @@ void main() {
     )
       ..userToken = 'test_user_token'
       ..trackClick(
-        'test_index',
-        'test_event_name',
-        'test_attribute',
-        'test_filter_value',
+        indexName: 'test_index',
+        eventName: 'test_event_name',
+        attribute: 'test_attribute',
+        value: 'test_filter_value',
       );
   });
 
@@ -79,19 +79,19 @@ void main() {
     )
       ..isEnabled = false
       ..trackClick(
-        'test_index',
-        'test_event_name',
-        'test_attribute',
-        'test_filter_value',
+        indexName: 'test_index',
+        eventName: 'test_event_name',
+        attribute: 'test_attribute',
+        value: 'test_filter_value',
       );
     verifyNever(eventService.send(any));
     insights
       ..isEnabled = true
       ..trackClick(
-        'test_index',
-        'test_event_name',
-        'test_attribute',
-        'test_filter_value',
+        indexName: 'test_index',
+        eventName: 'test_event_name',
+        attribute: 'test_attribute',
+        value: 'test_filter_value',
       );
     verify(eventService.send(any)).called(1);
   });

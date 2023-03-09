@@ -59,22 +59,27 @@ class Insights implements EventTracker {
   Insights.custom(this.service, this._userTokenStorage) : isEnabled = true;
 
   @override
-  void trackClick(
-    String indexName,
-    String eventName,
-    String attribute,
-    String filterValue,
-  ) =>
-      trackClicks(indexName, eventName, attribute, [filterValue]);
+  void trackClick({
+    required String indexName,
+    required String eventName,
+    required String attribute,
+    required String value,
+  }) =>
+      trackClicks(
+        indexName: indexName,
+        eventName: eventName,
+        attribute: attribute,
+        values: [value],
+      );
 
   @override
-  void trackClicks(
-    String indexName,
-    String eventName,
-    String attribute,
-    List<String> filterValues,
-  ) {
-    final events = filterValues
+  void trackClicks({
+    required String indexName,
+    required String eventName,
+    required String attribute,
+    required List<String> values,
+  }) {
+    final events = values
         .map((value) => '$attribute:$value')
         .toList()
         .slices(_maxFiltersPerEvent)
@@ -92,11 +97,23 @@ class Insights implements EventTracker {
   }
 
   @override
-  void trackView(String indexName, String eventName, String objectID) =>
-      trackViews(indexName, eventName, [objectID]);
+  void trackView({
+    required String indexName,
+    required String eventName,
+    required String objectID,
+  }) =>
+      trackViews(
+        indexName: indexName,
+        eventName: eventName,
+        objectIDs: [objectID],
+      );
 
   @override
-  void trackViews(String indexName, String eventName, List<String> objectIDs) {
+  void trackViews({
+    required String indexName,
+    required String eventName,
+    required List<String> objectIDs,
+  }) {
     final events = objectIDs
         .slices(_maxObjectIDsPerEvent)
         .map(

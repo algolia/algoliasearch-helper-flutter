@@ -60,29 +60,51 @@ class MockEventTracker extends _i1.Mock implements _i6.EventTracker {
       (super.noSuchMethod(Invocation.getter(#isEnabled), returnValue: false)
           as bool);
   @override
-  void trackClick(String? indexName, String? eventName, String? attribute,
-          String? value) =>
+  void trackClick(
+          {String? indexName,
+          String? eventName,
+          String? attribute,
+          String? value}) =>
       super.noSuchMethod(
-          Invocation.method(
-              #trackClick, [indexName, eventName, attribute, value]),
+          Invocation.method(#trackClick, [], {
+            #indexName: indexName,
+            #eventName: eventName,
+            #attribute: attribute,
+            #value: value
+          }),
           returnValueForMissingStub: null);
   @override
-  void trackClicks(String? indexName, String? eventName, String? attribute,
-          List<String>? values) =>
+  void trackClicks(
+          {String? indexName,
+          String? eventName,
+          String? attribute,
+          List<String>? values}) =>
       super.noSuchMethod(
-          Invocation.method(
-              #trackClicks, [indexName, eventName, attribute, values]),
+          Invocation.method(#trackClicks, [], {
+            #indexName: indexName,
+            #eventName: eventName,
+            #attribute: attribute,
+            #values: values
+          }),
           returnValueForMissingStub: null);
   @override
-  void trackView(String? indexName, String? eventName, String? objectID) =>
+  void trackView({String? indexName, String? eventName, String? objectID}) =>
       super.noSuchMethod(
-          Invocation.method(#trackView, [indexName, eventName, objectID]),
+          Invocation.method(#trackView, [], {
+            #indexName: indexName,
+            #eventName: eventName,
+            #objectID: objectID
+          }),
           returnValueForMissingStub: null);
   @override
   void trackViews(
-          String? indexName, String? eventName, List<String>? objectIDs) =>
+          {String? indexName, String? eventName, List<String>? objectIDs}) =>
       super.noSuchMethod(
-          Invocation.method(#trackViews, [indexName, eventName, objectIDs]),
+          Invocation.method(#trackViews, [], {
+            #indexName: indexName,
+            #eventName: eventName,
+            #objectIDs: objectIDs
+          }),
           returnValueForMissingStub: null);
 }
 

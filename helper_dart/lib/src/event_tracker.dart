@@ -3,32 +3,32 @@ abstract class EventTracker {
   bool get isEnabled;
 
   /// Send filter click event
-  void trackClick(
-    String indexName,
-    String eventName,
-    String attribute,
-    String value,
-  );
+  void trackClick({
+    required String indexName,
+    required String eventName,
+    required String attribute,
+    required String value,
+  });
 
   /// Send filter click events
-  void trackClicks(
-    String indexName,
-    String eventName,
-    String attribute,
-    List<String> values,
-  );
+  void trackClicks({
+    required String indexName,
+    required String eventName,
+    required String attribute,
+    required List<String> values,
+  });
 
   /// Send hit view event
-  void trackView(
-    String indexName,
-    String eventName,
-    String objectID,
-  );
+  void trackView({
+    required String indexName,
+    required String eventName,
+    required String objectID,
+  });
 
   /// Send hit view events
-  void trackViews(
-    String indexName,
-    String eventName,
-    List<String> objectIDs,
-  );
+  void trackViews({
+    required String indexName,
+    required String eventName,
+    required List<String> objectIDs,
+  });
 }
