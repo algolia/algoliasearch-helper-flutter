@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:algolia/algolia.dart';
 import 'package:algolia_helper/algolia_helper.dart';
+import 'package:algolia_helper/src/event_service.dart';
 import 'package:algolia_helper/src/event_tracker.dart';
 import 'package:algolia_helper/src/hits_searcher_service.dart';
 import 'package:mockito/annotations.dart';
@@ -10,7 +11,7 @@ import 'package:test/test.dart';
 
 import 'hits_searcher_test.mocks.dart';
 
-@GenerateMocks([HitsSearchService, EventTracker])
+@GenerateMocks([HitsSearchService, EventTracker, EventService])
 void main() {
   group('Integration tests', () {
     test('Successful search operation', () async {
@@ -206,7 +207,7 @@ void main() {
     when(searchService.search(any)).thenAnswer(mockResponse);
 
     final eventTracker = MockEventTracker();
-    when(eventTracker.trackViews(any, any)).thenAnswer((realInvocation) {
+    when(eventTracker.trackViews()).thenAnswer((realInvocation) {
       expect(realInvocation.positionalArguments[0], 'Hits Viewed');
       expect(realInvocation.positionalArguments[1], ['h1', 'h2']);
     });

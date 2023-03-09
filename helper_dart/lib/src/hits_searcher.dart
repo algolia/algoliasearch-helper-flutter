@@ -192,7 +192,7 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
       extraUserAgents: ['algolia-helper-dart ($libVersion)'],
       disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
     );
-    final insights = Insights(applicationID, apiKey, state.indexName);
+    final insights = Insights(applicationID, apiKey);
     return _HitsSearcher.create(
       service,
       insights,
@@ -226,8 +226,10 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
       ..add(
         _responses.listen((value) {
           eventTracker.trackViews(
-            'Hits Viewed',
-            value.hits.map((hit) => hit['objectID'].toString()).toList(),
+            indexName: snapshot().indexName,
+            eventName: 'Hits Viewed',
+            objectIDs:
+                value.hits.map((hit) => hit['objectID'].toString()).toList(),
           );
         }),
       );

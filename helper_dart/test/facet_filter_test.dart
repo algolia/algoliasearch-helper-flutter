@@ -317,7 +317,7 @@ void main() {
     when(searchService.search(any)).thenAnswer((_) => Future.value(initial));
     final eventTracker = MockEventTracker();
 
-    when(eventTracker.trackClick(any, any, any)).thenAnswer((realInvocation) {
+    when(eventTracker.trackClick()).thenAnswer((realInvocation) {
       expect(realInvocation.positionalArguments[0], 'Filter Applied');
       expect(realInvocation.positionalArguments[1], 'color');
       expect(realInvocation.positionalArguments[2], 'red');

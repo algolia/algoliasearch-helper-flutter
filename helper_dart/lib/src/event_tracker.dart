@@ -1,17 +1,34 @@
 abstract class EventTracker {
-
-  /// Switch that blocks the sending of event packets when set to false
+  /// Flag that blocks the sending of event packets when set to false
   bool get isEnabled;
 
-  /// Track filter click event
-  void trackClick(String eventName, String attribute, String value);
+  /// Send filter click event
+  void trackClick({
+    required String indexName,
+    required String eventName,
+    required String attribute,
+    required String value,
+  });
 
-  /// Track filter click events
-  void trackClicks(String eventName, String attribute, List<String> values);
+  /// Send filter click events
+  void trackClicks({
+    required String indexName,
+    required String eventName,
+    required String attribute,
+    required List<String> values,
+  });
 
-  /// Track hit view event
-  void trackView(String eventName, String objectID);
+  /// Send hit view event
+  void trackView({
+    required String indexName,
+    required String eventName,
+    required String objectID,
+  });
 
-  /// Track hit view events
-  void trackViews(String eventName, List<String> objectIDs);
+  /// Send hit view events
+  void trackViews({
+    required String indexName,
+    required String eventName,
+    required List<String> objectIDs,
+  });
 }
