@@ -35,11 +35,11 @@ void main() {
         userTokenStorage,
       )
         ..userTokenLeaseTime = 0
-        ..trackClick(
+        ..clickedFilters(
           indexName: 'test_index',
           eventName: 'test_event_name',
           attribute: 'test_attribute',
-          value: 'test_filter_value',
+          values: ['test_filter_value'],
         );
     },
   );
@@ -62,11 +62,11 @@ void main() {
       userTokenStorage,
     )
       ..userToken = 'test_user_token'
-      ..trackClick(
+      ..clickedFilters(
         indexName: 'test_index',
         eventName: 'test_event_name',
         attribute: 'test_attribute',
-        value: 'test_filter_value',
+        values: ['test_filter_value'],
       );
   });
 
@@ -78,20 +78,20 @@ void main() {
       userTokenStorage,
     )
       ..isEnabled = false
-      ..trackClick(
+      ..clickedFilters(
         indexName: 'test_index',
         eventName: 'test_event_name',
         attribute: 'test_attribute',
-        value: 'test_filter_value',
+        values: ['test_filter_value'],
       );
     verifyNever(eventService.send(any));
     insights
       ..isEnabled = true
-      ..trackClick(
+      ..clickedFilters(
         indexName: 'test_index',
         eventName: 'test_event_name',
         attribute: 'test_attribute',
-        value: 'test_filter_value',
+        values: ['test_filter_value'],
       );
     verify(eventService.send(any)).called(1);
   });

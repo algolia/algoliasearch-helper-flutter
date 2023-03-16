@@ -59,21 +59,7 @@ class Insights implements EventTracker {
   Insights.custom(this.service, this._userTokenStorage) : isEnabled = true;
 
   @override
-  void trackClick({
-    required String indexName,
-    required String eventName,
-    required String attribute,
-    required String value,
-  }) =>
-      trackClicks(
-        indexName: indexName,
-        eventName: eventName,
-        attribute: attribute,
-        values: [value],
-      );
-
-  @override
-  void trackClicks({
+  void clickedFilters({
     required String indexName,
     required String eventName,
     required String attribute,
@@ -85,7 +71,7 @@ class Insights implements EventTracker {
         .slices(_maxFiltersPerEvent)
         .map(
           (filters) => AlgoliaEvent(
-            eventType: AlgoliaEventType.view,
+            eventType: AlgoliaEventType.click,
             eventName: eventName,
             index: indexName,
             userToken: _userTokenStorage.userToken,
@@ -97,19 +83,104 @@ class Insights implements EventTracker {
   }
 
   @override
-  void trackView({
+  void convertedFilters({
     required String indexName,
     required String eventName,
-    required String objectID,
-  }) =>
-      trackViews(
-        indexName: indexName,
+    required String attribute,
+    required List<String> values,
+  }) {
+    final events = values
+        .map((value) => '$attribute:$value')
+        .toList()
+        .slices(_maxFiltersPerEvent)
+        .map(
+          (filters) => AlgoliaEvent(
+        eventType: AlgoliaEventType.conversion,
         eventName: eventName,
-        objectIDs: [objectID],
-      );
+        index: indexName,
+        userToken: _userTokenStorage.userToken,
+        filters: filters,
+      ),
+    )
+        .toList();
+    _send(events);
+  }
 
   @override
-  void trackViews({
+  void viewedFilters({
+    required String indexName,
+    required String eventName,
+    required String attribute,
+    required List<String> values,
+  }) {
+
+    final events = values
+        .map((value) => '$attribute:$value')
+        .toList()
+        .slices(_maxFiltersPerEvent)
+        .map(
+          (filters) => AlgoliaEvent(
+        eventType: AlgoliaEventType.view,
+        eventName: eventName,
+        index: indexName,
+        userToken: _userTokenStorage.userToken,
+        filters: filters,
+      ),
+    )
+        .toList();
+    _send(events);
+  }
+
+  @override
+  void clickedObjects({
+    required String indexName,
+    required Iterable<String> objectIDs,
+    required String eventName,
+    DateTime? timestamp,
+  }) {
+    final events = objectIDs
+        .slices(_maxObjectIDsPerEvent)
+        .map(
+          (objectIDs) => AlgoliaEvent(
+            eventType: AlgoliaEventType.click,
+            eventName: eventName,
+            index: indexName,
+            userToken: _userTokenStorage.userToken,
+            objectIDs: objectIDs,
+          ),
+        )
+        .toList();
+    _send(events);
+  }
+
+  @override
+  void clickedObjectsAfterSearch({
+    required String indexName,
+    required Iterable<String> objectIDs,
+    required String eventName,
+    required String queryID,
+    required Iterable<int> positions,
+    DateTime? timestamp,
+  }) {
+    final events = objectIDs
+        .slices(_maxObjectIDsPerEvent)
+        .map(
+          (objectIDs) => AlgoliaEvent(
+            eventType: AlgoliaEventType.click,
+            eventName: eventName,
+            queryID: queryID,
+            index: indexName,
+            userToken: _userTokenStorage.userToken,
+            objectIDs: objectIDs,
+            positions: positions.toList(),
+          ),
+        )
+        .toList();
+    _send(events);
+  }
+
+  @override
+  void viewedObjects({
     required String indexName,
     required String eventName,
     required List<String> objectIDs,
@@ -120,6 +191,52 @@ class Insights implements EventTracker {
           (filters) => AlgoliaEvent(
             eventType: AlgoliaEventType.view,
             eventName: eventName,
+            index: indexName,
+            userToken: _userTokenStorage.userToken,
+            objectIDs: objectIDs,
+          ),
+        )
+        .toList();
+    _send(events);
+  }
+
+  @override
+  void convertedObjects({
+    required String indexName,
+    required String eventName,
+    required Iterable<String> objectIDs,
+    DateTime? timestamp,
+  }) {
+    final events = objectIDs
+        .slices(_maxObjectIDsPerEvent)
+        .map(
+          (objectIDs) => AlgoliaEvent(
+            eventType: AlgoliaEventType.conversion,
+            eventName: eventName,
+            index: indexName,
+            userToken: _userTokenStorage.userToken,
+            objectIDs: objectIDs,
+          ),
+        )
+        .toList();
+    _send(events);
+  }
+
+  @override
+  void convertedObjectsAfterSearch({
+    required String indexName,
+    required String eventName,
+    required String queryID,
+    required Iterable<String> objectIDs,
+    DateTime? timestamp,
+  }) {
+    final events = objectIDs
+        .slices(_maxObjectIDsPerEvent)
+        .map(
+          (objectIDs) => AlgoliaEvent(
+            eventType: AlgoliaEventType.conversion,
+            eventName: eventName,
+            queryID: queryID,
             index: indexName,
             userToken: _userTokenStorage.userToken,
             objectIDs: objectIDs,

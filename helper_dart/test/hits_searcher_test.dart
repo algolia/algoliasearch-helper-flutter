@@ -207,7 +207,7 @@ void main() {
     when(searchService.search(any)).thenAnswer(mockResponse);
 
     final eventTracker = MockEventTracker();
-    when(eventTracker.trackViews()).thenAnswer((realInvocation) {
+    when(eventTracker.viewedObjects()).thenAnswer((realInvocation) {
       expect(realInvocation.positionalArguments[0], 'Hits Viewed');
       expect(realInvocation.positionalArguments[1], ['h1', 'h2']);
     });

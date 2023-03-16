@@ -7,9 +7,10 @@ import 'package:rxdart/rxdart.dart';
 
 import 'disposable.dart';
 import 'disposable_mixin.dart';
-import 'event_tracker.dart';
 import 'extensions.dart';
+import 'filter-event-tracker-adapter.dart';
 import 'filter.dart';
+import 'filter_event_tracker.dart';
 import 'filter_group.dart';
 import 'filter_state.dart';
 import 'filters.dart';
@@ -91,7 +92,10 @@ abstract class FacetList implements Disposable {
         groupID: FilterGroupID(attribute, operator),
         selectionMode: selectionMode,
         persistent: persistent,
-        eventTracker: searcher.eventTracker,
+        eventTracker: FilterEventTrackerAdapter(
+          searcher.eventTracker,
+          searcher.snapshot().indexName,
+        ),
       );
 
   /// Create [FacetList] instance.
@@ -110,8 +114,17 @@ abstract class FacetList implements Disposable {
         groupID: groupID,
         selectionMode: selectionMode,
         persistent: persistent,
-        eventTracker: searcher.eventTracker,
+        eventTracker: FilterEventTrackerAdapter(
+          searcher.eventTracker,
+          searcher.snapshot().indexName,
+        ),
       );
+
+  /// Insights events tracking component
+  FilterEventTracker get eventTracker;
+
+  /// Facet filter attribute
+  String get attribute;
 
   /// Stream of [Facet] list with selection status.
   Stream<List<SelectableFacet>> get facets;
@@ -122,6 +135,7 @@ abstract class FacetList implements Disposable {
   /// Select/deselect the provided facet value depending on the current
   /// selection state.
   void toggle(String value);
+
 }
 
 /// Elements selection mode.
@@ -172,9 +186,10 @@ class _FacetList with DisposableMixin implements FacetList {
   /// FilterState component.
   final FilterState filterState;
 
-  final EventTracker eventTracker;
+  @override
+  final FilterEventTracker eventTracker;
 
-  /// Facet filter attribute
+  @override
   final String attribute;
 
   /// Filter group ID.
@@ -291,11 +306,10 @@ class _FacetList with DisposableMixin implements FacetList {
   void _trackClickIfNeeded(String selection) {
     _selections.first.then((selections) {
       if (!selections.contains(selection)) {
-        eventTracker.trackClick(
-          indexName: searcher.snapshot().indexName,
+        eventTracker.clickedFilters(
           eventName: 'Filter Applied',
           attribute: attribute,
-          value: selection,
+          values: [selection],
         );
       }
     });
@@ -348,4 +362,46 @@ class _FacetList with DisposableMixin implements FacetList {
     _log.finest('FacetList disposed');
     _subscriptions.cancel();
   }
+
+}
+
+extension FilterTracking on FacetList {
+
+  /// Send a click event to capture when users select filters.
+  void clickedFilters({
+    required String eventName,
+    required Iterable<String> values,
+  }) {
+    eventTracker.clickedFilters(
+      eventName: eventName,
+      attribute: attribute,
+      values: values.toList(),
+    );
+  }
+
+  /// Send a view event to capture the active filters for items a user viewed.
+  void viewedFilters({
+    required String eventName,
+    required Iterable<String> values,
+  }) {
+    eventTracker.viewedFilters(
+      eventName: eventName,
+      attribute: attribute,
+      values: values.toList(),
+    );
+  }
+
+  /// Send a conversion event to capture the filters a user selected
+  /// when converting.
+  void convertedFilters({
+    required String eventName,
+    required Iterable<String> values,
+  }) {
+    eventTracker.convertedFilters(
+      eventName: eventName,
+      attribute: attribute,
+      values: values.toList(),
+    );
+  }
+
 }

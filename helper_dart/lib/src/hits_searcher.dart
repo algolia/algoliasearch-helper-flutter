@@ -4,17 +4,14 @@ import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
-import 'disposable.dart';
+import '../algolia_helper.dart';
 import 'disposable_mixin.dart';
 import 'event_tracker.dart';
-import 'filter_state.dart';
 import 'hits_searcher_service.dart';
 import 'insights.dart';
 import 'lib_version.dart';
 import 'logger.dart';
 import 'search_request.dart';
-import 'search_response.dart';
-import 'search_state.dart';
 
 /// Algolia Helpers main entry point, the component handling search requests
 /// and managing search sessions.
@@ -108,7 +105,7 @@ abstract class HitsSearcher implements Disposable {
       _HitsSearcher(
         applicationID: applicationID,
         apiKey: apiKey,
-        state: SearchState(indexName: indexName),
+        state: SearchState(indexName: indexName, clickAnalytics: true),
         disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
         debounce: debounce,
       );
@@ -124,7 +121,7 @@ abstract class HitsSearcher implements Disposable {
       _HitsSearcher(
         applicationID: applicationID,
         apiKey: apiKey,
-        state: state,
+        state: state.copyWith(clickAnalytics: true),
         disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
         debounce: debounce,
       );
@@ -157,6 +154,9 @@ abstract class HitsSearcher implements Disposable {
 
   /// Get current [SearchState].
   SearchState snapshot();
+
+  /// Get latest [SearchResponse].
+  SearchResponse? get lastResponse;
 
   /// Apply search state configuration.
   void applyState(SearchState Function(SearchState state) config);
@@ -225,7 +225,8 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
       ..add(_responses.connect())
       ..add(
         _responses.listen((value) {
-          eventTracker.trackViews(
+          lastResponse = value;
+          eventTracker.viewedObjects(
             indexName: snapshot().indexName,
             eventName: 'Hits Viewed',
             objectIDs:
@@ -279,6 +280,10 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   @override
   SearchState snapshot() => _request.value.state;
 
+  /// Get latest search response
+  @override
+  SearchResponse? lastResponse;
+
   /// Apply search state configuration.
   @override
   void applyState(SearchState Function(SearchState state) config) {
@@ -312,5 +317,63 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
     _log.fine('HitsSearcher disposed');
     _request.close();
     _subscriptions.cancel();
+  }
+}
+
+extension HitsTracking on HitsSearcher {
+  /// Send a click event to capture clicked items.
+  void clickedObjects({
+    required String eventName,
+    required Iterable<String> objectIDs,
+    required Iterable<int> positions,
+  }) {
+    if (lastResponse?.queryID == null) {
+      eventTracker.clickedObjects(
+        indexName: snapshot().indexName,
+        eventName: eventName,
+        objectIDs: objectIDs,
+      );
+    } else {
+      eventTracker.clickedObjectsAfterSearch(
+        indexName: snapshot().indexName,
+        eventName: eventName,
+        queryID: lastResponse!.queryID!,
+        objectIDs: objectIDs,
+        positions: positions,
+      );
+    }
+  }
+
+  /// Send a conversion event related to an Algolia request.
+  void convertedObjects({
+    required String eventName,
+    required Iterable<String> objectIDs,
+  }) {
+    if (lastResponse?.queryID == null) {
+      eventTracker.convertedObjects(
+        indexName: snapshot().indexName,
+        eventName: eventName,
+        objectIDs: objectIDs,
+      );
+    } else {
+      eventTracker.convertedObjectsAfterSearch(
+        indexName: snapshot().indexName,
+        eventName: eventName,
+        queryID: lastResponse!.queryID!,
+        objectIDs: objectIDs,
+      );
+    }
+  }
+
+  /// Send a view event to capture viewed items.
+  void viewedObjects({
+    required String eventName,
+    required Iterable<String> objectIDs,
+  }) {
+    eventTracker.convertedObjects(
+      indexName: snapshot().indexName,
+      eventName: eventName,
+      objectIDs: objectIDs,
+    );
   }
 }

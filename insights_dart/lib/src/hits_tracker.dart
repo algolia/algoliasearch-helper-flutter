@@ -11,7 +11,7 @@ abstract class HitsTracker {
     required String indexName,
     required String userToken,
   }) =>
-      _HitTracker(
+      _HitsTracker(
         EventsService(
           applicationID: applicationID,
           apiKey: apiKey,
@@ -53,12 +53,12 @@ abstract class HitsTracker {
   void convert(String objectID, {String eventName});
 }
 
-class _HitTracker implements HitsTracker {
+class _HitsTracker implements HitsTracker {
   final EventsService _service;
   final String _indexName;
   final String _userToken;
 
-  _HitTracker(this._service, this._indexName, this._userToken);
+  _HitsTracker(this._service, this._indexName, this._userToken);
 
   @override
   void clickAfterQuery({
@@ -83,6 +83,7 @@ class _HitTracker implements HitsTracker {
   @override
   void click({
     required Iterable<String> objectIDs,
+
     required String eventName,
     DateTime? timestamp,
   }) {

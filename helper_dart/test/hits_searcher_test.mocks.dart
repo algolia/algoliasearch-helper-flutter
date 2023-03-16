@@ -60,7 +60,7 @@ class MockEventTracker extends _i1.Mock implements _i6.EventTracker {
       (super.noSuchMethod(Invocation.getter(#isEnabled), returnValue: false)
           as bool);
   @override
-  void trackClick(
+  void clickedFilter(
           {String? indexName,
           String? eventName,
           String? attribute,
@@ -74,7 +74,7 @@ class MockEventTracker extends _i1.Mock implements _i6.EventTracker {
           }),
           returnValueForMissingStub: null);
   @override
-  void trackClicks(
+  void clickedFilters(
           {String? indexName,
           String? eventName,
           String? attribute,
@@ -88,7 +88,7 @@ class MockEventTracker extends _i1.Mock implements _i6.EventTracker {
           }),
           returnValueForMissingStub: null);
   @override
-  void trackView({String? indexName, String? eventName, String? objectID}) =>
+  void viewedObject({String? indexName, String? eventName, String? objectID}) =>
       super.noSuchMethod(
           Invocation.method(#trackView, [], {
             #indexName: indexName,
@@ -97,7 +97,7 @@ class MockEventTracker extends _i1.Mock implements _i6.EventTracker {
           }),
           returnValueForMissingStub: null);
   @override
-  void trackViews(
+  void viewedObjects(
           {String? indexName, String? eventName, List<String>? objectIDs}) =>
       super.noSuchMethod(
           Invocation.method(#trackViews, [], {
