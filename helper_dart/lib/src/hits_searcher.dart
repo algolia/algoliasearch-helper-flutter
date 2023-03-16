@@ -1,14 +1,13 @@
 import 'dart:async';
 
+import 'package:algolia_insights/algolia_insights.dart';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../algolia_helper.dart';
 import 'disposable_mixin.dart';
-import 'event_tracker.dart';
 import 'hits_searcher_service.dart';
-import 'insights.dart';
 import 'lib_version.dart';
 import 'logger.dart';
 import 'search_request.dart';

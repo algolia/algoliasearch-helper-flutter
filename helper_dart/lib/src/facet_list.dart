@@ -4,13 +4,12 @@ import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:algolia_insights/algolia_insights.dart';
 
 import 'disposable.dart';
 import 'disposable_mixin.dart';
 import 'extensions.dart';
-import 'filter-event-tracker-adapter.dart';
 import 'filter.dart';
-import 'filter_event_tracker.dart';
 import 'filter_group.dart';
 import 'filter_state.dart';
 import 'filters.dart';

@@ -1,4 +1,4 @@
-import 'package:algolia_helper/src/user_token_storage.dart';
+import 'package:algolia_insights/src/user_token_storage.dart';
 import 'package:test/test.dart';
 
 void main() {

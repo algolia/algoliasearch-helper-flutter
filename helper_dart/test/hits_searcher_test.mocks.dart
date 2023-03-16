@@ -6,8 +6,8 @@
 import 'dart:async' as _i4;
 
 import 'package:algolia/algolia.dart' as _i8;
-import 'package:algolia_helper/src/event_service.dart' as _i7;
-import 'package:algolia_helper/src/event_tracker.dart' as _i6;
+import 'package:algolia_insights/src/event_service.dart' as _i7;
+import 'package:algolia_insights/src/event_tracker.dart' as _i6;
 import 'package:algolia_helper/src/hits_searcher_service.dart' as _i3;
 import 'package:algolia_helper/src/search_response.dart' as _i2;
 import 'package:algolia_helper/src/search_state.dart' as _i5;

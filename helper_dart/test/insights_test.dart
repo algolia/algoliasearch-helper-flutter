@@ -1,7 +1,7 @@
 import 'package:algolia/algolia.dart';
-import 'package:algolia_helper/src/event_service.dart';
-import 'package:algolia_helper/src/insights.dart';
-import 'package:algolia_helper/src/user_token_storage.dart';
+import 'package:algolia_insights/src/event_service.dart';
+import '../../insights_dart/lib/src/insights.dart';
+import 'package:algolia_insights/src/user_token_storage.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
