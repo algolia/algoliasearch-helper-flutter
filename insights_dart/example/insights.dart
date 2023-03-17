@@ -12,7 +12,7 @@ void main() {
       eventName: 'CLICK_OBJECT',
       queryID: 'QUERY_ID',
       objectIDs: ['objectID1', 'objectID2', 'objectID3'],
-      positions: [5, 6, 7])
+      positions: [5, 6, 7]);
 
   /// Track hits click event
   insights.clickedObjects(

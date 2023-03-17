@@ -12,7 +12,7 @@ class Insights implements EventTracker {
   bool isEnabled;
 
   /// Service sending event packets
-  EventService service;
+  EventService _service;
 
   static const _maxObjectIDsPerEvent = 20;
   static const _maxFiltersPerEvent = 10;
@@ -56,7 +56,7 @@ class Insights implements EventTracker {
     return insights;
   }
 
-  Insights.custom(this.service, this._userTokenStorage) : isEnabled = true;
+  Insights.custom(this._service, this._userTokenStorage) : isEnabled = true;
 
   @override
   void clickedFilters({
@@ -256,6 +256,6 @@ class Insights implements EventTracker {
     if (!isEnabled) {
       return;
     }
-    service.send(events);
+    _service.send(events);
   }
 }
