@@ -36,9 +36,22 @@ class AlgoliaEventService implements EventService {
       );
 }
 
+extension AlgoliaEventTypeConversion on EventType {
+  AlgoliaEventType toAlgoliaEventType() {
+    switch (this) {
+      case EventType.view:
+        return AlgoliaEventType.view;
+      case EventType.click:
+        return AlgoliaEventType.click;
+      case EventType.conversion:
+        return AlgoliaEventType.conversion;
+    }
+  }
+}
+
 extension AlgoliaEventConversion on Event {
   AlgoliaEvent toAlgoliaEvent() => AlgoliaEvent(
-        eventType: AlgoliaEventType.view,
+        eventType: type.toAlgoliaEventType(),
         eventName: eventName,
         index: indexName,
         userToken: userToken,
