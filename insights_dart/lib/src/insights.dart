@@ -1,6 +1,6 @@
-import 'package:algolia/algolia.dart';
 import 'package:collection/collection.dart';
-import 'algolia_event_service_adapter.dart';
+import 'algolia_event_service.dart';
+import 'event.dart';
 import 'event_service.dart';
 import 'event_tracker.dart';
 import 'user_token_storage.dart';
@@ -49,7 +49,7 @@ class Insights implements EventTracker {
       return _insightsPool[applicationID]!;
     }
     final insights = Insights.custom(
-      AlgoliaEventServiceAdapter(applicationID, apiKey),
+      AlgoliaEventService(applicationID, apiKey),
       UserTokenStorage(),
     );
     _insightsPool[applicationID] = insights;
@@ -64,18 +64,20 @@ class Insights implements EventTracker {
     required String eventName,
     required String attribute,
     required List<String> values,
+    DateTime? timestamp,
   }) {
     final events = values
         .map((value) => '$attribute:$value')
         .toList()
         .slices(_maxFiltersPerEvent)
         .map(
-          (filters) => AlgoliaEvent(
-            eventType: AlgoliaEventType.click,
-            eventName: eventName,
-            index: indexName,
-            userToken: _userTokenStorage.userToken,
-            filters: filters,
+          (filters) => Event.clickFilters(
+            eventName,
+            indexName,
+            userToken,
+            attribute,
+            values,
+            timestamp: timestamp,
           ),
         )
         .toList();
@@ -88,20 +90,22 @@ class Insights implements EventTracker {
     required String eventName,
     required String attribute,
     required List<String> values,
+    DateTime? timestamp,
   }) {
     final events = values
         .map((value) => '$attribute:$value')
         .toList()
         .slices(_maxFiltersPerEvent)
         .map(
-          (filters) => AlgoliaEvent(
-        eventType: AlgoliaEventType.conversion,
-        eventName: eventName,
-        index: indexName,
-        userToken: _userTokenStorage.userToken,
-        filters: filters,
-      ),
-    )
+          (filters) => Event.convertFilters(
+            eventName,
+            indexName,
+            userToken,
+            attribute,
+            values,
+            timestamp: timestamp,
+          ),
+        )
         .toList();
     _send(events);
   }
@@ -112,21 +116,22 @@ class Insights implements EventTracker {
     required String eventName,
     required String attribute,
     required List<String> values,
+    DateTime? timestamp,
   }) {
-
     final events = values
         .map((value) => '$attribute:$value')
         .toList()
         .slices(_maxFiltersPerEvent)
         .map(
-          (filters) => AlgoliaEvent(
-        eventType: AlgoliaEventType.view,
-        eventName: eventName,
-        index: indexName,
-        userToken: _userTokenStorage.userToken,
-        filters: filters,
-      ),
-    )
+          (filters) => Event.viewFilters(
+            eventName,
+            indexName,
+            userToken,
+            attribute,
+            values,
+            timestamp: timestamp,
+          ),
+        )
         .toList();
     _send(events);
   }
@@ -141,12 +146,12 @@ class Insights implements EventTracker {
     final events = objectIDs
         .slices(_maxObjectIDsPerEvent)
         .map(
-          (objectIDs) => AlgoliaEvent(
-            eventType: AlgoliaEventType.click,
-            eventName: eventName,
-            index: indexName,
-            userToken: _userTokenStorage.userToken,
-            objectIDs: objectIDs,
+          (objectIDs) => Event.clickHits(
+            eventName,
+            indexName,
+            userToken,
+            objectIDs,
+            timestamp: timestamp,
           ),
         )
         .toList();
@@ -165,14 +170,14 @@ class Insights implements EventTracker {
     final events = objectIDs
         .slices(_maxObjectIDsPerEvent)
         .map(
-          (objectIDs) => AlgoliaEvent(
-            eventType: AlgoliaEventType.click,
-            eventName: eventName,
-            queryID: queryID,
-            index: indexName,
-            userToken: _userTokenStorage.userToken,
-            objectIDs: objectIDs,
-            positions: positions.toList(),
+          (objectIDs) => Event.clickHitsAfterSearch(
+            eventName,
+            indexName,
+            userToken,
+            queryID,
+            objectIDs,
+            positions,
+            timestamp: timestamp,
           ),
         )
         .toList();
@@ -184,16 +189,17 @@ class Insights implements EventTracker {
     required String indexName,
     required String eventName,
     required List<String> objectIDs,
+    DateTime? timestamp,
   }) {
     final events = objectIDs
         .slices(_maxObjectIDsPerEvent)
         .map(
-          (filters) => AlgoliaEvent(
-            eventType: AlgoliaEventType.view,
-            eventName: eventName,
-            index: indexName,
-            userToken: _userTokenStorage.userToken,
-            objectIDs: objectIDs,
+          (filters) => Event.viewHits(
+            eventName,
+            indexName,
+            userToken,
+            objectIDs,
+            timestamp: timestamp,
           ),
         )
         .toList();
@@ -210,12 +216,12 @@ class Insights implements EventTracker {
     final events = objectIDs
         .slices(_maxObjectIDsPerEvent)
         .map(
-          (objectIDs) => AlgoliaEvent(
-            eventType: AlgoliaEventType.conversion,
-            eventName: eventName,
-            index: indexName,
-            userToken: _userTokenStorage.userToken,
-            objectIDs: objectIDs,
+          (objectIDs) => Event.convertHits(
+            eventName,
+            indexName,
+            userToken,
+            objectIDs,
+            timestamp: timestamp,
           ),
         )
         .toList();
@@ -233,20 +239,20 @@ class Insights implements EventTracker {
     final events = objectIDs
         .slices(_maxObjectIDsPerEvent)
         .map(
-          (objectIDs) => AlgoliaEvent(
-            eventType: AlgoliaEventType.conversion,
-            eventName: eventName,
-            queryID: queryID,
-            index: indexName,
-            userToken: _userTokenStorage.userToken,
-            objectIDs: objectIDs,
+          (objectIDs) => Event.convertHitsAfterSearch(
+            eventName,
+            indexName,
+            userToken,
+            queryID,
+            objectIDs,
+            timestamp: timestamp,
           ),
         )
         .toList();
     _send(events);
   }
 
-  void _send(List<AlgoliaEvent> events) {
+  void _send(List<Event> events) {
     if (!isEnabled) {
       return;
     }

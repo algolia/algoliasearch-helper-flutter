@@ -1,82 +1,15 @@
-abstract class InsightsEvent {
-  String get eventName;
+enum EventType { click, conversion, view }
 
-  String get indexName;
+class Event {
+  EventType type;
 
-  String get userToken;
-
-  DateTime get timestamp;
-}
-
-class HitViewEvent implements InsightsEvent {
-  HitViewEvent({
-    required this.eventName,
-    required this.indexName,
-    required this.userToken,
-    required this.timestamp,
-    required this.objectIDs,
-  });
-
-  @override
   String eventName;
 
-  @override
   String indexName;
 
-  @override
   String userToken;
 
-  @override
-  DateTime timestamp;
-
-  Iterable<String> objectIDs;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is HitViewEvent &&
-          runtimeType == other.runtimeType &&
-          eventName == other.eventName &&
-          indexName == other.indexName &&
-          userToken == other.userToken &&
-          timestamp == other.timestamp &&
-          objectIDs == other.objectIDs;
-
-  @override
-  int get hashCode =>
-      eventName.hashCode ^
-      indexName.hashCode ^
-      userToken.hashCode ^
-      timestamp.hashCode ^
-      objectIDs.hashCode;
-
-  @override
-  String toString() => 'ViewEvent{eventName: $eventName, indexName: $indexName,'
-      ' userToken: $userToken, timestamp: $timestamp, objectIDs: $objectIDs}';
-}
-
-class HitClickEvent implements InsightsEvent {
-  HitClickEvent({
-    required this.eventName,
-    required this.indexName,
-    required this.userToken,
-    required this.timestamp,
-    this.objectIDs,
-    this.positions,
-    this.queryID,
-  });
-
-  @override
-  String eventName;
-
-  @override
-  String indexName;
-
-  @override
-  String userToken;
-
-  @override
-  DateTime timestamp;
+  DateTime? timestamp;
 
   String? queryID;
 
@@ -84,10 +17,159 @@ class HitClickEvent implements InsightsEvent {
 
   Iterable<int>? positions;
 
+  String? attribute;
+
+  Iterable<String>? filterValues;
+
+  Event._(
+    this.type,
+    this.eventName,
+    this.indexName,
+    this.userToken, {
+    this.timestamp,
+    this.queryID,
+    this.objectIDs,
+    this.positions,
+    this.attribute,
+    this.filterValues,
+  });
+
+  Event.clickHitsAfterSearch(
+    String eventName,
+    String indexName,
+    String userToken,
+    String queryID,
+    Iterable<String> objectIDs,
+    Iterable<int> positions, {
+    DateTime? timestamp,
+  }) : this._(
+          EventType.click,
+          eventName,
+          indexName,
+          userToken,
+          timestamp: timestamp,
+          queryID: queryID,
+          positions: positions,
+          objectIDs: objectIDs,
+        );
+
+  Event.clickHits(
+    String eventName,
+    String indexName,
+    String userToken,
+    Iterable<String> objectIDs, {
+    DateTime? timestamp,
+  }) : this._(
+          EventType.click,
+          eventName,
+          indexName,
+          userToken,
+          objectIDs: objectIDs,
+          timestamp: timestamp,
+        );
+
+  Event.convertHitsAfterSearch(
+    String eventName,
+    String indexName,
+    String userToken,
+    String queryID,
+    Iterable<String> objectIDs, {
+    DateTime? timestamp,
+  }) : this._(
+          EventType.conversion,
+          eventName,
+          indexName,
+          userToken,
+          queryID: queryID,
+          objectIDs: objectIDs,
+          timestamp: timestamp,
+        );
+
+  Event.convertHits(
+    String eventName,
+    String indexName,
+    String userToken,
+    Iterable<String> objectIDs, {
+    DateTime? timestamp,
+  }) : this._(
+          EventType.conversion,
+          eventName,
+          indexName,
+          userToken,
+          objectIDs: objectIDs,
+          timestamp: timestamp,
+        );
+
+  Event.viewHits(
+    String eventName,
+    String indexName,
+    String userToken,
+    Iterable<String> objectIDs, {
+    DateTime? timestamp,
+  }) : this._(
+          EventType.view,
+          eventName,
+          indexName,
+          userToken,
+          objectIDs: objectIDs,
+          timestamp: timestamp,
+        );
+
+  Event.clickFilters(
+    String eventName,
+    String indexName,
+    String userToken,
+    String attribute,
+    Iterable<String> values, {
+    DateTime? timestamp,
+  }) : this._(
+          EventType.click,
+          eventName,
+          indexName,
+          userToken,
+          attribute: attribute,
+          filterValues: values,
+          timestamp: timestamp,
+        );
+
+  Event.viewFilters(
+    String eventName,
+    String indexName,
+    String userToken,
+    String attribute,
+    Iterable<String> values, {
+    DateTime? timestamp,
+  }) : this._(
+          EventType.view,
+          eventName,
+          indexName,
+          userToken,
+          attribute: attribute,
+          filterValues: values,
+          timestamp: timestamp,
+        );
+
+  Event.convertFilters(
+    String eventName,
+    String indexName,
+    String userToken,
+    String attribute,
+    Iterable<String> values, {
+    DateTime? timestamp,
+  }) : this._(
+          EventType.conversion,
+          eventName,
+          indexName,
+          userToken,
+          attribute: attribute,
+          filterValues: values,
+          timestamp: timestamp,
+        );
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is HitClickEvent &&
+      other is Event &&
           runtimeType == other.runtimeType &&
           eventName == other.eventName &&
           indexName == other.indexName &&
@@ -95,21 +177,27 @@ class HitClickEvent implements InsightsEvent {
           timestamp == other.timestamp &&
           queryID == other.queryID &&
           objectIDs == other.objectIDs &&
-          positions == other.positions;
+          positions == other.positions &&
+          attribute == other.attribute &&
+          filterValues == other.filterValues;
 
   @override
   int get hashCode =>
+      type.hashCode ^
       eventName.hashCode ^
       indexName.hashCode ^
       userToken.hashCode ^
       timestamp.hashCode ^
       queryID.hashCode ^
       objectIDs.hashCode ^
-      positions.hashCode;
+      positions.hashCode ^
+      attribute.hashCode ^
+      filterValues.hashCode;
 
   @override
   String toString() =>
-      'HitClickEvent{eventName: $eventName, indexName: $indexName, '
+      'Event{type: $type, eventName: $eventName, indexName: $indexName, '
       'userToken: $userToken, timestamp: $timestamp, queryID: $queryID, '
-      'objectIDs: $objectIDs, positions: $positions}';
+      'objectIDs: $objectIDs, positions: $positions, attribute: $attribute, '
+      'filterValues: $filterValues}';
 }

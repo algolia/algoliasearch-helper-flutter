@@ -5,12 +5,12 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i4;
 
-import 'package:algolia/algolia.dart' as _i8;
-import 'package:algolia_insights/src/event_service.dart' as _i7;
-import 'package:algolia_insights/src/event_tracker.dart' as _i6;
 import 'package:algolia_helper/src/hits_searcher_service.dart' as _i3;
 import 'package:algolia_helper/src/search_response.dart' as _i2;
 import 'package:algolia_helper/src/search_state.dart' as _i5;
+import 'package:algolia_insights/src/event.dart' as _i8;
+import 'package:algolia_insights/src/event_service.dart' as _i7;
+import 'package:algolia_insights/src/event_tracker.dart' as _i6;
 import 'package:mockito/mockito.dart' as _i1;
 
 // ignore_for_file: type=lint
@@ -60,27 +60,13 @@ class MockEventTracker extends _i1.Mock implements _i6.EventTracker {
       (super.noSuchMethod(Invocation.getter(#isEnabled), returnValue: false)
           as bool);
   @override
-  void clickedFilter(
-          {String? indexName,
-          String? eventName,
-          String? attribute,
-          String? value}) =>
-      super.noSuchMethod(
-          Invocation.method(#trackClick, [], {
-            #indexName: indexName,
-            #eventName: eventName,
-            #attribute: attribute,
-            #value: value
-          }),
-          returnValueForMissingStub: null);
-  @override
   void clickedFilters(
           {String? indexName,
           String? eventName,
           String? attribute,
           List<String>? values}) =>
       super.noSuchMethod(
-          Invocation.method(#trackClicks, [], {
+          Invocation.method(#clickedFilters, [], {
             #indexName: indexName,
             #eventName: eventName,
             #attribute: attribute,
@@ -88,22 +74,103 @@ class MockEventTracker extends _i1.Mock implements _i6.EventTracker {
           }),
           returnValueForMissingStub: null);
   @override
-  void viewedObject({String? indexName, String? eventName, String? objectID}) =>
+  void viewedFilters(
+          {String? indexName,
+          String? eventName,
+          String? attribute,
+          List<String>? values}) =>
       super.noSuchMethod(
-          Invocation.method(#trackView, [], {
+          Invocation.method(#viewedFilters, [], {
             #indexName: indexName,
             #eventName: eventName,
-            #objectID: objectID
+            #attribute: attribute,
+            #values: values
+          }),
+          returnValueForMissingStub: null);
+  @override
+  void convertedFilters(
+          {String? indexName,
+          String? eventName,
+          String? attribute,
+          List<String>? values}) =>
+      super.noSuchMethod(
+          Invocation.method(#convertedFilters, [], {
+            #indexName: indexName,
+            #eventName: eventName,
+            #attribute: attribute,
+            #values: values
+          }),
+          returnValueForMissingStub: null);
+  @override
+  void clickedObjects(
+          {String? indexName,
+          String? eventName,
+          Iterable<String>? objectIDs,
+          DateTime? timestamp}) =>
+      super.noSuchMethod(
+          Invocation.method(#clickedObjects, [], {
+            #indexName: indexName,
+            #eventName: eventName,
+            #objectIDs: objectIDs,
+            #timestamp: timestamp
+          }),
+          returnValueForMissingStub: null);
+  @override
+  void clickedObjectsAfterSearch(
+          {String? indexName,
+          String? eventName,
+          String? queryID,
+          Iterable<String>? objectIDs,
+          Iterable<int>? positions,
+          DateTime? timestamp}) =>
+      super.noSuchMethod(
+          Invocation.method(#clickedObjectsAfterSearch, [], {
+            #indexName: indexName,
+            #eventName: eventName,
+            #queryID: queryID,
+            #objectIDs: objectIDs,
+            #positions: positions,
+            #timestamp: timestamp
           }),
           returnValueForMissingStub: null);
   @override
   void viewedObjects(
           {String? indexName, String? eventName, List<String>? objectIDs}) =>
       super.noSuchMethod(
-          Invocation.method(#trackViews, [], {
+          Invocation.method(#viewedObjects, [], {
             #indexName: indexName,
             #eventName: eventName,
             #objectIDs: objectIDs
+          }),
+          returnValueForMissingStub: null);
+  @override
+  void convertedObjects(
+          {String? indexName,
+          String? eventName,
+          Iterable<String>? objectIDs,
+          DateTime? timestamp}) =>
+      super.noSuchMethod(
+          Invocation.method(#convertedObjects, [], {
+            #indexName: indexName,
+            #eventName: eventName,
+            #objectIDs: objectIDs,
+            #timestamp: timestamp
+          }),
+          returnValueForMissingStub: null);
+  @override
+  void convertedObjectsAfterSearch(
+          {String? indexName,
+          String? eventName,
+          String? queryID,
+          Iterable<String>? objectIDs,
+          DateTime? timestamp}) =>
+      super.noSuchMethod(
+          Invocation.method(#convertedObjectsAfterSearch, [], {
+            #indexName: indexName,
+            #eventName: eventName,
+            #queryID: queryID,
+            #objectIDs: objectIDs,
+            #timestamp: timestamp
           }),
           returnValueForMissingStub: null);
 }
@@ -117,7 +184,7 @@ class MockEventService extends _i1.Mock implements _i7.EventService {
   }
 
   @override
-  void send(List<_i8.AlgoliaEvent>? events) =>
+  void send(List<_i8.Event>? events) =>
       super.noSuchMethod(Invocation.method(#send, [events]),
           returnValueForMissingStub: null);
 }

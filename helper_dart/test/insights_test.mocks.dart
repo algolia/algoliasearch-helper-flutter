@@ -3,7 +3,7 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:algolia/algolia.dart' as _i3;
+import 'package:algolia_insights/src/event.dart' as _i3;
 import 'package:algolia_insights/src/event_service.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 
@@ -27,7 +27,7 @@ class MockEventService extends _i1.Mock implements _i2.EventService {
   }
 
   @override
-  void send(List<_i3.AlgoliaEvent>? events) =>
+  void send(List<_i3.Event>? events) =>
       super.noSuchMethod(Invocation.method(#send, [events]),
           returnValueForMissingStub: null);
 }
