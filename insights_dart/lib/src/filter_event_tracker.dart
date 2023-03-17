@@ -1,5 +1,3 @@
-import 'event_tracker.dart';
-
 abstract class FilterEventTracker {
   /// Flag that blocks the sending of event packets when set to false
   bool get isEnabled;

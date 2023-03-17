@@ -26,7 +26,6 @@ abstract class EventTracker {
     required List<String> values,
   });
 
-
   /// Track a hit click event.
   /// Optional custom [timestamp] can be provided.
   void clickedObjects({
@@ -68,5 +67,4 @@ abstract class EventTracker {
     required Iterable<String> objectIDs,
     DateTime? timestamp,
   });
-
 }

@@ -1,6 +1,6 @@
 import 'package:algolia/algolia.dart';
+import 'package:algolia_insights/algolia_insights.dart';
 import 'package:algolia_insights/src/event_service.dart';
-import '../../insights_dart/lib/src/insights.dart';
 import 'package:algolia_insights/src/user_token_storage.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';

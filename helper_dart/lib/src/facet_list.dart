@@ -1,10 +1,10 @@
 import 'dart:async';
 
+import 'package:algolia_insights/algolia_insights.dart';
 import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:algolia_insights/algolia_insights.dart';
 
 import 'disposable.dart';
 import 'disposable_mixin.dart';
@@ -134,7 +134,6 @@ abstract class FacetList implements Disposable {
   /// Select/deselect the provided facet value depending on the current
   /// selection state.
   void toggle(String value);
-
 }
 
 /// Elements selection mode.
@@ -361,11 +360,9 @@ class _FacetList with DisposableMixin implements FacetList {
     _log.finest('FacetList disposed');
     _subscriptions.cancel();
   }
-
 }
 
 extension FilterTracking on FacetList {
-
   /// Send a click event to capture when users select filters.
   void clickedFilters({
     required String eventName,
@@ -402,5 +399,4 @@ extension FilterTracking on FacetList {
       values: values.toList(),
     );
   }
-
 }
