@@ -11,7 +11,7 @@ import 'package:test/test.dart';
 
 import 'hits_searcher_test.mocks.dart';
 
-@GenerateMocks([HitsSearchService, EventTracker, EventService])
+@GenerateMocks([HitsSearcher, HitsSearchService, EventTracker, EventService])
 void main() {
   group('Integration tests', () {
     test('Successful search operation', () async {
@@ -284,6 +284,116 @@ void main() {
       'AND (_tags:"unknown") AND ("attributeA":0 TO 1)',
     );
   });
+
+  group('HitsTracking', () {
+    late MockHitsSearcher hitsSearcher;
+    late MockEventTracker eventTracker;
+
+    setUp(() {
+      hitsSearcher = MockHitsSearcher();
+      eventTracker = MockEventTracker();
+      when(hitsSearcher.snapshot())
+          .thenReturn(const SearchState(indexName: 'indexName'));
+      when(hitsSearcher.lastResponse).thenReturn(SearchResponse({'hits': []}));
+      when(hitsSearcher.eventTracker).thenReturn(eventTracker);
+    });
+
+    group('clickedObjects', () {
+      test('calls clickedObjects if queryID is null', () {
+        final objectIDs = ['1', '2'];
+        final positions = [1, 2];
+
+        hitsSearcher.clickedObjects(
+          eventName: 'clickedObjects',
+          objectIDs: objectIDs,
+          positions: positions,
+        );
+
+        verify(eventTracker.clickedObjects(
+          indexName: 'indexName',
+          eventName: 'clickedObjects',
+          objectIDs: objectIDs,
+        )).called(1);
+      });
+
+      test('calls clickedObjectsAfterSearch if queryID is not null', () {
+        final objectIDs = ['1', '2'];
+        final positions = [1, 2];
+        const queryID = '123';
+
+        when(hitsSearcher.lastResponse)
+            .thenReturn(SearchResponse({'queryID': queryID}));
+
+        hitsSearcher.clickedObjects(
+          eventName: 'clickedObjects',
+          objectIDs: objectIDs,
+          positions: positions,
+        );
+
+        verify(eventTracker.clickedObjectsAfterSearch(
+          indexName: 'indexName',
+          eventName: 'clickedObjects',
+          queryID: queryID,
+          objectIDs: objectIDs,
+          positions: positions,
+        )).called(1);
+      });
+    });
+
+    group('convertedObjects', () {
+      test('calls convertedObjects if queryID is null', () {
+        final objectIDs = ['1', '2'];
+
+        hitsSearcher.convertedObjects(
+          eventName: 'convertedObjects',
+          objectIDs: objectIDs,
+        );
+
+        verify(eventTracker.convertedObjects(
+          indexName: 'indexName',
+          eventName: 'convertedObjects',
+          objectIDs: objectIDs,
+        )).called(1);
+      });
+
+      test('calls convertedObjectsAfterSearch if queryID is not null', () {
+        final objectIDs = ['1', '2'];
+        const queryID = '123';
+
+        when(hitsSearcher.lastResponse)
+            .thenReturn(SearchResponse({'queryID': queryID}));
+
+        hitsSearcher.convertedObjects(
+          eventName: 'convertedObjects',
+          objectIDs: objectIDs,
+        );
+
+        verify(eventTracker.convertedObjectsAfterSearch(
+          indexName: 'indexName',
+          eventName: 'convertedObjects',
+          queryID: queryID,
+          objectIDs: objectIDs,
+        )).called(1);
+      });
+    });
+
+    group('viewedObjects', () {
+      test('calls viewedObjects', () {
+        final objectIDs = ['1', '2'];
+
+        hitsSearcher.viewedObjects(
+          eventName: 'viewedObjects',
+          objectIDs: objectIDs,
+        );
+
+        verify(eventTracker.convertedObjects(
+          indexName: 'indexName',
+          eventName: 'viewedObjects',
+          objectIDs: objectIDs,
+        )).called(1);
+      });
+    });
+  });
 }
 
 Future<SearchResponse> mockResponse(Invocation inv) async {
@@ -294,7 +404,7 @@ Future<SearchResponse> mockResponse(Invocation inv) async {
     'hits': [
       {'objectID': 'h1'},
       {'objectID': 'h2'}
-    ]
+    ],
   });
 }
 
