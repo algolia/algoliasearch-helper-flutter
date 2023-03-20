@@ -361,20 +361,24 @@ void main() {
 
     test('clickedFilters', () {
       facetList.clickedFilters(eventName: 'Filter Selected', values: ['red']);
-      verify(eventTracker.clickedFilters(
-        eventName: 'Filter Selected',
-        attribute: 'color',
-        values: ['red'],
-      )).called(1);
+      verify(
+        eventTracker.clickedFilters(
+          eventName: 'Filter Selected',
+          attribute: 'color',
+          values: ['red'],
+        ),
+      ).called(1);
     });
 
     test('viewedFilters', () {
       facetList.viewedFilters(eventName: 'Product View', values: ['green']);
-      verify(eventTracker.viewedFilters(
-        eventName: 'Product View',
-        attribute: 'color',
-        values: ['green'],
-      )).called(1);
+      verify(
+        eventTracker.viewedFilters(
+          eventName: 'Product View',
+          attribute: 'color',
+          values: ['green'],
+        ),
+      ).called(1);
     });
 
     test('convertedFilters', () {
@@ -382,14 +386,15 @@ void main() {
         eventName: 'Conversion',
         values: ['blue', 'green'],
       );
-      verify(eventTracker.convertedFilters(
-        eventName: 'Conversion',
-        attribute: 'color',
-        values: ['blue', 'green'],
-      )).called(1);
+      verify(
+        eventTracker.convertedFilters(
+          eventName: 'Conversion',
+          attribute: 'color',
+          values: ['blue', 'green'],
+        ),
+      ).called(1);
     });
   });
-
 }
 
 HitsSearcher mockHitsSearcher([Map<String, dynamic> json = const {}]) {

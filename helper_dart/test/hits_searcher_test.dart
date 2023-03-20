@@ -309,11 +309,13 @@ void main() {
           positions: positions,
         );
 
-        verify(eventTracker.clickedObjects(
-          indexName: 'indexName',
-          eventName: 'clickedObjects',
-          objectIDs: objectIDs,
-        )).called(1);
+        verify(
+          eventTracker.clickedObjects(
+            indexName: 'indexName',
+            eventName: 'clickedObjects',
+            objectIDs: objectIDs,
+          ),
+        ).called(1);
       });
 
       test('calls clickedObjectsAfterSearch if queryID is not null', () {
@@ -330,13 +332,15 @@ void main() {
           positions: positions,
         );
 
-        verify(eventTracker.clickedObjectsAfterSearch(
-          indexName: 'indexName',
-          eventName: 'clickedObjects',
-          queryID: queryID,
-          objectIDs: objectIDs,
-          positions: positions,
-        )).called(1);
+        verify(
+          eventTracker.clickedObjectsAfterSearch(
+            indexName: 'indexName',
+            eventName: 'clickedObjects',
+            queryID: queryID,
+            objectIDs: objectIDs,
+            positions: positions,
+          ),
+        ).called(1);
       });
     });
 
@@ -349,11 +353,13 @@ void main() {
           objectIDs: objectIDs,
         );
 
-        verify(eventTracker.convertedObjects(
-          indexName: 'indexName',
-          eventName: 'convertedObjects',
-          objectIDs: objectIDs,
-        )).called(1);
+        verify(
+          eventTracker.convertedObjects(
+            indexName: 'indexName',
+            eventName: 'convertedObjects',
+            objectIDs: objectIDs,
+          ),
+        ).called(1);
       });
 
       test('calls convertedObjectsAfterSearch if queryID is not null', () {
@@ -368,12 +374,14 @@ void main() {
           objectIDs: objectIDs,
         );
 
-        verify(eventTracker.convertedObjectsAfterSearch(
-          indexName: 'indexName',
-          eventName: 'convertedObjects',
-          queryID: queryID,
-          objectIDs: objectIDs,
-        )).called(1);
+        verify(
+          eventTracker.convertedObjectsAfterSearch(
+            indexName: 'indexName',
+            eventName: 'convertedObjects',
+            queryID: queryID,
+            objectIDs: objectIDs,
+          ),
+        ).called(1);
       });
     });
 
@@ -386,11 +394,13 @@ void main() {
           objectIDs: objectIDs,
         );
 
-        verify(eventTracker.convertedObjects(
-          indexName: 'indexName',
-          eventName: 'viewedObjects',
-          objectIDs: objectIDs,
-        )).called(1);
+        verify(
+          eventTracker.convertedObjects(
+            indexName: 'indexName',
+            eventName: 'viewedObjects',
+            objectIDs: objectIDs,
+          ),
+        ).called(1);
       });
     });
   });
