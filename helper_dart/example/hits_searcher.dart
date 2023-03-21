@@ -18,4 +18,16 @@ void main() {
   });
 
   searcher.query('a');
+
+  searcher.clickedObjects(
+      eventName: 'clicked objects',
+      objectIDs: ['object1', 'object2', 'object3'],
+      positions: [1, 2, 3],);
+
+  searcher.viewedObjects(
+      eventName: 'viewed objects',
+      objectIDs: ['object1', 'object2', 'object3'],);
+
+  searcher.convertedObjects(eventName: 'converted objects',
+      objectIDs: ['object1', 'object2', 'object3'],);
 }
