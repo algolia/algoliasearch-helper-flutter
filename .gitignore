@@ -30,5 +30,5 @@ migrate_working_dir/
 build/
 
 # Local usertoken storage
-insights_dart/usertoken.hive
-insights_dart/usertoken.lock
+#insights_dart/usertoken.hive
+#insights_dart/usertoken.lock
