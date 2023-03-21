@@ -3,13 +3,15 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i4;
+import 'dart:async' as _i6;
 
-import 'package:algolia_helper/algolia_helper.dart' as _i3;
-import 'package:algolia_helper/src/hits_searcher_service.dart' as _i5;
+import 'package:algolia_helper/src/hits_searcher.dart' as _i5;
+import 'package:algolia_helper/src/hits_searcher_service.dart' as _i7;
+import 'package:algolia_helper/src/search_response.dart' as _i4;
+import 'package:algolia_helper/src/search_state.dart' as _i3;
 import 'package:algolia_insights/algolia_insights.dart' as _i2;
-import 'package:algolia_insights/src/event.dart' as _i7;
-import 'package:algolia_insights/src/event_service.dart' as _i6;
+import 'package:algolia_insights/src/event.dart' as _i9;
+import 'package:algolia_insights/src/event_service.dart' as _i8;
 import 'package:mockito/mockito.dart' as _i1;
 
 // ignore_for_file: type=lint
@@ -34,7 +36,7 @@ class _FakeSearchState_1 extends _i1.SmartFake implements _i3.SearchState {
 }
 
 class _FakeSearchResponse_2 extends _i1.SmartFake
-    implements _i3.SearchResponse {
+    implements _i4.SearchResponse {
   _FakeSearchResponse_2(Object parent, Invocation parentInvocation)
       : super(parent, parentInvocation);
 }
@@ -42,7 +44,7 @@ class _FakeSearchResponse_2 extends _i1.SmartFake
 /// A class which mocks [HitsSearcher].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockHitsSearcher extends _i1.Mock implements _i3.HitsSearcher {
+class MockHitsSearcher extends _i1.Mock implements _i5.HitsSearcher {
   MockHitsSearcher() {
     _i1.throwOnMissingStub(this);
   }
@@ -54,15 +56,15 @@ class MockHitsSearcher extends _i1.Mock implements _i3.HitsSearcher {
                   _FakeEventTracker_0(this, Invocation.getter(#eventTracker)))
           as _i2.EventTracker);
   @override
-  _i4.Stream<_i3.SearchState> get state =>
+  _i6.Stream<_i3.SearchState> get state =>
       (super.noSuchMethod(Invocation.getter(#state),
-              returnValue: _i4.Stream<_i3.SearchState>.empty())
-          as _i4.Stream<_i3.SearchState>);
+              returnValue: _i6.Stream<_i3.SearchState>.empty())
+          as _i6.Stream<_i3.SearchState>);
   @override
-  _i4.Stream<_i3.SearchResponse> get responses =>
+  _i6.Stream<_i4.SearchResponse> get responses =>
       (super.noSuchMethod(Invocation.getter(#responses),
-              returnValue: _i4.Stream<_i3.SearchResponse>.empty())
-          as _i4.Stream<_i3.SearchResponse>);
+              returnValue: _i6.Stream<_i4.SearchResponse>.empty())
+          as _i6.Stream<_i4.SearchResponse>);
   @override
   bool get isDisposed =>
       (super.noSuchMethod(Invocation.getter(#isDisposed), returnValue: false)
@@ -92,18 +94,18 @@ class MockHitsSearcher extends _i1.Mock implements _i3.HitsSearcher {
 /// A class which mocks [HitsSearchService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockHitsSearchService extends _i1.Mock implements _i5.HitsSearchService {
+class MockHitsSearchService extends _i1.Mock implements _i7.HitsSearchService {
   MockHitsSearchService() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Future<_i3.SearchResponse> search(_i3.SearchState? state) =>
+  _i6.Future<_i4.SearchResponse> search(_i3.SearchState? state) =>
       (super.noSuchMethod(Invocation.method(#search, [state]),
-              returnValue: _i4.Future<_i3.SearchResponse>.value(
+              returnValue: _i6.Future<_i4.SearchResponse>.value(
                   _FakeSearchResponse_2(
                       this, Invocation.method(#search, [state]))))
-          as _i4.Future<_i3.SearchResponse>);
+          as _i6.Future<_i4.SearchResponse>);
 }
 
 /// A class which mocks [EventTracker].
@@ -123,13 +125,15 @@ class MockEventTracker extends _i1.Mock implements _i2.EventTracker {
           {String? indexName,
           String? eventName,
           String? attribute,
-          List<String>? values}) =>
+          List<String>? values,
+          DateTime? timestamp}) =>
       super.noSuchMethod(
           Invocation.method(#clickedFilters, [], {
             #indexName: indexName,
             #eventName: eventName,
             #attribute: attribute,
-            #values: values
+            #values: values,
+            #timestamp: timestamp
           }),
           returnValueForMissingStub: null);
   @override
@@ -137,13 +141,15 @@ class MockEventTracker extends _i1.Mock implements _i2.EventTracker {
           {String? indexName,
           String? eventName,
           String? attribute,
-          List<String>? values}) =>
+          List<String>? values,
+          DateTime? timestamp}) =>
       super.noSuchMethod(
           Invocation.method(#viewedFilters, [], {
             #indexName: indexName,
             #eventName: eventName,
             #attribute: attribute,
-            #values: values
+            #values: values,
+            #timestamp: timestamp
           }),
           returnValueForMissingStub: null);
   @override
@@ -151,13 +157,15 @@ class MockEventTracker extends _i1.Mock implements _i2.EventTracker {
           {String? indexName,
           String? eventName,
           String? attribute,
-          List<String>? values}) =>
+          List<String>? values,
+          DateTime? timestamp}) =>
       super.noSuchMethod(
           Invocation.method(#convertedFilters, [], {
             #indexName: indexName,
             #eventName: eventName,
             #attribute: attribute,
-            #values: values
+            #values: values,
+            #timestamp: timestamp
           }),
           returnValueForMissingStub: null);
   @override
@@ -194,12 +202,16 @@ class MockEventTracker extends _i1.Mock implements _i2.EventTracker {
           returnValueForMissingStub: null);
   @override
   void viewedObjects(
-          {String? indexName, String? eventName, List<String>? objectIDs}) =>
+          {String? indexName,
+          String? eventName,
+          List<String>? objectIDs,
+          DateTime? timestamp}) =>
       super.noSuchMethod(
           Invocation.method(#viewedObjects, [], {
             #indexName: indexName,
             #eventName: eventName,
-            #objectIDs: objectIDs
+            #objectIDs: objectIDs,
+            #timestamp: timestamp
           }),
           returnValueForMissingStub: null);
   @override
@@ -237,13 +249,13 @@ class MockEventTracker extends _i1.Mock implements _i2.EventTracker {
 /// A class which mocks [EventService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockEventService extends _i1.Mock implements _i6.EventService {
+class MockEventService extends _i1.Mock implements _i8.EventService {
   MockEventService() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  void send(List<_i7.Event>? events) =>
+  void send(List<_i9.Event>? events) =>
       super.noSuchMethod(Invocation.method(#send, [events]),
           returnValueForMissingStub: null);
 }
