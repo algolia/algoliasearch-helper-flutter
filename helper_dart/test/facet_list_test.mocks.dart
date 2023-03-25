@@ -80,23 +80,23 @@ class MockFilterEventTracker extends _i1.Mock
           as bool);
   @override
   void clickedFilters(
-          {String? eventName, String? attribute, List<String>? values}) =>
+          {String? eventName, List<String>? values, DateTime? timestamp}) =>
       super.noSuchMethod(
           Invocation.method(#clickedFilters, [],
-              {#eventName: eventName, #attribute: attribute, #values: values}),
+              {#eventName: eventName, #values: values, #timestamp: timestamp}),
           returnValueForMissingStub: null);
   @override
   void viewedFilters(
-          {String? eventName, String? attribute, List<String>? values}) =>
+          {String? eventName, List<String>? values, DateTime? timestamp}) =>
       super.noSuchMethod(
           Invocation.method(#viewedFilters, [],
-              {#eventName: eventName, #attribute: attribute, #values: values}),
+              {#eventName: eventName, #values: values, #timestamp: timestamp}),
           returnValueForMissingStub: null);
   @override
   void convertedFilters(
-          {String? eventName, String? attribute, List<String>? values}) =>
+          {String? eventName, List<String>? values, DateTime? timestamp}) =>
       super.noSuchMethod(
           Invocation.method(#convertedFilters, [],
-              {#eventName: eventName, #attribute: attribute, #values: values}),
+              {#eventName: eventName, #values: values, #timestamp: timestamp}),
           returnValueForMissingStub: null);
 }

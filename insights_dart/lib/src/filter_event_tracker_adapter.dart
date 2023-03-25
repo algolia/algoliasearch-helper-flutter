@@ -1,7 +1,8 @@
 import 'event_tracker.dart';
 import 'filter_event_tracker.dart';
 
-/// Wrapper for an EventTracker with associated indexName
+/// Wrapper for an EventTracker with associated indexName and attribute
+/// implementing FilterEventTracker
 class FilterEventTrackerAdapter implements FilterEventTracker {
   /// Underlying EventTracker instance.
   EventTracker tracker;
@@ -9,20 +10,24 @@ class FilterEventTrackerAdapter implements FilterEventTracker {
   /// Name of the index to associate events with.
   String indexName;
 
+  /// Filter attribute to associate events with.
+  String attribute;
+
   @override
   bool isEnabled;
 
   FilterEventTrackerAdapter(
     this.tracker,
-    this.indexName, {
+    this.indexName,
+    this.attribute, {
     this.isEnabled = true,
   });
 
   @override
   void clickedFilters({
     required String eventName,
-    required String attribute,
     required List<String> values,
+    DateTime? timestamp,
   }) {
     if (isEnabled) {
       tracker.clickedFilters(
@@ -30,6 +35,7 @@ class FilterEventTrackerAdapter implements FilterEventTracker {
         eventName: eventName,
         attribute: attribute,
         values: values,
+        timestamp: timestamp,
       );
     }
   }
@@ -37,8 +43,8 @@ class FilterEventTrackerAdapter implements FilterEventTracker {
   @override
   void convertedFilters({
     required String eventName,
-    required String attribute,
     required List<String> values,
+    DateTime? timestamp,
   }) {
     if (isEnabled) {
       tracker.convertedFilters(
@@ -46,6 +52,7 @@ class FilterEventTrackerAdapter implements FilterEventTracker {
         eventName: eventName,
         attribute: attribute,
         values: values,
+        timestamp: timestamp,
       );
     }
   }
@@ -53,8 +60,8 @@ class FilterEventTrackerAdapter implements FilterEventTracker {
   @override
   void viewedFilters({
     required String eventName,
-    required String attribute,
     required List<String> values,
+    DateTime? timestamp,
   }) {
     if (isEnabled) {
       tracker.viewedFilters(
@@ -62,6 +69,7 @@ class FilterEventTrackerAdapter implements FilterEventTracker {
         eventName: eventName,
         attribute: attribute,
         values: values,
+        timestamp: timestamp,
       );
     }
   }

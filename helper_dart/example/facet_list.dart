@@ -46,17 +46,17 @@ void main() {
   // Apply a facet filter
   facetList.toggle('Samuel L. Jackson');
 
-  facetList.clickedFilters(
+  facetList.eventTracker.clickedFilters(
     eventName: 'did click filters',
     values: ['Samuel L. Jackson'],
   );
 
-  facetList.viewedFilters(
+  facetList.eventTracker.viewedFilters(
     eventName: 'viewed filters',
     values: ['Samuel L. Jackson'],
   );
 
-  facetList.convertedFilters(
+  facetList.eventTracker.convertedFilters(
     eventName: 'converted filters',
     values: ['Samuel L. Jackson'],
   );

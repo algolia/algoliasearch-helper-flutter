@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:algolia/algolia.dart';
 import 'package:algolia_helper/algolia_helper.dart';
 import 'package:algolia_helper/src/hits_searcher_service.dart';
+import 'package:algolia_insights/algolia_insights.dart';
 import 'package:algolia_insights/src/event_service.dart';
 import 'package:algolia_insights/src/event_tracker.dart';
 import 'package:mockito/annotations.dart';
@@ -11,7 +12,13 @@ import 'package:test/test.dart';
 
 import 'hits_searcher_test.mocks.dart';
 
-@GenerateMocks([HitsSearcher, HitsSearchService, EventTracker, EventService])
+@GenerateMocks([
+  HitsSearcher,
+  HitsSearchService,
+  EventTracker,
+  HitsEventTracker,
+  EventService,
+])
 void main() {
   group('Integration tests', () {
     test('Successful search operation', () async {
@@ -45,7 +52,7 @@ void main() {
       final searchService = MockHitsSearchService();
       final initial = SearchResponse(const {});
       when(searchService.search(any)).thenAnswer((_) => Future.value(initial));
-      final eventTracker = MockEventTracker();
+      final eventTracker = MockHitsEventTracker();
       final searcher = HitsSearcher.custom(
         searchService,
         eventTracker,
@@ -57,7 +64,7 @@ void main() {
 
     test('Should emit response after query', () async {
       final searchService = MockHitsSearchService();
-      final eventTracker = MockEventTracker();
+      final eventTracker = MockHitsEventTracker();
       final searcher = HitsSearcher.custom(
         searchService,
         eventTracker,
@@ -75,7 +82,7 @@ void main() {
       final searchService = MockHitsSearchService();
       when(searchService.search(any))
           .thenAnswer((_) => Future.value(SearchResponse({})));
-      final eventTracker = MockEventTracker();
+      final eventTracker = MockHitsEventTracker();
       final searcher = HitsSearcher.custom(
         searchService,
         eventTracker,
@@ -92,7 +99,7 @@ void main() {
     test('Should debounce search state', () async {
       final searchService = MockHitsSearchService();
       when(searchService.search(any)).thenAnswer(mockResponse);
-      final eventTracker = MockEventTracker();
+      final eventTracker = MockHitsEventTracker();
 
       final searcher = HitsSearcher.custom(
         searchService,
@@ -116,7 +123,7 @@ void main() {
     test("Shouldn't debounce search state", () async {
       final searchService = MockHitsSearchService();
       when(searchService.search(any)).thenAnswer(mockResponse);
-      final eventTracker = MockEventTracker();
+      final eventTracker = MockHitsEventTracker();
 
       final searcher = HitsSearcher.custom(
         searchService,
@@ -147,7 +154,7 @@ void main() {
     test('Should discard old requests', () async {
       final searchService = MockHitsSearchService();
       when(searchService.search(any)).thenAnswer(mockResponse);
-      final eventTracker = MockEventTracker();
+      final eventTracker = MockHitsEventTracker();
 
       final searcher = HitsSearcher.custom(
         searchService,
@@ -173,7 +180,7 @@ void main() {
     test('Should rerun requests', () async {
       final searchService = MockHitsSearchService();
       when(searchService.search(any)).thenAnswer(mockResponse);
-      final eventTracker = MockEventTracker();
+      final eventTracker = MockHitsEventTracker();
 
       final searcher = HitsSearcher.custom(
         searchService,
@@ -206,7 +213,7 @@ void main() {
     final searchService = MockHitsSearchService();
     when(searchService.search(any)).thenAnswer(mockResponse);
 
-    final eventTracker = MockEventTracker();
+    final eventTracker = MockHitsEventTracker();
     when(eventTracker.viewedObjects()).thenAnswer((realInvocation) {
       expect(realInvocation.positionalArguments[0], 'Hits Viewed');
       expect(realInvocation.positionalArguments[1], ['h1', 'h2']);
@@ -226,7 +233,7 @@ void main() {
   test('FilterState connect HitsSearcher', () async {
     final searchService = MockHitsSearchService();
     when(searchService.search(any)).thenAnswer(mockResponse);
-    final eventTracker = MockEventTracker();
+    final eventTracker = MockHitsEventTracker();
 
     const initSearchState = SearchState(indexName: 'myIndex');
     final searcher = HitsSearcher.custom(
@@ -287,11 +294,11 @@ void main() {
 
   group('HitsTracking', () {
     late MockHitsSearcher hitsSearcher;
-    late MockEventTracker eventTracker;
+    late MockHitsEventTracker eventTracker;
 
     setUp(() {
       hitsSearcher = MockHitsSearcher();
-      eventTracker = MockEventTracker();
+      eventTracker = MockHitsEventTracker();
       when(hitsSearcher.snapshot())
           .thenReturn(const SearchState(indexName: 'indexName'));
       when(hitsSearcher.lastResponse).thenReturn(SearchResponse({'hits': []}));
@@ -311,7 +318,6 @@ void main() {
 
         verify(
           eventTracker.clickedObjects(
-            indexName: 'indexName',
             eventName: 'clickedObjects',
             objectIDs: objectIDs,
           ),
@@ -334,7 +340,6 @@ void main() {
 
         verify(
           eventTracker.clickedObjectsAfterSearch(
-            indexName: 'indexName',
             eventName: 'clickedObjects',
             queryID: queryID,
             objectIDs: objectIDs,
@@ -355,7 +360,6 @@ void main() {
 
         verify(
           eventTracker.convertedObjects(
-            indexName: 'indexName',
             eventName: 'convertedObjects',
             objectIDs: objectIDs,
           ),
@@ -376,7 +380,6 @@ void main() {
 
         verify(
           eventTracker.convertedObjectsAfterSearch(
-            indexName: 'indexName',
             eventName: 'convertedObjects',
             queryID: queryID,
             objectIDs: objectIDs,
@@ -396,7 +399,6 @@ void main() {
 
         verify(
           eventTracker.convertedObjects(
-            indexName: 'indexName',
             eventName: 'viewedObjects',
             objectIDs: objectIDs,
           ),

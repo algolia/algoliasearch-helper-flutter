@@ -25,8 +25,9 @@ import 'package:mockito/mockito.dart' as _i1;
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-class _FakeEventTracker_0 extends _i1.SmartFake implements _i2.EventTracker {
-  _FakeEventTracker_0(Object parent, Invocation parentInvocation)
+class _FakeHitsEventTracker_0 extends _i1.SmartFake
+    implements _i2.HitsEventTracker {
+  _FakeHitsEventTracker_0(Object parent, Invocation parentInvocation)
       : super(parent, parentInvocation);
 }
 
@@ -50,11 +51,11 @@ class MockHitsSearcher extends _i1.Mock implements _i5.HitsSearcher {
   }
 
   @override
-  _i2.EventTracker get eventTracker =>
-      (super.noSuchMethod(Invocation.getter(#eventTracker),
-              returnValue:
-                  _FakeEventTracker_0(this, Invocation.getter(#eventTracker)))
-          as _i2.EventTracker);
+  _i2.HitsEventTracker get eventTracker => (super.noSuchMethod(
+          Invocation.getter(#eventTracker),
+          returnValue:
+              _FakeHitsEventTracker_0(this, Invocation.getter(#eventTracker)))
+      as _i2.HitsEventTracker);
   @override
   _i6.Stream<_i3.SearchState> get state =>
       (super.noSuchMethod(Invocation.getter(#state),
@@ -238,6 +239,84 @@ class MockEventTracker extends _i1.Mock implements _i2.EventTracker {
       super.noSuchMethod(
           Invocation.method(#convertedObjectsAfterSearch, [], {
             #indexName: indexName,
+            #eventName: eventName,
+            #queryID: queryID,
+            #objectIDs: objectIDs,
+            #timestamp: timestamp
+          }),
+          returnValueForMissingStub: null);
+}
+
+/// A class which mocks [HitsEventTracker].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockHitsEventTracker extends _i1.Mock implements _i2.HitsEventTracker {
+  MockHitsEventTracker() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  bool get isEnabled =>
+      (super.noSuchMethod(Invocation.getter(#isEnabled), returnValue: false)
+          as bool);
+  @override
+  void clickedObjects(
+          {String? eventName,
+          Iterable<String>? objectIDs,
+          DateTime? timestamp}) =>
+      super.noSuchMethod(
+          Invocation.method(#clickedObjects, [], {
+            #eventName: eventName,
+            #objectIDs: objectIDs,
+            #timestamp: timestamp
+          }),
+          returnValueForMissingStub: null);
+  @override
+  void clickedObjectsAfterSearch(
+          {String? eventName,
+          String? queryID,
+          Iterable<String>? objectIDs,
+          Iterable<int>? positions,
+          DateTime? timestamp}) =>
+      super.noSuchMethod(
+          Invocation.method(#clickedObjectsAfterSearch, [], {
+            #eventName: eventName,
+            #queryID: queryID,
+            #objectIDs: objectIDs,
+            #positions: positions,
+            #timestamp: timestamp
+          }),
+          returnValueForMissingStub: null);
+  @override
+  void viewedObjects(
+          {String? eventName, List<String>? objectIDs, DateTime? timestamp}) =>
+      super.noSuchMethod(
+          Invocation.method(#viewedObjects, [], {
+            #eventName: eventName,
+            #objectIDs: objectIDs,
+            #timestamp: timestamp
+          }),
+          returnValueForMissingStub: null);
+  @override
+  void convertedObjects(
+          {String? eventName,
+          Iterable<String>? objectIDs,
+          DateTime? timestamp}) =>
+      super.noSuchMethod(
+          Invocation.method(#convertedObjects, [], {
+            #eventName: eventName,
+            #objectIDs: objectIDs,
+            #timestamp: timestamp
+          }),
+          returnValueForMissingStub: null);
+  @override
+  void convertedObjectsAfterSearch(
+          {String? eventName,
+          String? queryID,
+          Iterable<String>? objectIDs,
+          DateTime? timestamp}) =>
+      super.noSuchMethod(
+          Invocation.method(#convertedObjectsAfterSearch, [], {
             #eventName: eventName,
             #queryID: queryID,
             #objectIDs: objectIDs,

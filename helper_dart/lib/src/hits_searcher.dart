@@ -212,6 +212,7 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   ]) : this._(
           searchService,
           eventTracker,
+          HitsEventTrackerAdapter(eventTracker, state.indexName),
           BehaviorSubject.seeded(SearchRequest(state)),
           debounce,
         );
@@ -220,6 +221,7 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   _HitsSearcher._(
     this.searchService,
     this.eventTracker,
+    this.hitsEventTracker,
     this._request,
     this.debounce,
   ) {
@@ -229,10 +231,10 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
         _responses.listen((value) {
           lastResponse = value;
           eventTracker.viewedObjects(
-            indexName: snapshot().indexName,
             eventName: 'Hits Viewed',
             objectIDs:
                 value.hits.map((hit) => hit['objectID'].toString()).toList(),
+            indexName: snapshot().indexName,
           );
         }),
       );
@@ -252,6 +254,8 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
 
   @override
   final EventTracker eventTracker;
+
+  final HitsEventTracker hitsEventTracker;
 
   /// Search state debounce duration
   final Duration debounce;
@@ -329,21 +333,19 @@ extension HitsTracking on HitsSearcher {
     required Iterable<String> objectIDs,
     required Iterable<int> positions,
   }) {
-    if (lastResponse?.queryID == null) {
-      eventTracker.clickedObjects(
-        indexName: snapshot().indexName,
-        eventName: eventName,
-        objectIDs: objectIDs,
-      );
-    } else {
-      eventTracker.clickedObjectsAfterSearch(
-        indexName: snapshot().indexName,
-        eventName: eventName,
-        queryID: lastResponse!.queryID!,
-        objectIDs: objectIDs,
-        positions: positions,
-      );
-    }
+    // if (lastResponse?.queryID == null) {
+    //   eventTracker.clickedObjects(
+    //     eventName: eventName,
+    //     objectIDs: objectIDs,
+    //   );
+    // } else {
+    //   eventTracker.clickedObjectsAfterSearch(
+    //     eventName: eventName,
+    //     queryID: lastResponse!.queryID!,
+    //     objectIDs: objectIDs,
+    //     positions: positions,
+    //   );
+    // }
   }
 
   /// Send a conversion event related to an Algolia request.
@@ -351,20 +353,18 @@ extension HitsTracking on HitsSearcher {
     required String eventName,
     required Iterable<String> objectIDs,
   }) {
-    if (lastResponse?.queryID == null) {
-      eventTracker.convertedObjects(
-        indexName: snapshot().indexName,
-        eventName: eventName,
-        objectIDs: objectIDs,
-      );
-    } else {
-      eventTracker.convertedObjectsAfterSearch(
-        indexName: snapshot().indexName,
-        eventName: eventName,
-        queryID: lastResponse!.queryID!,
-        objectIDs: objectIDs,
-      );
-    }
+    // if (lastResponse?.queryID == null) {
+    //   eventTracker.convertedObjects(
+    //     eventName: eventName,
+    //     objectIDs: objectIDs,
+    //   );
+    // } else {
+    //   eventTracker.convertedObjectsAfterSearch(
+    //     eventName: eventName,
+    //     queryID: lastResponse!.queryID!,
+    //     objectIDs: objectIDs,
+    //   );
+    // }
   }
 
   /// Send a view event to capture viewed items.
@@ -372,10 +372,9 @@ extension HitsTracking on HitsSearcher {
     required String eventName,
     required Iterable<String> objectIDs,
   }) {
-    eventTracker.convertedObjects(
-      indexName: snapshot().indexName,
-      eventName: eventName,
-      objectIDs: objectIDs,
-    );
+    // eventTracker.convertedObjects(
+    //   eventName: eventName,
+    //   objectIDs: objectIDs,
+    // );
   }
 }

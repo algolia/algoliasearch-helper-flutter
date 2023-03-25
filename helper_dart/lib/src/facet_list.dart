@@ -94,6 +94,7 @@ abstract class FacetList implements Disposable {
         eventTracker: FilterEventTrackerAdapter(
           searcher.eventTracker,
           searcher.snapshot().indexName,
+          attribute,
         ),
       );
 
@@ -116,6 +117,7 @@ abstract class FacetList implements Disposable {
         eventTracker: FilterEventTrackerAdapter(
           searcher.eventTracker,
           searcher.snapshot().indexName,
+          attribute,
         ),
       );
 
@@ -306,7 +308,6 @@ class _FacetList with DisposableMixin implements FacetList {
       if (!selections.contains(selection)) {
         eventTracker.clickedFilters(
           eventName: 'Filter Applied',
-          attribute: attribute,
           values: [selection],
         );
       }
@@ -359,44 +360,5 @@ class _FacetList with DisposableMixin implements FacetList {
   void doDispose() {
     _log.finest('FacetList disposed');
     _subscriptions.cancel();
-  }
-}
-
-extension FilterTracking on FacetList {
-  /// Send a click event to capture when users select filters.
-  void clickedFilters({
-    required String eventName,
-    required Iterable<String> values,
-  }) {
-    eventTracker.clickedFilters(
-      eventName: eventName,
-      attribute: attribute,
-      values: values.toList(),
-    );
-  }
-
-  /// Send a view event to capture the active filters for items a user viewed.
-  void viewedFilters({
-    required String eventName,
-    required Iterable<String> values,
-  }) {
-    eventTracker.viewedFilters(
-      eventName: eventName,
-      attribute: attribute,
-      values: values.toList(),
-    );
-  }
-
-  /// Send a conversion event to capture the filters a user selected
-  /// when converting.
-  void convertedFilters({
-    required String eventName,
-    required Iterable<String> values,
-  }) {
-    eventTracker.convertedFilters(
-      eventName: eventName,
-      attribute: attribute,
-      values: values.toList(),
-    );
   }
 }
