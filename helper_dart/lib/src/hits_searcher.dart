@@ -143,7 +143,7 @@ abstract class HitsSearcher implements Disposable {
         debounce,
       );
 
-  EventTracker get eventTracker;
+  HitsEventTracker get eventTracker;
 
   /// Search state stream
   Stream<SearchState> get state;
@@ -211,8 +211,7 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
     Duration debounce = const Duration(milliseconds: 100),
   ]) : this._(
           searchService,
-          eventTracker,
-          HitsEventTrackerAdapter(eventTracker, state.indexName),
+          HitsEventTracker(eventTracker, state.indexName),
           BehaviorSubject.seeded(SearchRequest(state)),
           debounce,
         );
@@ -221,7 +220,6 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   _HitsSearcher._(
     this.searchService,
     this.eventTracker,
-    this.hitsEventTracker,
     this._request,
     this.debounce,
   ) {
@@ -230,12 +228,13 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
       ..add(
         _responses.listen((value) {
           lastResponse = value;
-          eventTracker.viewedObjects(
-            eventName: 'Hits Viewed',
-            objectIDs:
-                value.hits.map((hit) => hit['objectID'].toString()).toList(),
-            indexName: snapshot().indexName,
-          );
+          eventTracker
+            ..queryID = value.queryID
+            ..viewedObjects(
+              eventName: 'Hits Viewed',
+              objectIDs:
+                  value.hits.map((hit) => hit['objectID'].toString()).toList(),
+            );
         }),
       );
   }
@@ -253,9 +252,7 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   final HitsSearchService searchService;
 
   @override
-  final EventTracker eventTracker;
-
-  final HitsEventTracker hitsEventTracker;
+  final HitsEventTracker eventTracker;
 
   /// Search state debounce duration
   final Duration debounce;
@@ -323,58 +320,5 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
     _log.fine('HitsSearcher disposed');
     _request.close();
     _subscriptions.cancel();
-  }
-}
-
-extension HitsTracking on HitsSearcher {
-  /// Send a click event to capture clicked items.
-  void clickedObjects({
-    required String eventName,
-    required Iterable<String> objectIDs,
-    required Iterable<int> positions,
-  }) {
-    // if (lastResponse?.queryID == null) {
-    //   eventTracker.clickedObjects(
-    //     eventName: eventName,
-    //     objectIDs: objectIDs,
-    //   );
-    // } else {
-    //   eventTracker.clickedObjectsAfterSearch(
-    //     eventName: eventName,
-    //     queryID: lastResponse!.queryID!,
-    //     objectIDs: objectIDs,
-    //     positions: positions,
-    //   );
-    // }
-  }
-
-  /// Send a conversion event related to an Algolia request.
-  void convertedObjects({
-    required String eventName,
-    required Iterable<String> objectIDs,
-  }) {
-    // if (lastResponse?.queryID == null) {
-    //   eventTracker.convertedObjects(
-    //     eventName: eventName,
-    //     objectIDs: objectIDs,
-    //   );
-    // } else {
-    //   eventTracker.convertedObjectsAfterSearch(
-    //     eventName: eventName,
-    //     queryID: lastResponse!.queryID!,
-    //     objectIDs: objectIDs,
-    //   );
-    // }
-  }
-
-  /// Send a view event to capture viewed items.
-  void viewedObjects({
-    required String eventName,
-    required Iterable<String> objectIDs,
-  }) {
-    // eventTracker.convertedObjects(
-    //   eventName: eventName,
-    //   objectIDs: objectIDs,
-    // );
   }
 }

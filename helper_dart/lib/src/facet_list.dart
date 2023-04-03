@@ -91,8 +91,8 @@ abstract class FacetList implements Disposable {
         groupID: FilterGroupID(attribute, operator),
         selectionMode: selectionMode,
         persistent: persistent,
-        eventTracker: FilterEventTrackerAdapter(
-          searcher.eventTracker,
+        eventTracker: FilterEventTracker(
+          searcher.eventTracker.tracker,
           searcher.snapshot().indexName,
           attribute,
         ),
@@ -114,8 +114,8 @@ abstract class FacetList implements Disposable {
         groupID: groupID,
         selectionMode: selectionMode,
         persistent: persistent,
-        eventTracker: FilterEventTrackerAdapter(
-          searcher.eventTracker,
+        eventTracker: FilterEventTracker(
+          searcher.eventTracker.tracker,
           searcher.snapshot().indexName,
           attribute,
         ),

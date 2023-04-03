@@ -28,6 +28,11 @@ class _FakeFilterEventTracker_0 extends _i1.SmartFake
       : super(parent, parentInvocation);
 }
 
+class _FakeEventTracker_1 extends _i1.SmartFake implements _i2.EventTracker {
+  _FakeEventTracker_1(Object parent, Invocation parentInvocation)
+      : super(parent, parentInvocation);
+}
+
 /// A class which mocks [FacetList].
 ///
 /// See the documentation for Mockito's code generation for more information.
@@ -75,9 +80,38 @@ class MockFilterEventTracker extends _i1.Mock
   }
 
   @override
+  _i2.EventTracker get tracker => (super.noSuchMethod(
+          Invocation.getter(#tracker),
+          returnValue: _FakeEventTracker_1(this, Invocation.getter(#tracker)))
+      as _i2.EventTracker);
+  @override
+  set tracker(_i2.EventTracker? _tracker) =>
+      super.noSuchMethod(Invocation.setter(#tracker, _tracker),
+          returnValueForMissingStub: null);
+  @override
+  String get indexName =>
+      (super.noSuchMethod(Invocation.getter(#indexName), returnValue: '')
+          as String);
+  @override
+  set indexName(String? _indexName) =>
+      super.noSuchMethod(Invocation.setter(#indexName, _indexName),
+          returnValueForMissingStub: null);
+  @override
+  String get attribute =>
+      (super.noSuchMethod(Invocation.getter(#attribute), returnValue: '')
+          as String);
+  @override
+  set attribute(String? _attribute) =>
+      super.noSuchMethod(Invocation.setter(#attribute, _attribute),
+          returnValueForMissingStub: null);
+  @override
   bool get isEnabled =>
       (super.noSuchMethod(Invocation.getter(#isEnabled), returnValue: false)
           as bool);
+  @override
+  set isEnabled(bool? _isEnabled) =>
+      super.noSuchMethod(Invocation.setter(#isEnabled, _isEnabled),
+          returnValueForMissingStub: null);
   @override
   void clickedFilters(
           {String? eventName, List<String>? values, DateTime? timestamp}) =>
@@ -86,17 +120,17 @@ class MockFilterEventTracker extends _i1.Mock
               {#eventName: eventName, #values: values, #timestamp: timestamp}),
           returnValueForMissingStub: null);
   @override
-  void viewedFilters(
-          {String? eventName, List<String>? values, DateTime? timestamp}) =>
-      super.noSuchMethod(
-          Invocation.method(#viewedFilters, [],
-              {#eventName: eventName, #values: values, #timestamp: timestamp}),
-          returnValueForMissingStub: null);
-  @override
   void convertedFilters(
           {String? eventName, List<String>? values, DateTime? timestamp}) =>
       super.noSuchMethod(
           Invocation.method(#convertedFilters, [],
+              {#eventName: eventName, #values: values, #timestamp: timestamp}),
+          returnValueForMissingStub: null);
+  @override
+  void viewedFilters(
+          {String? eventName, List<String>? values, DateTime? timestamp}) =>
+      super.noSuchMethod(
+          Invocation.method(#viewedFilters, [],
               {#eventName: eventName, #values: values, #timestamp: timestamp}),
           returnValueForMissingStub: null);
 }
