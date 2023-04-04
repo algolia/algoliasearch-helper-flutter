@@ -114,10 +114,11 @@ void main() {
       });
 
       insights.clickedFilters(
-          indexName: 'test_index',
-          eventName: 'test_event',
-          attribute: 'test_attribute',
-          values: ['value1', 'value2']);
+        indexName: 'test_index',
+        eventName: 'test_event',
+        attribute: 'test_attribute',
+        values: ['value1', 'value2'],
+      );
 
       final expectedEvent = Event.clickFilters(
         'test_event',
@@ -139,10 +140,11 @@ void main() {
       });
 
       insights.convertedFilters(
-          indexName: 'test_index',
-          eventName: 'test_event',
-          attribute: 'test_attribute',
-          values: ['value1', 'value2']);
+        indexName: 'test_index',
+        eventName: 'test_event',
+        attribute: 'test_attribute',
+        values: ['value1', 'value2'],
+      );
 
       final expectedEvent = Event.convertFilters(
         'test_event',
@@ -164,10 +166,11 @@ void main() {
       });
 
       insights.viewedFilters(
-          indexName: 'test_index',
-          eventName: 'test_event',
-          attribute: 'test_attribute',
-          values: ['value1', 'value2']);
+        indexName: 'test_index',
+        eventName: 'test_event',
+        attribute: 'test_attribute',
+        values: ['value1', 'value2'],
+      );
 
       final expectedEvent = Event.viewFilters(
         'test_event',
@@ -305,9 +308,7 @@ void main() {
 
       expect(capturedEvent, expectedEvent);
     });
-
   });
-
 }
 
 class EventMatcher extends Matcher {

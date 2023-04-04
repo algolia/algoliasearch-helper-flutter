@@ -1,5 +1,5 @@
-import 'event_tracker.dart';
 import 'event_data_delegate.dart';
+import 'event_tracker.dart';
 
 /// Wrapper for an EventTracker with associated indexName and attribute
 class FilterEventTracker {

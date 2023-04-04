@@ -47,7 +47,6 @@ void main() {
     expect(storage.read(), completion(isNull));
   });
 
-
   test('check expired user token nullified', () async {
     final userTokenStorage = UserTokenStorage()
       ..allowPersistentUserTokenStorage = true
@@ -56,5 +55,4 @@ void main() {
     final storedUserToken = await userTokenStorage.read();
     expect(storedUserToken, null);
   });
-
 }

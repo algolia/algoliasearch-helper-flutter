@@ -8,11 +8,13 @@ void main() {
   insights.userToken = 'MY_USER_TOKEN';
 
   /// Track hits click event after search
-  insights.clickedObjectsAfterSearch(indexName: 'MY_INDEX_NAME',
-      eventName: 'CLICK_OBJECT',
-      queryID: 'QUERY_ID',
-      objectIDs: ['objectID1', 'objectID2', 'objectID3'],
-      positions: [5, 6, 7]);
+  insights.clickedObjectsAfterSearch(
+    indexName: 'MY_INDEX_NAME',
+    eventName: 'CLICK_OBJECT',
+    queryID: 'QUERY_ID',
+    objectIDs: ['objectID1', 'objectID2', 'objectID3'],
+    positions: [5, 6, 7],
+  );
 
   /// Track hits click event
   insights.clickedObjects(
@@ -22,20 +24,26 @@ void main() {
   );
 
   /// Track hits conversion event after search
-  insights.convertedObjectsAfterSearch(indexName: 'MY_INDEX_NAME',
+  insights.convertedObjectsAfterSearch(
+    indexName: 'MY_INDEX_NAME',
     eventName: 'CLICK_OBJECT',
     queryID: 'QUERY_ID',
-    objectIDs: ['objectID1', 'objectID2', 'objectID3'],);
+    objectIDs: ['objectID1', 'objectID2', 'objectID3'],
+  );
 
   /// Track hits conversion event
-  insights.convertedObjects(indexName: 'MY_INDEX_NAME',
+  insights.convertedObjects(
+    indexName: 'MY_INDEX_NAME',
     eventName: 'CLICK_OBJECT',
-    objectIDs: ['objectID1', 'objectID2', 'objectID3'],);
+    objectIDs: ['objectID1', 'objectID2', 'objectID3'],
+  );
 
   /// Track hits view event
-  insights.viewedObjects(indexName: 'MY_INDEX_NAME',
+  insights.viewedObjects(
+    indexName: 'MY_INDEX_NAME',
     eventName: 'CLICK_OBJECT',
-    objectIDs: ['objectID1', 'objectID2', 'objectID3'],);
+    objectIDs: ['objectID1', 'objectID2', 'objectID3'],
+  );
 
   /// Track filters click event
   insights.clickedFilters(

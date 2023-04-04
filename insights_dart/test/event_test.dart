@@ -151,6 +151,6 @@ void main() {
       expect(event.timestamp, equals(timestamp));
       expect(event.attribute, equals(attribute));
       expect(event.filterValues, equals(filterValues));
+    });
   });
-});
 }
