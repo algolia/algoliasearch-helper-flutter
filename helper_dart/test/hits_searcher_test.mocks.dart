@@ -71,6 +71,10 @@ class MockHitsSearcher extends _i1.Mock implements _i5.HitsSearcher {
       (super.noSuchMethod(Invocation.getter(#isDisposed), returnValue: false)
           as bool);
   @override
+  String get indexName =>
+      (super.noSuchMethod(Invocation.getter(#indexName), returnValue: '')
+          as String);
+  @override
   void query(String? query) =>
       super.noSuchMethod(Invocation.method(#query, [query]),
           returnValueForMissingStub: null);

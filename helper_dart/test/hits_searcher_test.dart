@@ -306,6 +306,42 @@ void main() {
       );
     });
 
+    test('event index name change', () {
+      final objectIDs = ['1', '2'];
+
+      hitsSearcher
+          .applyState((state) => state.copyWith(indexName: 'indexName_asc'));
+
+      hitsSearcher.eventTracker.clickedObjects(
+        eventName: 'clickedObjects',
+        objectIDs: objectIDs,
+      );
+
+      verify(
+        eventTracker.clickedObjects(
+          indexName: 'indexName_asc',
+          eventName: 'clickedObjects',
+          objectIDs: objectIDs,
+        ),
+      ).called(1);
+
+      hitsSearcher
+          .applyState((state) => state.copyWith(indexName: 'indexName_desc'));
+
+      hitsSearcher.eventTracker.clickedObjects(
+        eventName: 'clickedObjects',
+        objectIDs: objectIDs,
+      );
+
+      verify(
+        eventTracker.clickedObjects(
+          indexName: 'indexName_desc',
+          eventName: 'clickedObjects',
+          objectIDs: objectIDs,
+        ),
+      ).called(1);
+    });
+
     group('clickedObjects', () {
       test('calls clickedObjects if queryID is null', () {
         final objectIDs = ['1', '2'];
@@ -331,7 +367,8 @@ void main() {
         final positions = [1, 3];
         const queryID = '123';
 
-        hitsSearcher.eventTracker.queryID = queryID;
+        hitsSearcher.query('query');
+        await expectLater(hitsSearcher.responses, emits(matchesQuery('query')));
 
         hitsSearcher.eventTracker.clickedObjects(
           eventName: 'clickedObjects',
@@ -369,11 +406,13 @@ void main() {
         ).called(1);
       });
 
-      test('calls convertedObjectsAfterSearch if queryID is not null', () {
+      test('calls convertedObjectsAfterSearch if queryID is not null',
+          () async {
         final objectIDs = ['1', '2'];
         const queryID = '123';
 
-        hitsSearcher.eventTracker.queryID = queryID;
+        hitsSearcher.query('query');
+        await expectLater(hitsSearcher.responses, emits(matchesQuery('query')));
 
         hitsSearcher.eventTracker.convertedObjects(
           eventName: 'convertedObjects',

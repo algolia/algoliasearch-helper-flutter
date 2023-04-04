@@ -1,12 +1,13 @@
 import 'event_tracker.dart';
+import 'event_data_delegate.dart';
 
 /// Wrapper for an EventTracker with associated indexName and attribute
 class FilterEventTracker {
   /// Underlying EventTracker instance.
   EventTracker tracker;
 
-  /// Name of the index to associate events with.
-  String indexName;
+  /// Delegate providing dynamic external events data
+  EventDataDelegate delegate;
 
   /// Filter attribute to associate events with.
   String attribute;
@@ -16,7 +17,7 @@ class FilterEventTracker {
 
   FilterEventTracker(
     this.tracker,
-    this.indexName,
+    this.delegate,
     this.attribute, {
     this.isEnabled = true,
   });
@@ -29,7 +30,7 @@ class FilterEventTracker {
   }) {
     if (isEnabled) {
       tracker.clickedFilters(
-        indexName: indexName,
+        indexName: delegate.indexName,
         eventName: eventName,
         attribute: attribute,
         values: values,
@@ -47,7 +48,7 @@ class FilterEventTracker {
   }) {
     if (isEnabled) {
       tracker.convertedFilters(
-        indexName: indexName,
+        indexName: delegate.indexName,
         eventName: eventName,
         attribute: attribute,
         values: values,
@@ -64,7 +65,7 @@ class FilterEventTracker {
   }) {
     if (isEnabled) {
       tracker.viewedFilters(
-        indexName: indexName,
+        indexName: delegate.indexName,
         eventName: eventName,
         attribute: attribute,
         values: values,

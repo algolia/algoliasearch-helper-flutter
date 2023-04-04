@@ -5,18 +5,15 @@ class HitsEventTracker {
   /// Underlying EventTracker instance.
   EventTracker tracker;
 
-  /// Name of the index to associate events with.
-  String indexName;
-
-  /// Latest query ID value
-  String? queryID;
+  /// Delegate providing external events data
+  EventDataDelegate delegate;
 
   /// Flag that blocks the sending of event packets when set to false
   bool isEnabled;
 
   HitsEventTracker(
     this.tracker,
-    this.indexName, {
+    this.delegate, {
     this.isEnabled = true,
   });
 
@@ -31,18 +28,18 @@ class HitsEventTracker {
     if (!isEnabled) {
       return;
     }
-    if (queryID == null) {
+    if (delegate.queryID == null) {
       tracker.clickedObjects(
-        indexName: indexName,
+        indexName: delegate.indexName,
         eventName: eventName,
         objectIDs: objectIDs,
         timestamp: timestamp,
       );
     } else {
       tracker.clickedObjectsAfterSearch(
-        indexName: indexName,
+        indexName: delegate.indexName,
         eventName: eventName,
-        queryID: queryID!,
+        queryID: delegate.queryID!,
         objectIDs: objectIDs,
         positions: positions!,
         timestamp: timestamp,
@@ -61,7 +58,7 @@ class HitsEventTracker {
       return;
     }
     tracker.viewedObjects(
-      indexName: indexName,
+      indexName: delegate.indexName,
       eventName: eventName,
       objectIDs: objectIDs,
       timestamp: timestamp,
@@ -78,18 +75,18 @@ class HitsEventTracker {
     if (!isEnabled) {
       return;
     }
-    if (queryID == null) {
+    if (delegate.queryID == null) {
       tracker.convertedObjects(
-        indexName: indexName,
+        indexName: delegate.indexName,
         eventName: eventName,
         objectIDs: objectIDs,
         timestamp: timestamp,
       );
     } else {
       tracker.convertedObjectsAfterSearch(
-        indexName: indexName,
+        indexName: delegate.indexName,
         eventName: eventName,
-        queryID: queryID!,
+        queryID: delegate.queryID!,
         objectIDs: objectIDs,
         timestamp: timestamp,
       );

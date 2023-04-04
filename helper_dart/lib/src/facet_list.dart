@@ -93,7 +93,7 @@ abstract class FacetList implements Disposable {
         persistent: persistent,
         eventTracker: FilterEventTracker(
           searcher.eventTracker.tracker,
-          searcher.snapshot().indexName,
+          searcher,
           attribute,
         ),
       );
@@ -116,7 +116,7 @@ abstract class FacetList implements Disposable {
         persistent: persistent,
         eventTracker: FilterEventTracker(
           searcher.eventTracker.tracker,
-          searcher.snapshot().indexName,
+          searcher,
           attribute,
         ),
       );

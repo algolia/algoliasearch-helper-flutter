@@ -33,6 +33,12 @@ class _FakeEventTracker_1 extends _i1.SmartFake implements _i2.EventTracker {
       : super(parent, parentInvocation);
 }
 
+class _FakeEventDataDelegate_2 extends _i1.SmartFake
+    implements _i2.EventDataDelegate {
+  _FakeEventDataDelegate_2(Object parent, Invocation parentInvocation)
+      : super(parent, parentInvocation);
+}
+
 /// A class which mocks [FacetList].
 ///
 /// See the documentation for Mockito's code generation for more information.
@@ -89,12 +95,14 @@ class MockFilterEventTracker extends _i1.Mock
       super.noSuchMethod(Invocation.setter(#tracker, _tracker),
           returnValueForMissingStub: null);
   @override
-  String get indexName =>
-      (super.noSuchMethod(Invocation.getter(#indexName), returnValue: '')
-          as String);
+  _i2.EventDataDelegate get delegate =>
+      (super.noSuchMethod(Invocation.getter(#delegate),
+              returnValue:
+                  _FakeEventDataDelegate_2(this, Invocation.getter(#delegate)))
+          as _i2.EventDataDelegate);
   @override
-  set indexName(String? _indexName) =>
-      super.noSuchMethod(Invocation.setter(#indexName, _indexName),
+  set delegate(_i2.EventDataDelegate? _delegate) =>
+      super.noSuchMethod(Invocation.setter(#delegate, _delegate),
           returnValueForMissingStub: null);
   @override
   String get attribute =>

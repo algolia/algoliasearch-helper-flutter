@@ -95,7 +95,7 @@ import 'search_state.dart';
 /// hitsSearcher.dispose();
 /// ```
 @sealed
-abstract class HitsSearcher implements Disposable {
+abstract class HitsSearcher implements Disposable, EventDataDelegate {
   /// HitsSearcher's factory.
   factory HitsSearcher({
     required String applicationID,
@@ -211,7 +211,7 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
     Duration debounce = const Duration(milliseconds: 100),
   ]) : this._(
           searchService,
-          HitsEventTracker(eventTracker, state.indexName),
+          eventTracker,
           BehaviorSubject.seeded(SearchRequest(state)),
           debounce,
         );
@@ -219,22 +219,22 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   /// HitsSearcher's private constructor
   _HitsSearcher._(
     this.searchService,
-    this.eventTracker,
+    EventTracker eventTracker,
     this._request,
     this.debounce,
   ) {
+    this.eventTracker = HitsEventTracker(eventTracker, this);
     _subscriptions
       ..add(_responses.connect())
       ..add(
         _responses.listen((value) {
           lastResponse = value;
-          eventTracker
-            ..queryID = value.queryID
-            ..viewedObjects(
-              eventName: 'Hits Viewed',
-              objectIDs:
-                  value.hits.map((hit) => hit['objectID'].toString()).toList(),
-            );
+          this.eventTracker.viewedObjects(
+                eventName: 'Hits Viewed',
+                objectIDs: value.hits
+                    .map((hit) => hit['objectID'].toString())
+                    .toList(),
+              );
         }),
       );
   }
@@ -252,7 +252,7 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   final HitsSearchService searchService;
 
   @override
-  final HitsEventTracker eventTracker;
+  late final HitsEventTracker eventTracker;
 
   /// Search state debounce duration
   final Duration debounce;
@@ -321,4 +321,10 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
     _request.close();
     _subscriptions.cancel();
   }
+
+  @override
+  String get indexName => snapshot().indexName;
+
+  @override
+  String? get queryID => lastResponse?.queryID;
 }
