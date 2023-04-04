@@ -1,3 +1,5 @@
+import 'package:collection/collection.dart';
+
 enum EventType { click, conversion, view }
 
 /// The `Event` class represents an Algolia Insights event, which is used
@@ -199,10 +201,12 @@ class Event {
           userToken == other.userToken &&
           timestamp == other.timestamp &&
           queryID == other.queryID &&
-          objectIDs == other.objectIDs &&
-          positions == other.positions &&
+          const IterableEquality().equals(objectIDs, other.objectIDs) &&
+          const IterableEquality().equals(positions, other.positions) &&
           attribute == other.attribute &&
-          filterValues == other.filterValues;
+          const IterableEquality().equals(filterValues, other.filterValues);
+
+  // filterValues == other.filterValues;
 
   @override
   int get hashCode =>
