@@ -5,6 +5,5 @@ export 'src/event.dart';
 export 'src/event_data_delegate.dart';
 export 'src/event_tracker.dart';
 export 'src/filter_event_tracker.dart';
-export 'src/filter_event_tracker.dart';
 export 'src/hits_event_tracker.dart';
 export 'src/insights.dart';
