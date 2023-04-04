@@ -1,4 +1,4 @@
-# Created with package:mono_repo v6.3.0
+# Created with package:mono_repo v6.4.0
 name: Dart CI
 on:
   push:
@@ -16,97 +16,82 @@ env:
 permissions: read-all
 
 jobs:
-  mono_repo_validate:
+  job_001:
     name: mono_repo self validate
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
+        uses: actions/cache@fd5de65bc895cf536527842281bea11763fefd77
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable"
           restore-keys: |
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: stable
       - id: checkout
-        uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
+        name: Checkout repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
       - name: mono_repo self validate
-        run: dart pub global activate mono_repo 6.3.0
+        run: dart pub global activate mono_repo 6.4.0
       - name: mono_repo self validate
         run: dart pub global run mono_repo generate --validate
-  analyze_format_helper_dart:
-    name: "analyze_and_format; PKG: helper_dart; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
+  job_002:
+    name: "analyze_and_format; PKGS: helper_dart, insights_dart; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
+        uses: actions/cache@fd5de65bc895cf536527842281bea11763fefd77
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:helper_dart;commands:format-analyze_0"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:helper_dart-insights_dart;commands:format-analyze_0"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:helper_dart
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:helper_dart-insights_dart
             os:ubuntu-latest;pub-cache-hosted;sdk:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: stable
       - id: checkout
-        uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
+        name: Checkout repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
       - id: helper_dart_pub_upgrade
         name: helper_dart; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: helper_dart
-        run: dart pub upgrade
       - name: "helper_dart; dart format --output=none --set-exit-if-changed ."
-        if: "always() && steps.helper_dart_pub_upgrade.conclusion == 'success'"
-        working-directory: helper_dart
         run: "dart format --output=none --set-exit-if-changed ."
-      - name: "helper_dart; dart analyze --fatal-infos ."
         if: "always() && steps.helper_dart_pub_upgrade.conclusion == 'success'"
         working-directory: helper_dart
+      - name: "helper_dart; dart analyze --fatal-infos ."
         run: dart analyze --fatal-infos .
-  analyze_format_insights_dart:
-    name: "analyze_and_format; PKG: insights_dart; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cache Pub hosted dependencies
-        uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
-        with:
-          path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:insights_dart;commands:format-analyze_0"
-          restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:insights_dart
-            os:ubuntu-latest;pub-cache-hosted;sdk:stable
-            os:ubuntu-latest;pub-cache-hosted
-            os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
-        with:
-          sdk: stable
-      - id: checkout
-        uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
+        if: "always() && steps.helper_dart_pub_upgrade.conclusion == 'success'"
+        working-directory: helper_dart
       - id: insights_dart_pub_upgrade
         name: insights_dart; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: insights_dart
-        run: dart pub upgrade
       - name: "insights_dart; dart format --output=none --set-exit-if-changed ."
-        if: "always() && steps.insights_dart_pub_upgrade.conclusion == 'success'"
-        working-directory: insights_dart
         run: "dart format --output=none --set-exit-if-changed ."
-      - name: "insights_dart; dart analyze --fatal-infos ."
         if: "always() && steps.insights_dart_pub_upgrade.conclusion == 'success'"
         working-directory: insights_dart
+      - name: "insights_dart; dart analyze --fatal-infos ."
         run: dart analyze --fatal-infos .
-  analyze_format_helper_flutter:
+        if: "always() && steps.insights_dart_pub_upgrade.conclusion == 'success'"
+        working-directory: insights_dart
+  job_003:
     name: "analyze_and_format; PKG: helper_flutter; `dart format --output=none --set-exit-if-changed .`, `flutter analyze --fatal-infos .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
+        uses: actions/cache@fd5de65bc895cf536527842281bea11763fefd77
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:helper_flutter;commands:format-analyze_1"
@@ -115,96 +100,32 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: subosito/flutter-action@2fb73e25c9488eb544b9b14b2ce00c4c2baf789e
+      - name: Setup Flutter SDK
+        uses: subosito/flutter-action@9d48f4efd5460d7013af812069d08b23f37aed20
         with:
           channel: stable
       - id: checkout
-        uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
+        name: Checkout repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
       - id: helper_flutter_pub_upgrade
-        name: helper_flutter; flutter pub pub upgrade
+        name: helper_flutter; flutter pub upgrade
+        run: flutter pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: helper_flutter
-        run: flutter pub pub upgrade
       - name: "helper_flutter; dart format --output=none --set-exit-if-changed ."
-        if: "always() && steps.helper_flutter_pub_upgrade.conclusion == 'success'"
-        working-directory: helper_flutter
         run: "dart format --output=none --set-exit-if-changed ."
-      - name: "helper_flutter; flutter analyze --fatal-infos ."
         if: "always() && steps.helper_flutter_pub_upgrade.conclusion == 'success'"
         working-directory: helper_flutter
+      - name: "helper_flutter; flutter analyze --fatal-infos ."
         run: flutter analyze --fatal-infos .
-  test_insights_dart_chrome:
-    name: "unit_test; PKG: insights_dart; `dart test -p chrome`"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cache Pub hosted dependencies
-        uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
-        with:
-          path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:insights_dart;commands:test_1"
-          restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:insights_dart
-            os:ubuntu-latest;pub-cache-hosted;sdk:stable
-            os:ubuntu-latest;pub-cache-hosted
-            os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
-        with:
-          sdk: stable
-      - id: checkout
-        uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
-      - id: insights_dart_pub_upgrade
-        name: insights_dart; dart pub upgrade
-        if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: insights_dart
-        run: dart pub upgrade
-      - name: "insights_dart; dart test -p chrome"
-        if: "always() && steps.insights_dart_pub_upgrade.conclusion == 'success'"
-        working-directory: insights_dart
-        run: dart test -p chrome
-    needs:
-      - mono_repo_validate
-      - analyze_format_helper_dart
-      - analyze_format_insights_dart
-      - analyze_format_helper_flutter
-  test_insights_dart:
-    name: "unit_test; PKG: insights_dart; `dart test`"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cache Pub hosted dependencies
-        uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
-        with:
-          path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:insights_dart;commands:test_0"
-          restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:insights_dart
-            os:ubuntu-latest;pub-cache-hosted;sdk:stable
-            os:ubuntu-latest;pub-cache-hosted
-            os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
-        with:
-          sdk: stable
-      - id: checkout
-        uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
-      - id: insights_dart_pub_upgrade
-        name: insights_dart; dart pub upgrade
-        if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: insights_dart
-        run: dart pub upgrade
-      - name: insights_dart; dart test
-        if: "always() && steps.insights_dart_pub_upgrade.conclusion == 'success'"
-        working-directory: insights_dart
-        run: dart test
-    needs:
-      - mono_repo_validate
-      - analyze_format_helper_dart
-      - analyze_format_insights_dart
-      - analyze_format_helper_flutter
-  test_helper_dart_chrome:
+        if: "always() && steps.helper_flutter_pub_upgrade.conclusion == 'success'"
+        working-directory: helper_flutter
+  job_004:
     name: "unit_test; PKG: helper_dart; `dart test -p chrome`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
+        uses: actions/cache@fd5de65bc895cf536527842281bea11763fefd77
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:helper_dart;commands:test_1"
@@ -213,64 +134,75 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: stable
       - id: checkout
-        uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
+        name: Checkout repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
       - id: helper_dart_pub_upgrade
         name: helper_dart; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: helper_dart
-        run: dart pub upgrade
       - name: "helper_dart; dart test -p chrome"
+        run: dart test -p chrome
         if: "always() && steps.helper_dart_pub_upgrade.conclusion == 'success'"
         working-directory: helper_dart
-        run: dart test -p chrome
     needs:
-      - mono_repo_validate
-      - analyze_format_helper_dart
-      - analyze_format_insights_dart
-      - analyze_format_helper_flutter
-  test_helper_dart:
-    name: "unit_test; PKG: helper_dart; `dart test`"
+      - job_001
+      - job_002
+      - job_003
+  job_005:
+    name: "unit_test; PKGS: helper_dart, insights_dart; `dart test`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
+        uses: actions/cache@fd5de65bc895cf536527842281bea11763fefd77
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:helper_dart;commands:test_0"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:helper_dart-insights_dart;commands:test_0"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:helper_dart
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:helper_dart-insights_dart
             os:ubuntu-latest;pub-cache-hosted;sdk:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: stable
       - id: checkout
-        uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
+        name: Checkout repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
       - id: helper_dart_pub_upgrade
         name: helper_dart; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: helper_dart
-        run: dart pub upgrade
       - name: helper_dart; dart test
+        run: dart test
         if: "always() && steps.helper_dart_pub_upgrade.conclusion == 'success'"
         working-directory: helper_dart
+      - id: insights_dart_pub_upgrade
+        name: insights_dart; dart pub upgrade
+        run: dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: insights_dart
+      - name: insights_dart; dart test
         run: dart test
+        if: "always() && steps.insights_dart_pub_upgrade.conclusion == 'success'"
+        working-directory: insights_dart
     needs:
-      - mono_repo_validate
-      - analyze_format_helper_dart
-      - analyze_format_insights_dart
-      - analyze_format_helper_flutter
-  test_helper_flutter:
+      - job_001
+      - job_002
+      - job_003
+  job_006:
     name: "unit_test; PKG: helper_flutter; `flutter test`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
+        uses: actions/cache@fd5de65bc895cf536527842281bea11763fefd77
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:helper_flutter;commands:test_2"
@@ -279,22 +211,23 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: subosito/flutter-action@2fb73e25c9488eb544b9b14b2ce00c4c2baf789e
+      - name: Setup Flutter SDK
+        uses: subosito/flutter-action@9d48f4efd5460d7013af812069d08b23f37aed20
         with:
           channel: stable
       - id: checkout
-        uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
+        name: Checkout repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
       - id: helper_flutter_pub_upgrade
-        name: helper_flutter; flutter pub pub upgrade
+        name: helper_flutter; flutter pub upgrade
+        run: flutter pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: helper_flutter
-        run: flutter pub pub upgrade
       - name: helper_flutter; flutter test
+        run: flutter test
         if: "always() && steps.helper_flutter_pub_upgrade.conclusion == 'success'"
         working-directory: helper_flutter
-        run: flutter test
     needs:
-      - mono_repo_validate
-      - analyze_format_helper_dart
-      - analyze_format_insights_dart
-      - analyze_format_helper_flutter
+      - job_001
+      - job_002
+      - job_003
