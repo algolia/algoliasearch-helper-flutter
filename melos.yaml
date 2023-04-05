@@ -1,0 +1,12 @@
+name: algolia_helper
+
+packages:
+  - helper_dart
+  - helper_flutter
+  - insights_dart
+
+scripts:
+  analyze:
+    exec: dart analyze .
+  format: 
+    exec: dart format .
