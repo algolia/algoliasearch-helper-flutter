@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:algolia_insights/algolia_insights.dart';
 import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
@@ -7,7 +8,6 @@ import 'package:rxdart/rxdart.dart';
 
 import 'disposable.dart';
 import 'disposable_mixin.dart';
-import 'event_tracker.dart';
 import 'extensions.dart';
 import 'filter.dart';
 import 'filter_group.dart';
@@ -91,7 +91,11 @@ abstract class FacetList implements Disposable {
         groupID: FilterGroupID(attribute, operator),
         selectionMode: selectionMode,
         persistent: persistent,
-        eventTracker: searcher.eventTracker,
+        eventTracker: FilterEventTracker(
+          searcher.eventTracker.tracker,
+          searcher,
+          attribute,
+        ),
       );
 
   /// Create [FacetList] instance.
@@ -110,8 +114,18 @@ abstract class FacetList implements Disposable {
         groupID: groupID,
         selectionMode: selectionMode,
         persistent: persistent,
-        eventTracker: searcher.eventTracker,
+        eventTracker: FilterEventTracker(
+          searcher.eventTracker.tracker,
+          searcher,
+          attribute,
+        ),
       );
+
+  /// Insights events tracking component
+  FilterEventTracker get eventTracker;
+
+  /// Facet filter attribute
+  String get attribute;
 
   /// Stream of [Facet] list with selection status.
   Stream<List<SelectableFacet>> get facets;
@@ -172,9 +186,10 @@ class _FacetList with DisposableMixin implements FacetList {
   /// FilterState component.
   final FilterState filterState;
 
-  final EventTracker eventTracker;
+  @override
+  final FilterEventTracker eventTracker;
 
-  /// Facet filter attribute
+  @override
   final String attribute;
 
   /// Filter group ID.
@@ -291,11 +306,9 @@ class _FacetList with DisposableMixin implements FacetList {
   void _trackClickIfNeeded(String selection) {
     _selections.first.then((selections) {
       if (!selections.contains(selection)) {
-        eventTracker.trackClick(
-          indexName: searcher.snapshot().indexName,
+        eventTracker.clickedFilters(
           eventName: 'Filter Applied',
-          attribute: attribute,
-          value: selection,
+          values: [selection],
         );
       }
     });

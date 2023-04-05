@@ -1,15 +1,14 @@
 import 'dart:async';
 
+import 'package:algolia_insights/algolia_insights.dart';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'disposable.dart';
 import 'disposable_mixin.dart';
-import 'event_tracker.dart';
 import 'filter_state.dart';
 import 'hits_searcher_service.dart';
-import 'insights.dart';
 import 'lib_version.dart';
 import 'logger.dart';
 import 'search_request.dart';
@@ -96,7 +95,7 @@ import 'search_state.dart';
 /// hitsSearcher.dispose();
 /// ```
 @sealed
-abstract class HitsSearcher implements Disposable {
+abstract class HitsSearcher implements Disposable, EventDataDelegate {
   /// HitsSearcher's factory.
   factory HitsSearcher({
     required String applicationID,
@@ -108,7 +107,7 @@ abstract class HitsSearcher implements Disposable {
       _HitsSearcher(
         applicationID: applicationID,
         apiKey: apiKey,
-        state: SearchState(indexName: indexName),
+        state: SearchState(indexName: indexName, clickAnalytics: true),
         disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
         debounce: debounce,
       );
@@ -124,7 +123,7 @@ abstract class HitsSearcher implements Disposable {
       _HitsSearcher(
         applicationID: applicationID,
         apiKey: apiKey,
-        state: state,
+        state: state.copyWith(clickAnalytics: true),
         disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
         debounce: debounce,
       );
@@ -144,7 +143,7 @@ abstract class HitsSearcher implements Disposable {
         debounce,
       );
 
-  EventTracker get eventTracker;
+  HitsEventTracker get eventTracker;
 
   /// Search state stream
   Stream<SearchState> get state;
@@ -157,6 +156,9 @@ abstract class HitsSearcher implements Disposable {
 
   /// Get current [SearchState].
   SearchState snapshot();
+
+  /// Get latest [SearchResponse].
+  SearchResponse? get lastResponse;
 
   /// Apply search state configuration.
   void applyState(SearchState Function(SearchState state) config);
@@ -217,20 +219,22 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   /// HitsSearcher's private constructor
   _HitsSearcher._(
     this.searchService,
-    this.eventTracker,
+    EventTracker eventTracker,
     this._request,
     this.debounce,
   ) {
+    this.eventTracker = HitsEventTracker(eventTracker, this);
     _subscriptions
       ..add(_responses.connect())
       ..add(
         _responses.listen((value) {
-          eventTracker.trackViews(
-            indexName: snapshot().indexName,
-            eventName: 'Hits Viewed',
-            objectIDs:
-                value.hits.map((hit) => hit['objectID'].toString()).toList(),
-          );
+          lastResponse = value;
+          this.eventTracker.viewedObjects(
+                eventName: 'Hits Viewed',
+                objectIDs: value.hits
+                    .map((hit) => hit['objectID'].toString())
+                    .toList(),
+              );
         }),
       );
   }
@@ -248,7 +252,7 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   final HitsSearchService searchService;
 
   @override
-  final EventTracker eventTracker;
+  late final HitsEventTracker eventTracker;
 
   /// Search state debounce duration
   final Duration debounce;
@@ -278,6 +282,10 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   /// Get current [SearchState].
   @override
   SearchState snapshot() => _request.value.state;
+
+  /// Get latest search response
+  @override
+  SearchResponse? lastResponse;
 
   /// Apply search state configuration.
   @override
@@ -313,4 +321,10 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
     _request.close();
     _subscriptions.cancel();
   }
+
+  @override
+  String get indexName => snapshot().indexName;
+
+  @override
+  String? get queryID => lastResponse?.queryID;
 }
