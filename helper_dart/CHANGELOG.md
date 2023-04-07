@@ -1,5 +1,12 @@
 # ChangeLog
 
+## [0.3.0](https://github.com/algolia/algoliasearch-helper-flutter/compare/0.2.3...0.3.0) (2022-04-07)
+
+### Feat
+
+- Add eventTracker instances to `HitsSearcher` and `FacetList` performing automatic hit view and filter click events
+  tracking and facilitating manual Insights event tracking.
+
 ## [0.2.3](https://github.com/algolia/algoliasearch-helper-flutter/compare/0.2.2...0.2.3) (2022-12-22)
 
 ### Feat

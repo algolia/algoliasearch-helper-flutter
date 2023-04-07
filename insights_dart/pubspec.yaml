@@ -1,6 +1,6 @@
 name: algolia_insights
 description: Algolia Insights Helper for Dart
-version: 0.0.1
+version: 0.1.0
 homepage: https://www.algolia.com/doc/guides/building-search-ui/what-is-instantsearch/flutter/
 repository: https://github.com/algolia/algoliasearch-helper-flutter/tree/main/insights_dart
 
