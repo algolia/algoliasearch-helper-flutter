@@ -224,19 +224,7 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
     this.debounce,
   ) {
     this.eventTracker = HitsEventTracker(eventTracker, this);
-    _subscriptions
-      ..add(_responses.connect())
-      ..add(
-        _responses.listen((value) {
-          lastResponse = value;
-          this.eventTracker.viewedObjects(
-                eventName: 'Hits Viewed',
-                objectIDs: value.hits
-                    .map((hit) => hit['objectID'].toString())
-                    .toList(),
-              );
-        }),
-      );
+    _subscriptions.add(_responses.connect());
   }
 
   /// Search state stream
@@ -265,7 +253,13 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
       .debounceTime(debounce)
       .distinct()
       .switchMap((req) => Stream.fromFuture(searchService.search(req.state)))
-      .publish();
+      .doOnData((value) {
+    lastResponse = value;
+    eventTracker.viewedObjects(
+      eventName: 'Hits Viewed',
+      objectIDs: value.hits.map((hit) => hit['objectID'].toString()).toList(),
+    );
+  }).publish();
 
   /// Events logger
   final Logger _log = algoliaLogger('HitsSearcher');

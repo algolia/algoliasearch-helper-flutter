@@ -10,7 +10,6 @@ import 'package:algolia_helper/src/hits_searcher_service.dart' as _i7;
 import 'package:algolia_helper/src/search_response.dart' as _i4;
 import 'package:algolia_helper/src/search_state.dart' as _i3;
 import 'package:algolia_insights/algolia_insights.dart' as _i2;
-import 'package:algolia_insights/src/event.dart' as _i9;
 import 'package:algolia_insights/src/event_service.dart' as _i8;
 import 'package:mockito/mockito.dart' as _i1;
 
@@ -260,7 +259,7 @@ class MockEventService extends _i1.Mock implements _i8.EventService {
   }
 
   @override
-  void send(List<_i9.Event>? events) =>
+  void send(List<_i2.Event>? events) =>
       super.noSuchMethod(Invocation.method(#send, [events]),
           returnValueForMissingStub: null);
 }
