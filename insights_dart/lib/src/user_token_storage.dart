@@ -2,7 +2,6 @@ import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
 class UserTokenStorage {
-  static const _boxName = 'userToken';
   static const _userTokenKey = 'insights-user-token';
   static const _expirationDateKey = 'insights-user-token-expiration-date';
 
@@ -35,8 +34,11 @@ class UserTokenStorage {
     }
   }
 
+  String _boxPath;
+  String _boxName = 'userToken';
+
   /// Box value persistently storing the user token and its lease time
-  Future<Box> get _box => Hive.openBox(_boxName, path: './');
+  Future<Box> get _box => Hive.openBox(_boxName, path: _boxPath);
 
   /// Private value storing the actual value of the persistent storage allowance
   /// flag
@@ -51,18 +53,19 @@ class UserTokenStorage {
     if (isAllowed) {
       _write(userToken);
     } else {
-      _remove();
+      remove();
     }
   }
 
   /// Value storing the unique UserTokenStorage instance
-  static final UserTokenStorage _sharedInstance = UserTokenStorage._();
+  static final UserTokenStorage _sharedInstance =
+      UserTokenStorage.custom('algolia', 'user-token');
 
   /// Factory constructor returning the unique UserTokenStorage instance
   factory UserTokenStorage() => _sharedInstance;
 
   /// UserTokenStorage's private constructor
-  UserTokenStorage._() {
+  UserTokenStorage.custom(this._boxPath, this._boxName) {
     read().then((storedUserToken) {
       if (storedUserToken != null) {
         userToken = storedUserToken;
@@ -82,12 +85,14 @@ class UserTokenStorage {
   }
 
   /// Remove user token and its expiration date from persistent storage
-  void _remove() {
-    _box.then(
-      (box) => box
-        ..delete(_userTokenKey)
-        ..delete(_leaseTime),
-    );
+  void remove() {
+    _box.then((box) {
+      if (box.isOpen) {
+        box
+          ..delete(_userTokenKey)
+          ..delete(_leaseTime);
+      }
+    });
   }
 
   /// Read user token value from the persistent storage.

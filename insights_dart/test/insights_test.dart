@@ -1,4 +1,3 @@
-import 'package:algolia/algolia.dart';
 import 'package:algolia_insights/algolia_insights.dart';
 import 'package:algolia_insights/src/event_service.dart';
 import 'package:algolia_insights/src/user_token_storage.dart';
@@ -26,7 +25,7 @@ void main() {
 
       when(eventService.send(any)).thenAnswer((realInvocation) {
         final event =
-            (realInvocation.positionalArguments[0] as List<AlgoliaEvent>).first;
+            (realInvocation.positionalArguments[0] as List<Event>).first;
         expect(event.userToken.startsWith('anonymous-'), true);
       });
 
@@ -50,10 +49,11 @@ void main() {
 
     when(eventService.send(any)).thenAnswer((realInvocation) {
       final event =
-          (realInvocation.positionalArguments[0] as List<AlgoliaEvent>).first;
+          (realInvocation.positionalArguments[0] as List<Event>).first;
       expect(event.eventName, 'test_event_name');
-      expect(event.index, 'test_index');
-      expect(event.filters, ['test_attribute:test_filter_value']);
+      expect(event.indexName, 'test_index');
+      expect(event.attribute, 'test_attribute');
+      expect(event.filterValues, ['test_filter_value']);
       expect(event.userToken, 'test_user_token');
     });
 

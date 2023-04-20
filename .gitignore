@@ -28,6 +28,7 @@ migrate_working_dir/
 .dart_tool/
 .packages
 build/
+pubspec_overrides.yaml
 
 # Local usertoken storage
 insights_dart/usertoken.hive
