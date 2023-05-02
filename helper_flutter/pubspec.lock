@@ -11,10 +11,17 @@ packages:
   algolia_helper:
     dependency: "direct main"
     description:
-      name: algolia_helper
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.2.2"
+      path: "../helper_dart"
+      relative: true
+    source: path
+    version: "0.3.0"
+  algolia_insights:
+    dependency: "direct overridden"
+    description:
+      path: "../insights_dart"
+      relative: true
+    source: path
+    version: "0.1.0"
   async:
     dependency: transitive
     description:
@@ -81,6 +88,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  hive:
+    dependency: transitive
+    description:
+      name: hive
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.2.3"
   http:
     dependency: transitive
     description:

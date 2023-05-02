@@ -118,6 +118,8 @@ extension AlgoliaExt on Algolia {
     state.tagFilters?.let((it) => query = query.setTagFilters(it));
     state.userToken?.let((it) => query = query.setUserToken(it));
     state.filterGroups?.let((it) => query = query.setFilterGroups(it));
+    state.clickAnalytics
+        ?.let((it) => query = query.setClickAnalytics(enabled: it));
     return query;
   }
 

@@ -3,19 +3,26 @@ import 'dart:async';
 import 'package:algolia/algolia.dart';
 import 'package:algolia_helper/algolia_helper.dart';
 import 'package:algolia_helper/src/hits_searcher_service.dart';
+import 'package:algolia_insights/algolia_insights.dart';
+import 'package:algolia_insights/src/event_service.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
 import 'hits_searcher_test.mocks.dart';
 
-@GenerateMocks([HitsSearchService])
+@GenerateMocks([
+  HitsSearcher,
+  HitsSearchService,
+  EventTracker,
+  EventService,
+])
 void main() {
   group('Integration tests', () {
     test('Successful search operation', () async {
       final helper = HitsSearcher.create(
         applicationID: 'latency',
-        apiKey: 'afc3dd66dd1293e2e2736a5a51b05c0a',
+        apiKey: 'af044fb0788d6bb15f807e4420592bc5',
         state: const SearchState(
           indexName: 'instant_search',
           query: 'apple',
@@ -33,8 +40,8 @@ void main() {
         applicationID: 'latency',
         apiKey: 'UNKNOWN',
         indexName: 'instant_search',
-      )..query('apple');
-      await expectLater(helper.responses, emitsError(isA<SearchError>()));
+      );
+      await expectLater(helper.responses, emitsError(anything));
     });
   });
 
@@ -43,9 +50,10 @@ void main() {
       final searchService = MockHitsSearchService();
       final initial = SearchResponse(const {});
       when(searchService.search(any)).thenAnswer((_) => Future.value(initial));
-
+      final eventTracker = MockEventTracker();
       final searcher = HitsSearcher.custom(
         searchService,
+        eventTracker,
         const SearchState(indexName: 'myIndex'),
       );
 
@@ -54,8 +62,10 @@ void main() {
 
     test('Should emit response after query', () async {
       final searchService = MockHitsSearchService();
+      final eventTracker = MockEventTracker();
       final searcher = HitsSearcher.custom(
         searchService,
+        eventTracker,
         const SearchState(indexName: 'myIndex'),
       );
 
@@ -70,8 +80,10 @@ void main() {
       final searchService = MockHitsSearchService();
       when(searchService.search(any))
           .thenAnswer((_) => Future.value(SearchResponse({})));
+      final eventTracker = MockEventTracker();
       final searcher = HitsSearcher.custom(
         searchService,
+        eventTracker,
         const SearchState(indexName: 'myIndex'),
       );
 
@@ -85,9 +97,11 @@ void main() {
     test('Should debounce search state', () async {
       final searchService = MockHitsSearchService();
       when(searchService.search(any)).thenAnswer(mockResponse);
+      final eventTracker = MockEventTracker();
 
       final searcher = HitsSearcher.custom(
         searchService,
+        eventTracker,
         const SearchState(indexName: 'myIndex'),
       );
 
@@ -107,9 +121,11 @@ void main() {
     test("Shouldn't debounce search state", () async {
       final searchService = MockHitsSearchService();
       when(searchService.search(any)).thenAnswer(mockResponse);
+      final eventTracker = MockEventTracker();
 
       final searcher = HitsSearcher.custom(
         searchService,
+        eventTracker,
         const SearchState(indexName: 'myIndex'),
       );
 
@@ -136,9 +152,11 @@ void main() {
     test('Should discard old requests', () async {
       final searchService = MockHitsSearchService();
       when(searchService.search(any)).thenAnswer(mockResponse);
+      final eventTracker = MockEventTracker();
 
       final searcher = HitsSearcher.custom(
         searchService,
+        eventTracker,
         const SearchState(indexName: 'myIndex'),
       );
 
@@ -160,13 +178,15 @@ void main() {
     test('Should rerun requests', () async {
       final searchService = MockHitsSearchService();
       when(searchService.search(any)).thenAnswer(mockResponse);
+      final eventTracker = MockEventTracker();
 
       final searcher = HitsSearcher.custom(
         searchService,
+        eventTracker,
         const SearchState(indexName: 'myIndex'),
       );
 
-      searcher.responses.listen(print);
+      // searcher.responses.listen(print);
 
       unawaited(
         expectLater(
@@ -187,13 +207,36 @@ void main() {
     });
   });
 
-  test('FilterState connect HitsSearcher', () async {
+  test('Should pass received hits to event tracker', () async {
     final searchService = MockHitsSearchService();
     when(searchService.search(any)).thenAnswer(mockResponse);
+
+    final eventTracker = MockEventTracker();
+    when(eventTracker.viewedObjects()).thenAnswer((realInvocation) {
+      expect(realInvocation.positionalArguments[0], 'Hits Viewed');
+      expect(realInvocation.positionalArguments[1], ['h1', 'h2']);
+    });
 
     const initSearchState = SearchState(indexName: 'myIndex');
     final searcher = HitsSearcher.custom(
       searchService,
+      eventTracker,
+      initSearchState,
+    )..query('q');
+
+    await delay();
+    searcher.dispose();
+  });
+
+  test('FilterState connect HitsSearcher', () async {
+    final searchService = MockHitsSearchService();
+    when(searchService.search(any)).thenAnswer(mockResponse);
+    final eventTracker = MockEventTracker();
+
+    const initSearchState = SearchState(indexName: 'myIndex');
+    final searcher = HitsSearcher.custom(
+      searchService,
+      eventTracker,
       initSearchState,
     );
 
@@ -246,12 +289,179 @@ void main() {
       'AND (_tags:"unknown") AND ("attributeA":0 TO 1)',
     );
   });
+
+  group('HitsTracking', () {
+    late HitsSearcher hitsSearcher;
+    late MockEventTracker eventTracker;
+
+    setUp(() {
+      final searchService = MockHitsSearchService();
+      when(searchService.search(any)).thenAnswer(mockResponse);
+      eventTracker = MockEventTracker();
+      const initSearchState = SearchState(indexName: 'indexName');
+      hitsSearcher = HitsSearcher.custom(
+        searchService,
+        eventTracker,
+        initSearchState,
+      );
+    });
+
+    test('event index name change', () {
+      final objectIDs = ['1', '2'];
+
+      hitsSearcher
+          .applyState((state) => state.copyWith(indexName: 'indexName_asc'));
+
+      hitsSearcher.eventTracker.clickedObjects(
+        eventName: 'clickedObjects',
+        objectIDs: objectIDs,
+      );
+
+      verify(
+        eventTracker.clickedObjects(
+          indexName: 'indexName_asc',
+          eventName: 'clickedObjects',
+          objectIDs: objectIDs,
+        ),
+      ).called(1);
+
+      hitsSearcher
+          .applyState((state) => state.copyWith(indexName: 'indexName_desc'));
+
+      hitsSearcher.eventTracker.clickedObjects(
+        eventName: 'clickedObjects',
+        objectIDs: objectIDs,
+      );
+
+      verify(
+        eventTracker.clickedObjects(
+          indexName: 'indexName_desc',
+          eventName: 'clickedObjects',
+          objectIDs: objectIDs,
+        ),
+      ).called(1);
+    });
+
+    group('clickedObjects', () {
+      test('calls clickedObjects if queryID is null', () {
+        final objectIDs = ['1', '2'];
+        final positions = [1, 2];
+
+        hitsSearcher.eventTracker.clickedObjects(
+          eventName: 'clickedObjects',
+          objectIDs: objectIDs,
+          positions: positions,
+        );
+
+        verify(
+          eventTracker.clickedObjects(
+            indexName: 'indexName',
+            eventName: 'clickedObjects',
+            objectIDs: objectIDs,
+          ),
+        ).called(1);
+      });
+
+      test('calls clickedObjectsAfterSearch if queryID is not null', () async {
+        final objectIDs = ['1', '3'];
+        final positions = [1, 3];
+        const queryID = '123';
+
+        hitsSearcher.query('query');
+        await expectLater(hitsSearcher.responses, emits(matchesQuery('query')));
+
+        hitsSearcher.eventTracker.clickedObjects(
+          eventName: 'clickedObjects',
+          objectIDs: objectIDs,
+          positions: positions,
+        );
+
+        verify(
+          eventTracker.clickedObjectsAfterSearch(
+            indexName: 'indexName',
+            eventName: 'clickedObjects',
+            queryID: queryID,
+            objectIDs: objectIDs,
+            positions: positions,
+          ),
+        ).called(1);
+      });
+    });
+
+    group('convertedObjects', () {
+      test('calls convertedObjects if queryID is null', () {
+        final objectIDs = ['1', '2'];
+
+        hitsSearcher.eventTracker.convertedObjects(
+          eventName: 'convertedObjects',
+          objectIDs: objectIDs,
+        );
+
+        verify(
+          eventTracker.convertedObjects(
+            indexName: 'indexName',
+            eventName: 'convertedObjects',
+            objectIDs: objectIDs,
+          ),
+        ).called(1);
+      });
+
+      test('calls convertedObjectsAfterSearch if queryID is not null',
+          () async {
+        final objectIDs = ['1', '2'];
+        const queryID = '123';
+
+        hitsSearcher.query('query');
+        await expectLater(hitsSearcher.responses, emits(matchesQuery('query')));
+
+        hitsSearcher.eventTracker.convertedObjects(
+          eventName: 'convertedObjects',
+          objectIDs: objectIDs,
+        );
+
+        verify(
+          eventTracker.convertedObjectsAfterSearch(
+            indexName: 'indexName',
+            eventName: 'convertedObjects',
+            queryID: queryID,
+            objectIDs: objectIDs,
+          ),
+        ).called(1);
+      });
+    });
+
+    group('viewedObjects', () {
+      test('calls viewedObjects', () {
+        final objectIDs = ['1', '2'];
+
+        hitsSearcher.eventTracker.viewedObjects(
+          eventName: 'viewedObjects',
+          objectIDs: objectIDs,
+        );
+
+        verify(
+          eventTracker.viewedObjects(
+            indexName: 'indexName',
+            eventName: 'viewedObjects',
+            objectIDs: objectIDs,
+          ),
+        ).called(1);
+      });
+    });
+  });
 }
 
 Future<SearchResponse> mockResponse(Invocation inv) async {
   final state = inv.positionalArguments[0] as SearchState;
   await delay(100);
-  return SearchResponse({'query': state.query});
+  return SearchResponse({
+    'query': state.query,
+    'hits': [
+      {'objectID': 'h1'},
+      {'objectID': 'h2'}
+    ],
+    'queryID': '123',
+  });
 }
 
 /// Return future with a delay

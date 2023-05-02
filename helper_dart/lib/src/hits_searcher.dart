@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:algolia_insights/algolia_insights.dart';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
@@ -94,7 +95,7 @@ import 'search_state.dart';
 /// hitsSearcher.dispose();
 /// ```
 @sealed
-abstract class HitsSearcher implements Disposable {
+abstract class HitsSearcher implements Disposable, EventDataDelegate {
   /// HitsSearcher's factory.
   factory HitsSearcher({
     required String applicationID,
@@ -106,7 +107,7 @@ abstract class HitsSearcher implements Disposable {
       _HitsSearcher(
         applicationID: applicationID,
         apiKey: apiKey,
-        state: SearchState(indexName: indexName),
+        state: SearchState(indexName: indexName, clickAnalytics: true),
         disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
         debounce: debounce,
       );
@@ -122,7 +123,7 @@ abstract class HitsSearcher implements Disposable {
       _HitsSearcher(
         applicationID: applicationID,
         apiKey: apiKey,
-        state: state,
+        state: state.copyWith(clickAnalytics: true),
         disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
         debounce: debounce,
       );
@@ -131,10 +132,18 @@ abstract class HitsSearcher implements Disposable {
   @internal
   factory HitsSearcher.custom(
     HitsSearchService searchService,
+    EventTracker eventTracker,
     SearchState state, [
     Duration debounce = const Duration(milliseconds: 100),
   ]) =>
-      _HitsSearcher.create(searchService, state, debounce);
+      _HitsSearcher.create(
+        searchService,
+        eventTracker,
+        state,
+        debounce,
+      );
+
+  HitsEventTracker get eventTracker;
 
   /// Search state stream
   Stream<SearchState> get state;
@@ -147,6 +156,9 @@ abstract class HitsSearcher implements Disposable {
 
   /// Get current [SearchState].
   SearchState snapshot();
+
+  /// Get latest [SearchResponse].
+  SearchResponse? get lastResponse;
 
   /// Apply search state configuration.
   void applyState(SearchState Function(SearchState state) config);
@@ -182,23 +194,37 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
       extraUserAgents: ['algolia-helper-dart ($libVersion)'],
       disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
     );
-    return _HitsSearcher.create(service, state, debounce);
+    final insights = Insights(applicationID, apiKey);
+    return _HitsSearcher.create(
+      service,
+      insights,
+      state,
+      debounce,
+    );
   }
 
   /// HitSearcher's constructor, for internal and test use only.
   _HitsSearcher.create(
     HitsSearchService searchService,
+    EventTracker eventTracker,
     SearchState state, [
     Duration debounce = const Duration(milliseconds: 100),
   ]) : this._(
           searchService,
+          eventTracker,
           BehaviorSubject.seeded(SearchRequest(state)),
           debounce,
         );
 
   /// HitsSearcher's private constructor
-  _HitsSearcher._(this.searchService, this._request, this.debounce) {
-    _subscription = _responses.connect();
+  _HitsSearcher._(
+    this.searchService,
+    EventTracker eventTracker,
+    this._request,
+    this.debounce,
+  ) {
+    this.eventTracker = HitsEventTracker(eventTracker, this);
+    _subscriptions.add(_responses.connect());
   }
 
   /// Search state stream
@@ -213,6 +239,9 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   /// Service handling search requests
   final HitsSearchService searchService;
 
+  @override
+  late final HitsEventTracker eventTracker;
+
   /// Search state debounce duration
   final Duration debounce;
 
@@ -224,13 +253,19 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
       .debounceTime(debounce)
       .distinct()
       .switchMap((req) => Stream.fromFuture(searchService.search(req.state)))
-      .publish();
+      .doOnData((value) {
+    lastResponse = value;
+    eventTracker.viewedObjects(
+      eventName: 'Hits Viewed',
+      objectIDs: value.hits.map((hit) => hit['objectID'].toString()).toList(),
+    );
+  }).publish();
 
   /// Events logger
   final Logger _log = algoliaLogger('HitsSearcher');
 
-  /// Subscriptions composite
-  late final StreamSubscription _subscription;
+  /// Streams subscriptions composite.
+  final CompositeSubscription _subscriptions = CompositeSubscription();
 
   /// Set query string.
   @override
@@ -241,6 +276,10 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   /// Get current [SearchState].
   @override
   SearchState snapshot() => _request.value.state;
+
+  /// Get latest search response
+  @override
+  SearchResponse? lastResponse;
 
   /// Apply search state configuration.
   @override
@@ -274,6 +313,12 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   void doDispose() {
     _log.fine('HitsSearcher disposed');
     _request.close();
-    _subscription.cancel();
+    _subscriptions.cancel();
   }
+
+  @override
+  String get indexName => snapshot().indexName;
+
+  @override
+  String? get queryID => lastResponse?.queryID;
 }

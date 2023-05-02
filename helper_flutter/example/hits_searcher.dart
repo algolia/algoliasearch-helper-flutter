@@ -72,7 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     return ListTile(
                       title: RichText(
                         text: TextSpan(
-                          style: Theme.of(context).textTheme.subtitle2,
+                          style: Theme.of(context).textTheme.titleSmall,
                           children:
                               hit.getHighlightedString('title').toInlineSpans(),
                         ),

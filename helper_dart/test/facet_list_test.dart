@@ -1,10 +1,14 @@
 import 'package:algolia_helper/algolia_helper.dart';
+import 'package:algolia_insights/algolia_insights.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
+import 'facet_list_test.mocks.dart';
 import 'hits_searcher_test.dart';
 import 'hits_searcher_test.mocks.dart';
 
+@GenerateMocks([FacetList, FilterEventTracker])
 void main() {
   group('Build facets list', () {
     test('Get facet items and select', () async {
@@ -306,15 +310,105 @@ void main() {
       );
     });
   });
+
+  test('Should pass clicked facet values to event tracker', () async {
+    final searchService = MockHitsSearchService();
+    final initial = SearchResponse({
+      'facets': {
+        'color': {'red': 1}
+      }
+    });
+    when(searchService.search(any)).thenAnswer((_) => Future.value(initial));
+    final eventTracker = MockEventTracker();
+
+    when(eventTracker.clickedFilters()).thenAnswer((realInvocation) {
+      expect(realInvocation.positionalArguments[0], 'Filter Applied');
+      expect(realInvocation.positionalArguments[1], 'color');
+      expect(realInvocation.positionalArguments[2], 'red');
+    });
+
+    final searcher = HitsSearcher.custom(
+      searchService,
+      eventTracker,
+      const SearchState(indexName: 'myIndex'),
+    );
+
+    const groupID = FilterGroupID('color', FilterOperator.or);
+    final filterState = FilterState()
+      ..add(groupID, [
+        Filter.facet('color', 'green'),
+      ]);
+
+    FacetList.create(
+      searcher: searcher,
+      filterState: filterState,
+      attribute: 'color',
+      groupID: groupID,
+      persistent: true,
+    ).toggle('red');
+  });
+
+  group('FilterTracking', () {
+    late MockFacetList facetList;
+    late MockFilterEventTracker eventTracker;
+
+    setUp(() {
+      eventTracker = MockFilterEventTracker();
+      facetList = MockFacetList();
+      when(facetList.attribute).thenReturn('color');
+      when(facetList.eventTracker).thenReturn(eventTracker);
+    });
+
+    test('clickedFilters', () {
+      facetList.eventTracker.clickedFilters(
+        eventName: 'Filter Selected',
+        values: ['red'],
+      );
+      verify(
+        eventTracker.clickedFilters(
+          eventName: 'Filter Selected',
+          values: ['red'],
+        ),
+      ).called(1);
+    });
+
+    test('viewedFilters', () {
+      facetList.eventTracker.viewedFilters(
+        eventName: 'Product View',
+        values: ['green'],
+      );
+      verify(
+        eventTracker.viewedFilters(
+          eventName: 'Product View',
+          values: ['green'],
+        ),
+      ).called(1);
+    });
+
+    test('convertedFilters', () {
+      facetList.eventTracker.convertedFilters(
+        eventName: 'Conversion',
+        values: ['blue', 'green'],
+      );
+      verify(
+        eventTracker.convertedFilters(
+          eventName: 'Conversion',
+          values: ['blue', 'green'],
+        ),
+      ).called(1);
+    });
+  });
 }
 
 HitsSearcher mockHitsSearcher([Map<String, dynamic> json = const {}]) {
   final searchService = MockHitsSearchService();
   final initial = SearchResponse(json);
   when(searchService.search(any)).thenAnswer((_) => Future.value(initial));
+  final eventTracker = MockEventTracker();
 
   return HitsSearcher.custom(
     searchService,
+    eventTracker,
     const SearchState(indexName: 'myIndex'),
   );
 }
