@@ -8,6 +8,7 @@
 
 | Package                                  | Description                 | Version                                                                                                                    | Release stage                                                            |
 |------------------------------------------|-----------------------------|----------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
+| [algolia_insights](insights_dart)        | Algolia Insights for Dart   | [![pub package](https://img.shields.io/pub/v/algolia_insights.svg)](https://pub.dev/packages/algolia_insights)             | ![alpha version](https://img.shields.io/badge/release-alpha-yellowgreen) |
 | [algolia_helper](helper_dart)            | Algolia Helpers for Dart    | [![pub package](https://img.shields.io/pub/v/algolia_helper.svg)](https://pub.dev/packages/algolia_helper)                 | ![alpha version](https://img.shields.io/badge/release-alpha-yellowgreen) |
 | [algolia_helper_flutter](helper_flutter) | Algolia Helpers for Flutter | [![pub package](https://img.shields.io/pub/v/algolia_helper_flutter.svg)](https://pub.dev/packages/algolia_helper_flutter) | ![alpha version](https://img.shields.io/badge/release-alpha-yellowgreen) |
 
