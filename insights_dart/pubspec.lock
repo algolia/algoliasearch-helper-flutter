@@ -422,7 +422,7 @@ packages:
     source: hosted
     version: "1.21.4"
   test_api:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: test_api
       url: "https://pub.dartlang.org"

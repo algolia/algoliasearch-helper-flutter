@@ -21,3 +21,4 @@ dev_dependencies:
   lints: ^2.0.0
   mockito: ^5.3.0
   test: ^1.17.12
+  test_api: ^0.4.12
