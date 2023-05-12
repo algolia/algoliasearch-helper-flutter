@@ -39,7 +39,11 @@ class SearchState {
     this.sumOrFiltersScore,
     this.tagFilters,
     this.userToken,
-    this.clickAnalytics,
+    this.aroundLatLngViaIP,
+    this.aroundLatLng,
+    this.aroundRadius,
+    this.minimumAroundRadius,
+    this.aroundPrecision,
   });
 
   /// Index name
@@ -115,9 +119,11 @@ class SearchState {
   /// Whether the current query will be taken into account in the Analytics.
   final bool? analytics;
 
-  /// Add a query ID parameter to the response for tracking click and conversion
-  /// events.
-  final bool? clickAnalytics;
+  final bool? aroundLatLngViaIP;
+  final String? aroundLatLng;
+  final dynamic? aroundRadius;
+  final int? aroundPrecision;
+  final int? minimumAroundRadius;
 
   /// Make a copy of the search state.
   SearchState copyWith({
@@ -143,11 +149,15 @@ class SearchState {
     int? maxFacetHits,
     int? maxValuesPerFacet,
     int? page,
-    bool? clickAnalytics,
+    bool? aroundLatLngViaIP,
+    String? aroundLatLng,
+    dynamic? aroundRadius,
+    int? aroundPrecision,
+    int? minimumAroundRadius,
   }) =>
       SearchState(
         attributesToHighlight:
-            attributesToHighlight ?? this.attributesToHighlight,
+        attributesToHighlight ?? this.attributesToHighlight,
         attributesToRetrieve: attributesToRetrieve ?? this.attributesToRetrieve,
         attributesToSnippet: attributesToSnippet ?? this.attributesToSnippet,
         facetFilters: facetFilters ?? this.facetFilters,
@@ -169,37 +179,45 @@ class SearchState {
         maxFacetHits: maxFacetHits ?? this.maxFacetHits,
         maxValuesPerFacet: maxValuesPerFacet ?? this.maxValuesPerFacet,
         page: page ?? this.page,
-        clickAnalytics: clickAnalytics ?? this.clickAnalytics,
+        aroundLatLngViaIP: aroundLatLngViaIP ?? this.aroundLatLngViaIP,
+        aroundLatLng: aroundLatLng ?? this.aroundLatLng,
+        aroundRadius: aroundRadius ?? this.aroundRadius,
+        aroundPrecision: aroundPrecision ?? this.aroundPrecision,
+        minimumAroundRadius: minimumAroundRadius ?? this.minimumAroundRadius,
       );
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is SearchState &&
-          runtimeType == other.runtimeType &&
-          indexName == other.indexName &&
-          query == other.query &&
-          page == other.page &&
-          hitsPerPage == other.hitsPerPage &&
-          facets.equals(other.facets) &&
-          disjunctiveFacets.equals(other.disjunctiveFacets) &&
-          filterGroups.equals(other.filterGroups) &&
-          ruleContexts.equals(other.ruleContexts) &&
-          facetFilters.equals(other.facetFilters) &&
-          attributesToHighlight.equals(other.attributesToHighlight) &&
-          attributesToRetrieve.equals(other.attributesToRetrieve) &&
-          attributesToSnippet.equals(other.attributesToSnippet) &&
-          highlightPostTag == other.highlightPostTag &&
-          highlightPreTag == other.highlightPreTag &&
-          maxFacetHits == other.maxFacetHits &&
-          maxValuesPerFacet == other.maxValuesPerFacet &&
-          numericFilters.equals(other.numericFilters) &&
-          optionalFilters.equals(other.optionalFilters) &&
-          sumOrFiltersScore == other.sumOrFiltersScore &&
-          tagFilters.equals(other.tagFilters) &&
-          analytics == other.analytics &&
-          userToken == other.userToken &&
-          clickAnalytics == other.clickAnalytics;
+          other is SearchState &&
+              runtimeType == other.runtimeType &&
+              indexName == other.indexName &&
+              query == other.query &&
+              page == other.page &&
+              hitsPerPage == other.hitsPerPage &&
+              facets.equals(other.facets) &&
+              disjunctiveFacets.equals(other.disjunctiveFacets) &&
+              filterGroups.equals(other.filterGroups) &&
+              ruleContexts.equals(other.ruleContexts) &&
+              facetFilters.equals(other.facetFilters) &&
+              attributesToHighlight.equals(other.attributesToHighlight) &&
+              attributesToRetrieve.equals(other.attributesToRetrieve) &&
+              attributesToSnippet.equals(other.attributesToSnippet) &&
+              highlightPostTag == other.highlightPostTag &&
+              highlightPreTag == other.highlightPreTag &&
+              maxFacetHits == other.maxFacetHits &&
+              maxValuesPerFacet == other.maxValuesPerFacet &&
+              numericFilters.equals(other.numericFilters) &&
+              optionalFilters.equals(other.optionalFilters) &&
+              sumOrFiltersScore == other.sumOrFiltersScore &&
+              tagFilters.equals(other.tagFilters) &&
+              analytics == other.analytics &&
+              userToken == other.userToken &&
+              aroundLatLngViaIP == other.aroundLatLngViaIP &&
+              aroundLatLng == other.aroundLatLng &&
+              aroundRadius == other.aroundRadius &&
+              aroundPrecision == other.aroundPrecision &&
+              minimumAroundRadius == other.minimumAroundRadius;
 
   @override
   int get hashCode =>
@@ -225,7 +243,11 @@ class SearchState {
       tagFilters.hashing() ^
       analytics.hashCode ^
       userToken.hashCode ^
-      clickAnalytics.hashCode;
+      aroundLatLngViaIP.hashCode ^
+      aroundLatLng.hashCode ^
+      aroundRadius.hashCode ^
+      aroundPrecision.hashCode ^
+      minimumAroundRadius.hashCode;
 
   @override
   String toString() => 'SearchState{'
@@ -251,5 +273,11 @@ class SearchState {
       'sumOrFiltersScore: $sumOrFiltersScore, '
       'tagFilters: $tagFilters, '
       'userToken: $userToken, '
-      'clickAnalytics: $clickAnalytics}';
+      'aroundLatLngViaIP: $aroundLatLngViaIP, '
+      'aroundLatLng: $aroundLatLng, '
+      'aroundRadius: $aroundRadius, '
+      'aroundPrecision: $aroundPrecision, '
+      'minimumAroundRadius: $minimumAroundRadius, '
+      '}'
+  ;
 }
