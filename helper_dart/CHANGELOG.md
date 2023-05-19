@@ -1,5 +1,10 @@
 # ChangeLog
 
+## [0.3.1](https://github.com/algolia/algoliasearch-helper-flutter/compare/0.3.0...0.3.1) (2022-05-19)
+
+### Fix
+- Restore Pub points
+
 ## [0.3.0](https://github.com/algolia/algoliasearch-helper-flutter/compare/0.2.3...0.3.0) (2022-04-07)
 
 ### Feat
