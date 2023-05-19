@@ -89,8 +89,9 @@ class _CompositeDisposable with DisposableMixin implements CompositeDisposable {
   T add<T extends Disposable>(T disposable) {
     if (isDisposed) {
       throw StateError(
-          'This $runtimeType was disposed, consider checking `isDisposed` or'
-          ' try to use new instance instead',);
+        'This $runtimeType was disposed, consider checking `isDisposed` or'
+        ' try to use new instance instead',
+      );
     }
     _disposables.add(disposable);
     return disposable;

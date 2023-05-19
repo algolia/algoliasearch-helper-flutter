@@ -1,5 +1,5 @@
 name: algolia_insights
-description: Algolia Insights Helper for Dart
+description: Algolia Insights for Dart provides a simple and flexible way to track events such as clicks, conversions, and views on search results.
 version: 0.1.0
 homepage: https://www.algolia.com/doc/guides/building-search-ui/what-is-instantsearch/flutter/
 repository: https://github.com/algolia/algoliasearch-helper-flutter/tree/main/insights_dart
@@ -17,8 +17,8 @@ dependencies:
   uuid: ^3.0.6
 
 dev_dependencies:
-  build_runner: 2.2.0
-  lints: ^2.0.0
-  mockito: ^5.3.0
-  test: ^1.17.12
-  test_api: ^0.4.12
+  build_runner: ^2.4.4
+  lints: ^2.1.0
+  mockito: ^5.4.0
+  test: ^1.24.0
+  test_api: ">=0.2.1 <0.6.0"
