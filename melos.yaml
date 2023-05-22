@@ -12,6 +12,11 @@ scripts:
   format: 
     exec: dart format .
 
+  pana:
+    exec: pana --no-warning --exit-code-threshold 0
+    description: |
+      Run pub points check for all packages
+
   lint:pub:
     run: |
       melos exec -c 5 --no-private "dart pub publish --dry-run"
