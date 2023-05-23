@@ -77,3 +77,27 @@ jobs:
         run: melos bootstrap
       - name: "Flutter Test"
         run: melos run test:all
+
+  pana:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    timeout-minutes: 15
+    steps:
+      - name: "Git Checkout"
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: "Install Flutter"
+        uses: subosito/flutter-action@v2
+        with:
+          cache: true
+          flutter-version: ${{ env.flutter_version }}
+      - name: "Install Tools"
+        run: |
+          dart pub global activate pana
+          flutter pub global activate melos
+      - name: "Bootstrap Workspace"
+        run: melos bootstrap --verbose
+      - name: "Pana check"
+        run: |
+          melos run pana
