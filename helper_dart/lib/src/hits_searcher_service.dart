@@ -133,8 +133,20 @@ extension AlgoliaExt on Algolia {
     state.aroundPrecision?.let((it) => query = query.setAroundPrecision(it));
     state.minimumAroundRadius
         ?.let((it) => query = query.setMinimumAroundRadius(it));
-    state.insideBoundingBox
-        ?.let((it) => query = query.setInsideBoundingBox(it));
+    state.insideBoundingBox?.let(
+      (it) => query = query.setInsideBoundingBox(
+        it
+            .map(
+              (e) => BoundingBox(
+                p1Lat: e[0],
+                p1Lng: e[1],
+                p2Lat: e[2],
+                p2Lng: e[3],
+              ),
+            )
+            .toList(),
+      ),
+    );
     return query;
   }
 

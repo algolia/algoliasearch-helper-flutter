@@ -1,5 +1,3 @@
-import 'package:algolia/algolia.dart';
-
 import 'extensions.dart';
 import 'filter_group.dart';
 
@@ -285,7 +283,7 @@ class SearchState {
   ///
   /// Source: [Learn more](https://www.algolia.com/doc/api-reference/api-parameters/insideBoundingBox/)
   ///
-  final List<BoundingBox>? insideBoundingBox;
+  final List<List<double>>? insideBoundingBox;
 
   /// Make a copy of the search state.
   SearchState copyWith({
@@ -316,7 +314,7 @@ class SearchState {
     dynamic aroundRadius,
     int? aroundPrecision,
     int? minimumAroundRadius,
-    List<BoundingBox>? insideBoundingBox,
+    List<List<double>>? insideBoundingBox,
   }) =>
       SearchState(
         attributesToHighlight:
