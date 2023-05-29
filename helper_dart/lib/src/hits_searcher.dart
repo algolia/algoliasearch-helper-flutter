@@ -107,7 +107,7 @@ abstract class HitsSearcher implements Disposable, EventDataDelegate {
       _HitsSearcher(
         applicationID: applicationID,
         apiKey: apiKey,
-        state: SearchState(indexName: indexName, clickAnalytics: true),
+        state: SearchState(indexName: indexName),
         disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
         debounce: debounce,
       );
@@ -123,7 +123,7 @@ abstract class HitsSearcher implements Disposable, EventDataDelegate {
       _HitsSearcher(
         applicationID: applicationID,
         apiKey: apiKey,
-        state: state.copyWith(clickAnalytics: true),
+        state: state,
         disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
         debounce: debounce,
       );

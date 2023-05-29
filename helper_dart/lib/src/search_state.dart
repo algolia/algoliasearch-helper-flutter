@@ -121,7 +121,7 @@ class SearchState {
 
   final bool? aroundLatLngViaIP;
   final String? aroundLatLng;
-  final dynamic? aroundRadius;
+  final dynamic aroundRadius;
   final int? aroundPrecision;
   final int? minimumAroundRadius;
 
@@ -151,13 +151,13 @@ class SearchState {
     int? page,
     bool? aroundLatLngViaIP,
     String? aroundLatLng,
-    dynamic? aroundRadius,
+    dynamic aroundRadius,
     int? aroundPrecision,
     int? minimumAroundRadius,
   }) =>
       SearchState(
         attributesToHighlight:
-        attributesToHighlight ?? this.attributesToHighlight,
+            attributesToHighlight ?? this.attributesToHighlight,
         attributesToRetrieve: attributesToRetrieve ?? this.attributesToRetrieve,
         attributesToSnippet: attributesToSnippet ?? this.attributesToSnippet,
         facetFilters: facetFilters ?? this.facetFilters,
@@ -189,35 +189,35 @@ class SearchState {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is SearchState &&
-              runtimeType == other.runtimeType &&
-              indexName == other.indexName &&
-              query == other.query &&
-              page == other.page &&
-              hitsPerPage == other.hitsPerPage &&
-              facets.equals(other.facets) &&
-              disjunctiveFacets.equals(other.disjunctiveFacets) &&
-              filterGroups.equals(other.filterGroups) &&
-              ruleContexts.equals(other.ruleContexts) &&
-              facetFilters.equals(other.facetFilters) &&
-              attributesToHighlight.equals(other.attributesToHighlight) &&
-              attributesToRetrieve.equals(other.attributesToRetrieve) &&
-              attributesToSnippet.equals(other.attributesToSnippet) &&
-              highlightPostTag == other.highlightPostTag &&
-              highlightPreTag == other.highlightPreTag &&
-              maxFacetHits == other.maxFacetHits &&
-              maxValuesPerFacet == other.maxValuesPerFacet &&
-              numericFilters.equals(other.numericFilters) &&
-              optionalFilters.equals(other.optionalFilters) &&
-              sumOrFiltersScore == other.sumOrFiltersScore &&
-              tagFilters.equals(other.tagFilters) &&
-              analytics == other.analytics &&
-              userToken == other.userToken &&
-              aroundLatLngViaIP == other.aroundLatLngViaIP &&
-              aroundLatLng == other.aroundLatLng &&
-              aroundRadius == other.aroundRadius &&
-              aroundPrecision == other.aroundPrecision &&
-              minimumAroundRadius == other.minimumAroundRadius;
+      other is SearchState &&
+          runtimeType == other.runtimeType &&
+          indexName == other.indexName &&
+          query == other.query &&
+          page == other.page &&
+          hitsPerPage == other.hitsPerPage &&
+          facets.equals(other.facets) &&
+          disjunctiveFacets.equals(other.disjunctiveFacets) &&
+          filterGroups.equals(other.filterGroups) &&
+          ruleContexts.equals(other.ruleContexts) &&
+          facetFilters.equals(other.facetFilters) &&
+          attributesToHighlight.equals(other.attributesToHighlight) &&
+          attributesToRetrieve.equals(other.attributesToRetrieve) &&
+          attributesToSnippet.equals(other.attributesToSnippet) &&
+          highlightPostTag == other.highlightPostTag &&
+          highlightPreTag == other.highlightPreTag &&
+          maxFacetHits == other.maxFacetHits &&
+          maxValuesPerFacet == other.maxValuesPerFacet &&
+          numericFilters.equals(other.numericFilters) &&
+          optionalFilters.equals(other.optionalFilters) &&
+          sumOrFiltersScore == other.sumOrFiltersScore &&
+          tagFilters.equals(other.tagFilters) &&
+          analytics == other.analytics &&
+          userToken == other.userToken &&
+          aroundLatLngViaIP == other.aroundLatLngViaIP &&
+          aroundLatLng == other.aroundLatLng &&
+          aroundRadius == other.aroundRadius &&
+          aroundPrecision == other.aroundPrecision &&
+          minimumAroundRadius == other.minimumAroundRadius;
 
   @override
   int get hashCode =>
@@ -278,6 +278,5 @@ class SearchState {
       'aroundRadius: $aroundRadius, '
       'aroundPrecision: $aroundPrecision, '
       'minimumAroundRadius: $minimumAroundRadius, '
-      '}'
-  ;
+      '}';
 }

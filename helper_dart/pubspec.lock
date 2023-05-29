@@ -20,9 +20,10 @@ packages:
   algolia_insights:
     dependency: "direct main"
     description:
-      path: "../insights_dart"
-      relative: true
-    source: path
+      name: algolia_insights
+      sha256: e4c39cd39e39eded3db500bc4fc085e26216f99a6fe3173cc63756f0596a94b3
+      url: "https://pub.dev"
+    source: hosted
     version: "0.1.1"
   analyzer:
     dependency: transitive
