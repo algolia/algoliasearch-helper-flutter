@@ -1,5 +1,11 @@
 # ChangeLog
 
+## [0.3.2](https://github.com/algolia/algoliasearch-helper-flutter/compare/0.3.1...0.3.2) (2022-04-07)
+
+### Feat
+
+- Add 'aroundLagLngViaIP', 'aroundLatLng', 'aroundRadius', 'aroundPrecision', 'minimumAroundRadius', and 'insideBoundingBox' to `SearchParameters`
+
 ## [0.3.1](https://github.com/algolia/algoliasearch-helper-flutter/compare/0.3.0...0.3.1) (2022-05-19)
 
 ### Fix
