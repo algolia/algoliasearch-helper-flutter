@@ -25,13 +25,13 @@ class AlgoliaSearchService implements HitsSearchService {
     required List<String> extraUserAgents,
     required bool disjunctiveFacetingEnabled,
   }) : this.create(
-    Algolia.init(
-      applicationId: applicationID,
-      apiKey: apiKey,
-      extraUserAgents: extraUserAgents,
-    ),
-    disjunctiveFacetingEnabled,
-  );
+          Algolia.init(
+            applicationId: applicationID,
+            apiKey: apiKey,
+            extraUserAgents: extraUserAgents,
+          ),
+          disjunctiveFacetingEnabled,
+        );
 
   /// Creates [HitsSearchService] instance.
   AlgoliaSearchService.create(this._client, this._disjunctiveFacetingEnabled)
@@ -73,7 +73,7 @@ class AlgoliaSearchService implements HitsSearchService {
       final queryBuilder = QueryBuilder(state);
       final queries = queryBuilder.build().map(_client.queryOf).toList();
       final responses =
-      await _client.multipleQueries.addQueries(queries).getObjects();
+          await _client.multipleQueries.addQueries(queries).getObjects();
       _log.fine('Search responses: $responses');
       return queryBuilder
           .merge(responses.map((r) => r.toSearchResponse()).toList());
@@ -123,16 +123,18 @@ extension AlgoliaExt on Algolia {
     state.aroundLatLng?.let((it) => query = query.setAroundLatLng(it));
 
     // ?.let does not work on dynamic types
-    if(state.aroundRadius is String) {
+    if (state.aroundRadius is String) {
       query = query.setAroundRadius('all');
     }
-    if(state.aroundRadius is int) {
+    if (state.aroundRadius is int) {
       query = query.setAroundRadius(state.aroundRadius);
     }
 
     state.aroundPrecision?.let((it) => query = query.setAroundPrecision(it));
     state.minimumAroundRadius
         ?.let((it) => query = query.setMinimumAroundRadius(it));
+    state.insideBoundingBox
+        ?.let((it) => query = query.setInsideBoundingBox(it));
     return query;
   }
 
