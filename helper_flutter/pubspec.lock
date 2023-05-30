@@ -15,7 +15,7 @@ packages:
       path: "../helper_dart"
       relative: true
     source: path
-    version: "0.3.1"
+    version: "0.3.2"
   algolia_insights:
     dependency: "direct overridden"
     description:
