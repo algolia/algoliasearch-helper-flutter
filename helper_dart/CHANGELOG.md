@@ -1,5 +1,10 @@
 # ChangeLog
 
+## [0.3.2](https://github.com/algolia/algoliasearch-helper-flutter/compare/0.3.1...0.3.2) (2022-05-30)
+
+### Fix
+- Outdated algolia_helper version in the algolia_helper_flutter pubspec
+
 ## [0.3.1](https://github.com/algolia/algoliasearch-helper-flutter/compare/0.3.0...0.3.1) (2022-05-19)
 
 ### Fix
