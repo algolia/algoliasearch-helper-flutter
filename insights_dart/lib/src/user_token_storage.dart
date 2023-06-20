@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
 class UserTokenStorage {
@@ -38,7 +39,10 @@ class UserTokenStorage {
   String _boxName = 'userToken';
 
   /// Box value persistently storing the user token and its lease time
-  Future<Box> get _box => Hive.openBox(_boxName, path: _boxPath);
+  Future<Box> get _box async {
+    final tmpDir = await getTemporaryDirectory();
+    return Hive.openBox(_boxName, path: '${tmpDir.path}/$_boxPath');
+  }
 
   /// Private value storing the actual value of the persistent storage allowance
   /// flag
