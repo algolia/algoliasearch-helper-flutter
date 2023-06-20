@@ -1,4 +1,0 @@
-fileignoreconfig:
-- filename: insights_dart/pubspec.lock
-  checksum: a360cde2a70314412f3137873e2977681bbed00fa0a815cb2aa1b91bdf8b56c0
-version: "1.0"
