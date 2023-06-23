@@ -1,5 +1,7 @@
 import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
+import 'dart:io' show Platform;
 
 class UserTokenStorage {
   static const _userTokenKey = 'insights-user-token';
@@ -38,7 +40,20 @@ class UserTokenStorage {
   String _boxName = 'userToken';
 
   /// Box value persistently storing the user token and its lease time
-  Future<Box> get _box => Hive.openBox(_boxName, path: _boxPath);
+  Future<Box> get _box async {
+    final String path;
+    if (Platform.isAndroid ||
+        Platform.isIOS ||
+        Platform.isLinux ||
+        Platform.isMacOS ||
+        Platform.isWindows) {
+      final docsDir = await getApplicationDocumentsDirectory();
+      path = '${docsDir.path}/$_boxPath';
+    } else {
+      path = _boxPath;
+    }
+    return Hive.openBox(_boxName, path: path);
+  }
 
   /// Private value storing the actual value of the persistent storage allowance
   /// flag
