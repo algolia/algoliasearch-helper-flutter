@@ -1,7 +1,8 @@
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
-import 'dart:io' show Platform;
+import 'platform_web.dart'
+  if (dart.library.io) 'platform_native.dart';
 
 class UserTokenStorage {
   static const _userTokenKey = 'insights-user-token';
@@ -42,11 +43,7 @@ class UserTokenStorage {
   /// Box value persistently storing the user token and its lease time
   Future<Box> get _box async {
     final String path;
-    if (Platform.isAndroid ||
-        Platform.isIOS ||
-        Platform.isLinux ||
-        Platform.isMacOS ||
-        Platform.isWindows) {
+    if (!isWeb) {
       final docsDir = await getApplicationDocumentsDirectory();
       path = '${docsDir.path}/$_boxPath';
     } else {
