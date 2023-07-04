@@ -1,4 +1,4 @@
-import 'package:algolia/algolia.dart';
+import 'package:algolia_client_insights/algolia_client_insights.dart';
 import 'package:logging/logging.dart';
 
 import 'event.dart';
@@ -7,7 +7,7 @@ import 'event_service.dart';
 /// EventService implementation using community client instance
 class AlgoliaEventService implements EventService {
   /// Client instance
-  Algolia _client;
+  InsightsClient _client;
 
   /// Logger instance
   final Logger _log;
@@ -16,11 +16,7 @@ class AlgoliaEventService implements EventService {
     String applicationID,
     String apiKey,
   ) : this.create(
-          Algolia.init(
-            applicationId: applicationID,
-            apiKey: apiKey,
-            extraUserAgents: ['algolia-insights-dart (0.0.1)'],
-          ),
+          InsightsClient(appId: applicationID, apiKey: apiKey),
         );
 
   /// Creates [AlgoliaEventService] instance.
@@ -29,35 +25,118 @@ class AlgoliaEventService implements EventService {
 
   @override
   void send(List<Event> events) => _client
-      .pushEvents(events.map((event) => event.toAlgoliaEvent()).toList())
+      .pushEvents(
+          insightsEvents:
+              InsightsEvents(events: events.map((e) => e.toAlgoliaEvent())),)
       .then(
         (_) => _log.fine('Events upload: $events'),
         onError: (exception) => _log.severe('Events upload error: $exception'),
       );
 }
 
-extension AlgoliaEventTypeConversion on EventType {
-  AlgoliaEventType toAlgoliaEventType() {
-    switch (this) {
-      case EventType.view:
-        return AlgoliaEventType.view;
-      case EventType.click:
-        return AlgoliaEventType.click;
-      case EventType.conversion:
-        return AlgoliaEventType.conversion;
-    }
-  }
-}
-
 extension AlgoliaEventConversion on Event {
-  AlgoliaEvent toAlgoliaEvent() => AlgoliaEvent(
-        eventType: type.toAlgoliaEventType(),
-        eventName: eventName,
-        index: indexName,
-        userToken: userToken,
-        timestamp: timestamp,
-        objectIDs: objectIDs?.toList(),
-        positions: positions?.toList(),
-        filters: filterValues?.map((value) => '$attribute:$value').toList(),
-      );
+  dynamic toAlgoliaEvent() {
+    switch (type) {
+      case EventType.click:
+        final objectIDs = this.objectIDs;
+        if (objectIDs != null) {
+          final queryID = this.queryID;
+          final positions = this.positions;
+          if (queryID != null && positions != null) {
+            return ClickedObjectIDsAfterSearch(
+              eventName: eventName,
+              eventType: ClickEvent.click,
+              index: indexName,
+              objectIDs: objectIDs.toList(),
+              positions: positions.toList(),
+              queryID: queryID,
+              userToken: userToken,
+              timestamp: timestamp?.millisecondsSinceEpoch,
+            );
+          } else {
+            return ClickedObjectIDs(
+              eventName: eventName,
+              eventType: ClickEvent.click,
+              index: indexName,
+              objectIDs: objectIDs.toList(),
+              userToken: userToken,
+              timestamp: timestamp?.millisecondsSinceEpoch,
+            );
+          }
+        }
+        final filterValues = this.filterValues;
+        if (filterValues != null) {
+          return ClickedFilters(
+            eventName: eventName,
+            eventType: ClickEvent.click,
+            index: indexName,
+            filters: filterValues.toList(),
+            userToken: userToken,
+            timestamp: timestamp?.millisecondsSinceEpoch,
+          );
+        }
+        break;
+      case EventType.conversion:
+        final objectIDs = this.objectIDs;
+        if (objectIDs != null) {
+          final queryID = this.queryID;
+          if (queryID != null) {
+            return ConvertedObjectIDsAfterSearch(
+              eventName: eventName,
+              eventType: ConversionEvent.conversion,
+              index: indexName,
+              objectIDs: objectIDs.toList(),
+              queryID: queryID,
+              userToken: userToken,
+              timestamp: timestamp?.millisecondsSinceEpoch,
+            );
+          } else {
+            return ConvertedObjectIDs(
+              eventName: eventName,
+              eventType: ConversionEvent.conversion,
+              index: indexName,
+              objectIDs: objectIDs.toList(),
+              userToken: userToken,
+              timestamp: timestamp?.millisecondsSinceEpoch,
+            );
+          }
+        }
+        final filterValues = this.filterValues;
+        if (filterValues != null) {
+          return ConvertedFilters(
+            eventName: eventName,
+            eventType: ConversionEvent.conversion,
+            index: indexName,
+            filters: filterValues.toList(),
+            userToken: userToken,
+          );
+        }
+        break;
+      case EventType.view:
+        final objectIDs = this.objectIDs;
+        if (objectIDs != null) {
+          return ViewedObjectIDs(
+            eventName: eventName,
+            eventType: ViewEvent.view,
+            index: indexName,
+            objectIDs: objectIDs.toList(),
+            userToken: userToken,
+            timestamp: timestamp?.millisecondsSinceEpoch,
+          );
+        }
+        final filterValues = this.filterValues;
+        if (filterValues != null) {
+          return ViewedFilters(
+            eventName: eventName,
+            eventType: ViewEvent.view,
+            index: indexName,
+            filters: filterValues.toList(),
+            userToken: userToken,
+            timestamp: timestamp?.millisecondsSinceEpoch,
+          );
+        }
+        break;
+    }
+    return null;
+  }
 }
