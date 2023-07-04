@@ -1,4 +1,3 @@
-import 'package:algolia/algolia.dart';
 import 'package:logging/logging.dart';
 
 import 'exception.dart';
@@ -15,7 +14,7 @@ abstract class HitsSearchService {
   /// Send a search request [state] and asynchronously get a [SearchResponse].
   Future<SearchResponse> search(SearchState state);
 }
-
+/*
 /// Implementation of [HitsSearchService] using [Algolia] client.
 class AlgoliaSearchService implements HitsSearchService {
   /// Creates [HitsSearchService] instance.
@@ -188,3 +187,4 @@ extension AlgoliaErrorExt on AlgoliaError {
   /// Converts API error to [SearchError].
   SearchError toSearchError() => SearchError(error, statusCode);
 }
+*/

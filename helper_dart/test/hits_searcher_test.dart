@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:algolia/algolia.dart';
 import 'package:algolia_helper/algolia_helper.dart';
+import 'package:algolia_helper/src/algolia_search_service.dart';
 import 'package:algolia_helper/src/hits_searcher_service.dart';
 import 'package:algolia_insights/algolia_insights.dart';
 import 'package:algolia_insights/src/event_service.dart';
@@ -277,14 +277,10 @@ void main() {
         ),
       },
     );
-    const client = Algolia.init(
-      applicationId: 'applicationId',
-      apiKey: 'apiKey',
-    );
 
-    final query = client.queryOf(state);
+    final query = state.toRequest();
     expect(
-      query.parameters['filters'],
+      query.filters,
       '("attributeA":0) AND ("attributeA":0) '
       'AND (_tags:"unknown") AND ("attributeA":0 TO 1)',
     );

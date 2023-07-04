@@ -5,6 +5,7 @@ import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
+import 'algolia_search_service.dart';
 import 'disposable.dart';
 import 'disposable_mixin.dart';
 import 'filter_state.dart';
@@ -188,10 +189,10 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
     bool disjunctiveFacetingEnabled = true,
     Duration debounce = const Duration(milliseconds: 100),
   }) {
-    final service = AlgoliaSearchService(
+    final service = AlgoliaOfficialSearchService(
       applicationID: applicationID,
       apiKey: apiKey,
-      extraUserAgents: ['algolia-helper-dart ($libVersion)'],
+      // extraUserAgents: ['algolia-helper-dart ($libVersion)'],
       disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
     );
     final insights = Insights(applicationID, apiKey);
