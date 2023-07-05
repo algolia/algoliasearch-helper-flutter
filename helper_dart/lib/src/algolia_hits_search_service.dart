@@ -4,29 +4,34 @@ import 'package:logging/logging.dart';
 import 'exception.dart';
 import 'extensions.dart';
 import 'filter_group_converter.dart';
-import 'hits_searcher_service.dart';
+import 'hits_search_service.dart';
+import 'lib_version.dart';
 import 'logger.dart';
 import 'query_builder.dart';
 import 'search_response.dart';
 import 'search_state.dart';
 
-/*
-What's the proper way to inject additional user agents?
- */
-
-class AlgoliaOfficialSearchService implements HitsSearchService {
+class AlgoliaHitsSearchService implements HitsSearchService {
   /// Creates [HitsSearchService] instance.
-  AlgoliaOfficialSearchService({
+  AlgoliaHitsSearchService({
     required String applicationID,
     required String apiKey,
     required bool disjunctiveFacetingEnabled,
   }) : this.create(
-          algolia.SearchClient(appId: applicationID, apiKey: apiKey),
+          algolia.SearchClient(
+              appId: applicationID,
+              apiKey: apiKey,
+              options: const algolia.ClientOptions(agentSegments: [
+                algolia.AgentSegment(
+                  value: 'algolia-helper-dart',
+                  version: libVersion,
+                )
+              ]),),
           disjunctiveFacetingEnabled,
         );
 
   /// Creates [HitsSearchService] instance.
-  AlgoliaOfficialSearchService.create(
+  AlgoliaHitsSearchService.create(
       this._client, this._disjunctiveFacetingEnabled)
       : _log = algoliaLogger('SearchService');
 
@@ -84,8 +89,9 @@ class AlgoliaOfficialSearchService implements HitsSearchService {
 
 extension AlgolisSearchExt on SearchState {
   algolia.SearchForHits toRequest() {
-    final filters = filterGroups?.let((it) =>
-        const FilterGroupConverter().sql(it),);
+    final filters = filterGroups?.let(
+      (it) => const FilterGroupConverter().sql(it),
+    );
     final search = algolia.SearchForHits(
       indexName: indexName,
       analytics: analytics,

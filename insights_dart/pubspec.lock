@@ -25,22 +25,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.1.1+3"
-  algolia_client_search:
-    dependency: transitive
-    description:
-      name: algolia_client_search
-      sha256: "9dc3ca93a281cb10ce5726e1e609687aeb43d67f20badfae17bf88d589b19d91"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.1+2"
-  algoliasearch:
-    dependency: "direct main"
-    description:
-      name: algoliasearch
-      sha256: "5bfd61a237a00932d19d9e3b461696c8ee0aaa92f517fbe30ecf2c147fb8d879"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.1+3"
   analyzer:
     dependency: transitive
     description:

@@ -1,8 +1,10 @@
 import 'package:algolia_client_insights/algolia_client_insights.dart';
+import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
 
 import 'event.dart';
 import 'event_service.dart';
+import 'lib_version.dart';
 
 /// EventService implementation using community client instance
 class AlgoliaEventService implements EventService {
@@ -16,7 +18,18 @@ class AlgoliaEventService implements EventService {
     String applicationID,
     String apiKey,
   ) : this.create(
-          InsightsClient(appId: applicationID, apiKey: apiKey),
+          InsightsClient(
+            appId: applicationID,
+            apiKey: apiKey,
+            options: const ClientOptions(
+              agentSegments: [
+                AgentSegment(
+                  value: 'algolia-insights-dart',
+                  version: libVersion,
+                )
+              ],
+            ),
+          ),
         );
 
   /// Creates [AlgoliaEventService] instance.
@@ -26,8 +39,10 @@ class AlgoliaEventService implements EventService {
   @override
   void send(List<Event> events) => _client
       .pushEvents(
-          insightsEvents:
-              InsightsEvents(events: events.map((e) => e.toAlgoliaEvent())),)
+        insightsEvents: InsightsEvents(
+          events: events.map((e) => e.toAlgoliaEvent()).whereNotNull(),
+        ),
+      )
       .then(
         (_) => _log.fine('Events upload: $events'),
         onError: (exception) => _log.severe('Events upload error: $exception'),

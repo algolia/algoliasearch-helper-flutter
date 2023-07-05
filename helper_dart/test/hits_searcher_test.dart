@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:algolia_helper/algolia_helper.dart';
-import 'package:algolia_helper/src/algolia_search_service.dart';
-import 'package:algolia_helper/src/hits_searcher_service.dart';
+import 'package:algolia_helper/src/algolia_hits_search_service.dart';
+import 'package:algolia_helper/src/hits_search_service.dart';
 import 'package:algolia_insights/algolia_insights.dart';
 import 'package:algolia_insights/src/event_service.dart';
 import 'package:mockito/annotations.dart';
