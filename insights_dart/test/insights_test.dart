@@ -1,19 +1,14 @@
 import 'package:algolia_insights/algolia_insights.dart';
 import 'package:algolia_insights/src/event_service.dart';
 import 'package:algolia_insights/src/user_token_storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:test/test.dart';
 
-import 'fake_path_provider_platform.dart';
 import 'insights_test.mocks.dart';
 
 @GenerateMocks([EventService])
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  PathProviderPlatform.instance = FakePathProviderPlatform();
 
   test('fetch Insights instance from pool for the same app id', () {
     final insights1 = Insights('appID1', 'key1');
@@ -113,7 +108,7 @@ void main() {
     setUp(() {
       mockEventService = MockEventService();
       insights = Insights.custom(
-          mockEventService, UserTokenStorage.custom('algolia', 'user-token'));
+          mockEventService, UserTokenStorage.custom('algolia', 'user-token'),);
     });
 
     tearDown(() => {
