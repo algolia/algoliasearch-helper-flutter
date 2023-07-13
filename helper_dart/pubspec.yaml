@@ -6,7 +6,7 @@ environment:
   sdk: '>=2.17.5 <4.0.0'
 dependencies:
   algolia: ^1.1.1
-  algolia_insights: ^0.1.0
+  algolia_insights: ^0.1.1
   collection: ^1.16.0
   logging: ^1.0.2
   meta: ^1.7.0

@@ -37,17 +37,19 @@ class UserTokenStorage {
     }
   }
 
-  String _boxPath;
-  String _boxName = 'userToken';
+  String? _boxPath;
+  String _boxName = 'user-token';
 
   /// Box value persistently storing the user token and its lease time
   Future<Box> get _box async {
     final String path;
-    if (!isWeb) {
-      final docsDir = await getApplicationDocumentsDirectory();
-      path = '${docsDir.path}/$_boxPath';
+    if (_boxPath != null) {
+      path = _boxPath!;
+    } else if (isWeb) {
+      path = 'algolia';
     } else {
-      path = _boxPath;
+      final docsDir = await getApplicationDocumentsDirectory();
+      path = '${docsDir.path}/algolia';
     }
     return Hive.openBox(_boxName, path: path);
   }

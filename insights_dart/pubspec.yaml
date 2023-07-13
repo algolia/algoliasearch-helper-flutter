@@ -6,7 +6,7 @@ repository: https://github.com/algolia/algoliasearch-helper-flutter/tree/main/in
 
 environment:
   sdk: ">=2.17.5 <4.0.0"
-
+  flutter: '>=1.17.0'
 dependencies:
   algolia: ^1.1.1
   collection: ^1.16.0
