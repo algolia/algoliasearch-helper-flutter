@@ -1,3 +1,16 @@
+## 0.3.3
+
+ - **REFACTOR**(docs): update public API (#9).
+ - **REFACTOR**(searcher): update API and tests (#3).
+ - **REFACTOR**: rename main entry to algolia.dart.
+ - **FIX**: use app documents directory to store the user token if possible (#88).
+ - **FIX**: outdated algolia_helper version in the algolia_helper_flutter pubspec' (#81).
+ - **FIX**: Restore pub points (#75).
+ - **FIX**: modules types.
+ - **FEAT**: Insights (#62).
+ - **FEAT**: enhance DX and update documentation  (#33).
+ - **FEAT**(highlighting): Highlighting feature (#11).
+
 # ChangeLog
 
 ## [0.3.2](https://github.com/algolia/algoliasearch-helper-flutter/compare/0.3.1...0.3.2) (2022-05-30)

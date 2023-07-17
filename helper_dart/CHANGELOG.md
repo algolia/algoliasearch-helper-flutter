@@ -1,3 +1,37 @@
+## 0.3.3
+
+ - **REFACTOR**: Filters/FilterState and add disposables (#31).
+ - **REFACTOR**(searcher): responses as published stream (#30).
+ - **REFACTOR**: `HitsSearcher` and `FacetList` spec and impl SoC (#24).
+ - **REFACTOR**(hierarchical): update group logic (#10).
+ - **REFACTOR**(docs): update public API (#9).
+ - **REFACTOR**(searcher): update API and tests (#3).
+ - **REFACTOR**: rename main entry to algolia.dart.
+ - **FIX**: use app documents directory to store the user token if possible (#88).
+ - **FIX**: Restore pub points (#75).
+ - **FIX**(highlighting): strings with symbols other then letters (#46).
+ - **FIX**: allow same search query to be executed (#48).
+ - **FIX**: add type alias for deprecated immutable filters (#32).
+ - **FIX**: named parameters for Hit.getHighlightedString (#22).
+ - **FIX**: remove distinct from search state stream (#21).
+ - **FIX**(QueryBuilder): build disjunctive faceting queries exception (#19).
+ - **FIX**(searchResponse): facetStats type (#15).
+ - **FIX**(queryBuilder): add objectID to attributes for aux queries (#14).
+ - **FIX**: tag filter attribute.
+ - **FIX**(searcher): search response build.
+ - **FIX**(searcher): search operation call.
+ - **FIX**: modules types.
+ - **FEAT**: Insights (#62).
+ - **FEAT**: add rerun search query (#51).
+ - **FEAT**: enhance DX and update documentation  (#33).
+ - **FEAT**(FacetList): update search state on disjunctive faceting  (#27).
+ - **FEAT**(HitsSearcher): expose search state stream (#17).
+ - **FEAT**: facet list component (#13).
+ - **FEAT**(highlighting): Highlighting feature (#11).
+ - **FEAT**(search): update query params build (#8).
+ - **FEAT**(filterstate): update and document API (#6).
+ - **FEAT**: QueryBuilder (#5).
+
 # ChangeLog
 
 ## [0.3.2](https://github.com/algolia/algoliasearch-helper-flutter/compare/0.3.1...0.3.2) (2022-05-30)
