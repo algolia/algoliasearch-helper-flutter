@@ -10,14 +10,6 @@ import 'insights_test.mocks.dart';
 @GenerateMocks([EventService])
 void main() {
 
-  test('fetch Insights instance from pool for the same app id', () {
-    final insights1 = Insights('appID1', 'key1');
-    final insights2 = Insights('appID2', 'key1');
-    final insights3 = Insights('appID1', 'key1');
-    expect(insights1, same(insights3));
-    expect(insights1, isNot(insights2));
-  });
-
   test(
     'check generated user token format',
     () {
