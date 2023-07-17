@@ -6,13 +6,14 @@ repository: https://github.com/algolia/algoliasearch-helper-flutter/tree/main/in
 
 environment:
   sdk: ">=2.17.5 <4.0.0"
-
+  flutter: '>=1.17.0'
 dependencies:
   algolia: ^1.1.1
   collection: ^1.16.0
   hive: ^2.2.3
   logging: ^1.0.2
   meta: ^1.7.0
+  path_provider: ^2.0.15
   rxdart: ^0.27.4
   uuid: ^3.0.6
 
