@@ -20,10 +20,15 @@ import 'hits_searcher_test.mocks.dart';
 void main() {
   group('Integration tests', () {
     test('Successful search operation', () async {
-      final helper = HitsSearcher.create(
-        applicationID: 'latency',
-        apiKey: 'af044fb0788d6bb15f807e4420592bc5',
-        state: const SearchState(
+      final helper = HitsSearcher.custom(
+        AlgoliaSearchService(
+          applicationID: 'latency',
+          apiKey: 'af044fb0788d6bb15f807e4420592bc5',
+          extraUserAgents: [],
+          disjunctiveFacetingEnabled: true,
+        ),
+        MockEventTracker(),
+        const SearchState(
           indexName: 'instant_search',
           query: 'apple',
           hitsPerPage: 1,
@@ -36,10 +41,19 @@ void main() {
     });
 
     test('Failing search operation', () async {
-      final helper = HitsSearcher(
-        applicationID: 'latency',
-        apiKey: 'UNKNOWN',
-        indexName: 'instant_search',
+      final helper = HitsSearcher.custom(
+        AlgoliaSearchService(
+          applicationID: 'latency',
+          apiKey: 'UNKNOWN',
+          extraUserAgents: [],
+          disjunctiveFacetingEnabled: true,
+        ),
+        MockEventTracker(),
+        const SearchState(
+          indexName: 'instant_search',
+          query: 'apple',
+          hitsPerPage: 1,
+        ),
       );
       await expectLater(helper.responses, emitsError(anything));
     });
