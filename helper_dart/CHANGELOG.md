@@ -1,4 +1,6 @@
-# ChangeLog
+## 0.3.3
+
+- **FIX**: use app documents directory to store the user token if possible (#88).
 
 ## [0.3.2](https://github.com/algolia/algoliasearch-helper-flutter/compare/0.3.1...0.3.2) (2022-05-30)
 
