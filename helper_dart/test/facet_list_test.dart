@@ -1,4 +1,5 @@
 import 'package:algolia_helper/algolia_helper.dart';
+import 'package:algolia_helper/src/model/facet.dart';
 import 'package:algolia_insights/algolia_insights.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -321,7 +322,14 @@ void main() {
     when(searchService.search(any)).thenAnswer((_) => Future.value(initial));
     final eventTracker = MockEventTracker();
 
-    when(eventTracker.clickedFilters()).thenAnswer((realInvocation) {
+    when(
+      eventTracker.clickedFilters(
+        indexName: '',
+        eventName: '',
+        attribute: '',
+        values: [],
+      ),
+    ).thenAnswer((realInvocation) {
       expect(realInvocation.positionalArguments[0], 'Filter Applied');
       expect(realInvocation.positionalArguments[1], 'color');
       expect(realInvocation.positionalArguments[2], 'red');

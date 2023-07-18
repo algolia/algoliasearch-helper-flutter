@@ -1,9 +1,10 @@
 import 'package:collection/collection.dart';
+import 'facet.dart';
 
-import 'extensions.dart';
+sealed class MultiSearchResponse {}
 
 /// Search operation response.
-class SearchResponse {
+class SearchResponse implements MultiSearchResponse {
   /// Creates [SearchResponse] instance.
   SearchResponse(this.raw)
       : hits = Hit._fromList(raw['hits']),
@@ -52,7 +53,7 @@ class SearchResponse {
   /// A mapping of each facet name to the corresponding facet counts.
   /// Returned only if `SearchState.facets` is non-empty.
   Map<String, List<Facet>> get facets =>
-      Facet._fromMap(raw['facets'] as Map<String, dynamic>? ?? {});
+      Facet.fromMap(raw['facets'] as Map<String, dynamic>? ?? {});
 
   /// Statistics for numerical facets.
   /// Returned only if `SearchState.facets` is non-empty and at least one of
@@ -121,42 +122,19 @@ class Hit extends DelegatingMap<String, dynamic> {
   String toString() => 'Hit{json: $_json}';
 }
 
-/// A value of a given facet, together with its number of occurrences.
-/// Useful when an ordered list of facet values has to be presented to the user.
-class Facet {
-  /// Creates [Facet] instance.
-  const Facet(this.value, this.count, [this.highlighted]);
+final class FacetSearchResponse implements MultiSearchResponse {
+  /// The list of facets.
+  final List<Facet> facetHits;
 
-  /// Creates Map of attributes and [Facet] lists from [json].
-  static Map<String, List<Facet>> _fromMap(Map<String, dynamic> json) =>
-      json.map((key, value) {
-        final facetsMap = Map<String, int>.from(value as Map? ?? {});
-        final facetsList = facetsMap.toList(Facet.new);
-        return MapEntry(key, facetsList);
-      });
+  /// Whether the count returned for each facets is exhaustive.
+  final bool exhaustiveFacetsCount;
 
-  /// Name of the facet. Is equal to the value associated to an attribute.
-  final String value;
+  /// Processing time.
+  final double processingTimeMS;
 
-  /// Number of times this [value] occurs for a given attribute.
-  final int count;
-
-  /// Highlighted value.
-  final String? highlighted;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Facet &&
-          runtimeType == other.runtimeType &&
-          value == other.value &&
-          count == other.count &&
-          highlighted == other.highlighted;
-
-  @override
-  int get hashCode => value.hashCode ^ count.hashCode ^ highlighted.hashCode;
-
-  @override
-  String toString() =>
-      'Facet{value: $value, count: $count, highlighted: $highlighted}';
+  FacetSearchResponse(
+    this.facetHits,
+    this.exhaustiveFacetsCount,
+    this.processingTimeMS,
+  );
 }

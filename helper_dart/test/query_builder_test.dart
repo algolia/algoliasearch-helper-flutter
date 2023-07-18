@@ -1,4 +1,5 @@
 import 'package:algolia_helper/algolia_helper.dart';
+import 'package:algolia_helper/src/model/facet.dart';
 import 'package:algolia_helper/src/query_builder.dart';
 import 'package:test/test.dart';
 

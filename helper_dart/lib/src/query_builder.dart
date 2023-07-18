@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 
 import 'filter.dart';
 import 'filter_group.dart';
-import 'search_response.dart';
+import 'model/search_response.dart';
 import 'search_state.dart';
 
 /// Transform single query into multiple requests for disjunctive/hierarchical

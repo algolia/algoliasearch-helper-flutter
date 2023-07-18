@@ -1,15 +1,15 @@
 import 'package:algoliasearch/algoliasearch_lite.dart' as algolia;
 import 'package:logging/logging.dart';
 
-import 'exception.dart';
-import 'extensions.dart';
-import 'filter_group_converter.dart';
+import '../exception.dart';
+import '../extensions.dart';
+import '../filter_group_converter.dart';
+import '../lib_version.dart';
+import '../logger.dart';
+import '../model/search_response.dart';
+import '../query_builder.dart';
+import '../search_state.dart';
 import 'hits_search_service.dart';
-import 'lib_version.dart';
-import 'logger.dart';
-import 'query_builder.dart';
-import 'search_response.dart';
-import 'search_state.dart';
 
 class AlgoliaHitsSearchService implements HitsSearchService {
   /// Creates [HitsSearchService] instance.

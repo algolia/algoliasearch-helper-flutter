@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:algolia_helper/algolia_helper.dart';
-import 'package:algolia_helper/src/algolia_hits_search_service.dart';
-import 'package:algolia_helper/src/hits_search_service.dart';
+import 'package:algolia_helper/src/service/algolia_hits_search_service.dart';
+import 'package:algolia_helper/src/service/hits_search_service.dart';
 import 'package:algolia_insights/algolia_insights.dart';
 import 'package:algolia_insights/src/event_service.dart';
 import 'package:mockito/annotations.dart';
@@ -212,7 +212,13 @@ void main() {
     when(searchService.search(any)).thenAnswer(mockResponse);
 
     final eventTracker = MockEventTracker();
-    when(eventTracker.viewedObjects()).thenAnswer((realInvocation) {
+    when(
+      eventTracker.viewedObjects(
+        indexName: '',
+        eventName: '',
+        objectIDs: [],
+      ),
+    ).thenAnswer((realInvocation) {
       expect(realInvocation.positionalArguments[0], 'Hits Viewed');
       expect(realInvocation.positionalArguments[1], ['h1', 'h2']);
     });
