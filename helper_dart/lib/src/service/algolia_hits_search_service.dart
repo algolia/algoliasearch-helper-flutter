@@ -1,14 +1,12 @@
-import 'package:algoliasearch/algoliasearch_lite.dart' as algolia;
+import 'package:algoliasearch/algoliasearch.dart' as algolia;
 import 'package:logging/logging.dart';
 
-import '../exception.dart';
-import '../extensions.dart';
-import '../filter_group_converter.dart';
 import '../lib_version.dart';
 import '../logger.dart';
-import '../model/search_response.dart';
+import '../model/multi_search_response.dart';
+import '../model/multi_search_state.dart';
 import '../query_builder.dart';
-import '../search_state.dart';
+import 'algolia_client_helper.dart';
 import 'hits_search_service.dart';
 
 class AlgoliaHitsSearchService implements HitsSearchService {
@@ -19,21 +17,25 @@ class AlgoliaHitsSearchService implements HitsSearchService {
     required bool disjunctiveFacetingEnabled,
   }) : this.create(
           algolia.SearchClient(
-              appId: applicationID,
-              apiKey: apiKey,
-              options: const algolia.ClientOptions(agentSegments: [
+            appId: applicationID,
+            apiKey: apiKey,
+            options: const algolia.ClientOptions(
+              agentSegments: [
                 algolia.AgentSegment(
                   value: 'algolia-helper-dart',
                   version: libVersion,
                 )
-              ]),),
+              ],
+            ),
+          ),
           disjunctiveFacetingEnabled,
         );
 
   /// Creates [HitsSearchService] instance.
   AlgoliaHitsSearchService.create(
-      this._client, this._disjunctiveFacetingEnabled)
-      : _log = algoliaLogger('SearchService');
+    this._client,
+    this._disjunctiveFacetingEnabled,
+  ) : _log = algoliaLogger('SearchService');
 
   /// Search events logger.
   final Logger _log;
@@ -54,7 +56,14 @@ class AlgoliaHitsSearchService implements HitsSearchService {
   Future<SearchResponse> _singleQuerySearch(SearchState state) async {
     _log.fine('Run search with state: $state');
     try {
-      final response = await _client.searchIndex(request: state.toRequest());
+      final result = await _client.post(
+        path: '/indexes/*/queries',
+        body: algolia.SearchMethodParams(requests: [state.toRequest()]),
+      );
+      final results = (result as Map)['results'] as List<Map<String, dynamic>>;
+      final response = algolia.SearchResponse.fromJson(
+        results.first,
+      );
       _log.fine('Search response: $response');
       return response.toSearchResponse();
     } catch (exception) {
@@ -85,48 +94,4 @@ class AlgoliaHitsSearchService implements HitsSearchService {
   Exception _launderException(error) => error is algolia.AlgoliaApiException
       ? error.toSearchError()
       : Exception(error);
-}
-
-extension AlgolisSearchExt on SearchState {
-  algolia.SearchForHits toRequest() {
-    final filters = filterGroups?.let(
-      (it) => const FilterGroupConverter().sql(it),
-    );
-    final search = algolia.SearchForHits(
-      indexName: indexName,
-      analytics: analytics,
-      attributesToHighlight: attributesToHighlight,
-      attributesToRetrieve: attributesToRetrieve,
-      attributesToSnippet: attributesToSnippet,
-      facetFilters: facetFilters,
-      facets: facets,
-      highlightPostTag: highlightPostTag,
-      highlightPreTag: highlightPreTag,
-      hitsPerPage: hitsPerPage,
-      maxFacetHits: maxFacetHits,
-      maxValuesPerFacet: maxValuesPerFacet,
-      numericFilters: numericFilters,
-      optionalFilters: optionalFilters,
-      page: page,
-      query: query,
-      ruleContexts: ruleContexts,
-      sumOrFiltersScores: sumOrFiltersScore,
-      tagFilters: tagFilters,
-      userToken: userToken,
-      filters: filters,
-      clickAnalytics: clickAnalytics,
-    );
-    return search;
-  }
-}
-
-extension AlgoliaSearchResponseExt on algolia.SearchResponse {
-  SearchResponse toSearchResponse() => SearchResponse(toJson());
-}
-
-/// Extensions over [AlgoliaException].
-extension AlgoliaExceptionExt on algolia.AlgoliaApiException {
-  /// Converts API error to [SearchError].
-  SearchError toSearchError() =>
-      SearchError({'message': error.toString()}, statusCode);
 }

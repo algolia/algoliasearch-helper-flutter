@@ -1,5 +1,4 @@
-import 'extensions.dart';
-import 'filter_group.dart';
+part of 'multi_search_state.dart';
 
 /// Represents a search operation state, and an abstraction over search queries.
 ///
@@ -14,7 +13,7 @@ import 'filter_group.dart';
 ///   attributesToRetrieve: ['name', 'description', 'price'],
 /// );
 /// ```
-class SearchState {
+class SearchState extends MultiSearchState {
   /// Creates [SearchState] instance.
   const SearchState({
     required this.indexName,

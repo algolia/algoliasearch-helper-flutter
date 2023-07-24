@@ -1,10 +1,7 @@
-import 'package:collection/collection.dart';
-import 'facet.dart';
-
-sealed class MultiSearchResponse {}
+part of 'multi_search_response.dart';
 
 /// Search operation response.
-class SearchResponse implements MultiSearchResponse {
+class SearchResponse extends MultiSearchResponse {
   /// Creates [SearchResponse] instance.
   SearchResponse(this.raw)
       : hits = Hit._fromList(raw['hits']),
@@ -122,19 +119,4 @@ class Hit extends DelegatingMap<String, dynamic> {
   String toString() => 'Hit{json: $_json}';
 }
 
-final class FacetSearchResponse implements MultiSearchResponse {
-  /// The list of facets.
-  final List<Facet> facetHits;
 
-  /// Whether the count returned for each facets is exhaustive.
-  final bool exhaustiveFacetsCount;
-
-  /// Processing time.
-  final double processingTimeMS;
-
-  FacetSearchResponse(
-    this.facetHits,
-    this.exhaustiveFacetsCount,
-    this.processingTimeMS,
-  );
-}

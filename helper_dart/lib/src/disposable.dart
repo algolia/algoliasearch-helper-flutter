@@ -1,7 +1,7 @@
 import 'disposable_mixin.dart';
 import 'facet_list.dart';
 import 'filter_state.dart';
-import 'hits_searcher.dart';
+import 'searcher/hits_searcher.dart';
 
 /// Represents an object able to release it's resources.
 abstract class Disposable {

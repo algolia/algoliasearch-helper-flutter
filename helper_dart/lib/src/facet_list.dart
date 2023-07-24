@@ -13,7 +13,7 @@ import 'filter.dart';
 import 'filter_group.dart';
 import 'filter_state.dart';
 import 'filters.dart';
-import 'hits_searcher.dart';
+import 'searcher/hits_searcher.dart';
 import 'logger.dart';
 import 'model/facet.dart';
 import 'selectable_item.dart';

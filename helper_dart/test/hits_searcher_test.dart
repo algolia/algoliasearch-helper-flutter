@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:algolia_helper/algolia_helper.dart';
-import 'package:algolia_helper/src/service/algolia_hits_search_service.dart';
+import 'package:algolia_helper/src/service/algolia_client_helper.dart';
 import 'package:algolia_helper/src/service/hits_search_service.dart';
 import 'package:algolia_insights/algolia_insights.dart';
 import 'package:algolia_insights/src/event_service.dart';

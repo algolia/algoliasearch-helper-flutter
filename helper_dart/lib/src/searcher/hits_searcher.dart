@@ -5,15 +5,16 @@ import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
-import 'disposable.dart';
-import 'disposable_mixin.dart';
-import 'filter_state.dart';
-import 'logger.dart';
-import 'model/search_response.dart';
-import 'search_request.dart';
-import 'search_state.dart';
-import 'service/algolia_hits_search_service.dart';
-import 'service/hits_search_service.dart';
+import '../disposable.dart';
+import '../disposable_mixin.dart';
+import '../filter_state.dart';
+import '../logger.dart';
+import '../model/multi_search_response.dart';
+import '../model/multi_search_state.dart';
+import '../model/search_request.dart';
+import '../multi_search_state_provider.dart';
+import '../service/algolia_hits_search_service.dart';
+import '../service/hits_search_service.dart';
 
 /// Algolia Helpers main entry point, the component handling search requests
 /// and managing search sessions.
@@ -95,7 +96,8 @@ import 'service/hits_search_service.dart';
 /// hitsSearcher.dispose();
 /// ```
 @sealed
-abstract class HitsSearcher implements Disposable, EventDataDelegate {
+abstract class HitsSearcher
+    implements Disposable, EventDataDelegate, MultiSearchStateProvider {
   /// HitsSearcher's factory.
   factory HitsSearcher({
     required String applicationID,
@@ -246,7 +248,7 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   final Duration debounce;
 
   /// Search state subject
-  final BehaviorSubject<SearchRequest> _request;
+  final BehaviorSubject<SearchRequest<SearchState>> _request;
 
   /// Search responses subject
   late final _responses = _request.stream
@@ -321,4 +323,7 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
 
   @override
   String? get queryID => lastResponse?.queryID;
+
+  @override
+  Stream<MultiSearchState> get multiSearchState => state;
 }

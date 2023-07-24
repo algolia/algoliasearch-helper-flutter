@@ -2,8 +2,8 @@ import 'package:collection/collection.dart';
 
 import 'filter.dart';
 import 'filter_group.dart';
-import 'model/search_response.dart';
-import 'search_state.dart';
+import 'model/multi_search_response.dart';
+import 'model/multi_search_state.dart';
 
 /// Transform single query into multiple requests for disjunctive/hierarchical
 /// faceting. Merges multiple search responses into a single one
@@ -44,6 +44,9 @@ class QueryBuilder {
     }
     return group.path.isEmpty ? 0 : group.path.length + 1;
   }
+
+  /// Public getter for total queries count.
+  int get totalQueriesCount => _totalQueriesCount;
 
   /// Total number of queries
   int get _totalQueriesCount =>

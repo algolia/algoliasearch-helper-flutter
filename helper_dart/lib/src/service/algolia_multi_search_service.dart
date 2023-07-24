@@ -1,11 +1,11 @@
-import 'package:algoliasearch/algoliasearch_lite.dart' as algolia;
+import 'package:algoliasearch/algoliasearch.dart' as algolia;
 import 'package:logging/logging.dart';
 
 import '../logger.dart';
-import '../model/search_response.dart';
+import '../model/multi_search_response.dart';
+import '../model/multi_search_state.dart';
 import '../query_builder.dart';
-import '../search_state.dart';
-import 'algolia_hits_search_service.dart';
+import 'algolia_client_helper.dart';
 import 'multi_search_service.dart';
 
 final class AlgoliaMultiSearchService extends MultiSearchService {
@@ -22,53 +22,48 @@ final class AlgoliaMultiSearchService extends MultiSearchService {
       : _log = algoliaLogger('MultiSearchService');
 
   @override
-  Future<List<SearchResponse>> search(List<SearchState> states) async {
-// Map to store SearchState and corresponding QueryBuilder
-    final builders = <SearchState, QueryBuilder>{};
+  Future<List<MultiSearchResponse>> search(
+    List<MultiSearchState> states,
+  ) async {
+    final builders = <QueryBuilder>[];
 
-// List to hold all SearchForHits instances to be queried
-    final allQueries = <algolia.SearchForHits>[];
+    final unfoldedRequests = <MultiSearchState>[];
 
-// For each state, create a builder, build queries, and add them to allQueries
-    for (var state in states) {
-      final builder = QueryBuilder(state);
-      final queries = builder.build();
-      builders[queries[0]] =
-          builder; // Store builder with reference to the first state
-      allQueries.addAll(
-        queries.map((s) => s.toRequest()),
-      ); // Convert states to queries
+    for (final state in states) {
+      switch (state) {
+        case SearchState():
+          final builder = QueryBuilder(state);
+          builders.add(builder);
+          final queries = builder.build();
+          unfoldedRequests.addAll(queries); // Convert states to queries
+        case FacetSearchState():
+          unfoldedRequests.add(state);
+      }
     }
 
-// Perform search with all queries
-    final responses = await _client.searchMultiIndex(queries: allQueries);
+    final unfoldedResponses = await _client.multiSearch(unfoldedRequests);
 
-// Transform Algolia search results to SearchResponse instances
-    final searchResponses =
-        responses.results.map((e) => e.toSearchResponse()).toList();
+    final foldedResponses = <MultiSearchResponse>[];
 
-// Prepare final list of merged responses
-    final finalResponses = <SearchResponse>[];
-
-// Iterate over the map, for each state get corresponding responses and
-// merge them
-    for (var entry in builders.entries) {
-// Calculate number of queries for this builder
-      final int queriesCount = entry.value._totalQueriesCount;
-
-// Get corresponding responses
-      final correspondingResponses = searchResponses.sublist(0, queriesCount);
-
-// Remove processed responses from the list
-      searchResponses.removeRange(0, queriesCount);
-
-// Merge responses
-      final mergedResponse = entry.value.merge(correspondingResponses);
-
-// Add merged response to the final list
-      finalResponses.add(mergedResponse);
+    while (unfoldedResponses.isNotEmpty) {
+      final response = unfoldedResponses.first;
+      switch (response) {
+        case SearchResponse():
+          final builder = builders.removeAt(0);
+          final queriesCount = builder.totalQueriesCount;
+          final currentUnfoldedResponses = unfoldedResponses
+              .sublist(0, queriesCount)
+              .map((e) => e as SearchResponse)
+              .toList();
+          final mergedResponse = builder.merge(currentUnfoldedResponses);
+          foldedResponses.add(mergedResponse);
+          unfoldedResponses.removeRange(0, queriesCount);
+        case FacetSearchResponse():
+          foldedResponses.add(response);
+          unfoldedResponses.removeAt(0);
+      }
     }
 
-    return finalResponses;
+    return foldedResponses;
   }
 }

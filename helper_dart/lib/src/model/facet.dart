@@ -14,6 +14,16 @@ class Facet {
         return MapEntry(key, facetsList);
       });
 
+  static List<Facet> fromList(List<Map<String, dynamic>> json) => json
+      .map(
+        (rawFacet) => Facet(
+          rawFacet['value'] as String,
+          rawFacet['count'] as int,
+          rawFacet['highlighted'] as String?,
+        ),
+      )
+      .toList();
+
   /// Name of the facet. Is equal to the value associated to an attribute.
   final String value;
 
@@ -26,11 +36,11 @@ class Facet {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is Facet &&
-              runtimeType == other.runtimeType &&
-              value == other.value &&
-              count == other.count &&
-              highlighted == other.highlighted;
+      other is Facet &&
+          runtimeType == other.runtimeType &&
+          value == other.value &&
+          count == other.count &&
+          highlighted == other.highlighted;
 
   @override
   int get hashCode => value.hashCode ^ count.hashCode ^ highlighted.hashCode;

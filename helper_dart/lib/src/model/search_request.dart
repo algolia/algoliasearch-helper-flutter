@@ -1,18 +1,18 @@
-import 'search_state.dart';
+import 'multi_search_state.dart';
 
-class SearchRequest {
+class SearchRequest<State> {
   /// Creates [SearchRequest] instance.
   SearchRequest(this.state, [this.attempts = 1]);
 
   /// Search state query
-  final SearchState state;
+  final State state;
 
   /// Count of query attempts
   final int attempts;
 
   /// Create a copy with given parameters.
-  SearchRequest copyWith({
-    SearchState? state,
+  SearchRequest<State> copyWith({
+    State? state,
     int? attempts,
   }) =>
       SearchRequest(

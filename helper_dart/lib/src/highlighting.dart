@@ -1,4 +1,4 @@
-import 'model/search_response.dart';
+import 'model/multi_search_response.dart';
 
 /// Extension over [Hit].
 extension Highlightable on Hit {

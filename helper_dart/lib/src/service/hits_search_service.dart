@@ -1,5 +1,5 @@
-import '../model/search_response.dart';
-import '../search_state.dart';
+import '../model/multi_search_response.dart';
+import '../model/multi_search_state.dart';
 
 /// A contract search Service handling search requests and responses.
 abstract class HitsSearchService {
