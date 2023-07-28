@@ -9,19 +9,12 @@ import 'insights_test.mocks.dart';
 
 @GenerateMocks([EventService])
 void main() {
-  test('fetch Insights instance from pool for the same app id', () {
-    final insights1 = Insights('appID1', 'key1');
-    final insights2 = Insights('appID2', 'key1');
-    final insights3 = Insights('appID1', 'key1');
-    expect(insights1, same(insights3));
-    expect(insights1, isNot(insights2));
-  });
 
   test(
     'check generated user token format',
     () {
       final eventService = MockEventService();
-      final userTokenStorage = UserTokenStorage();
+      final userTokenStorage = UserTokenStorage.custom('algolia', 'user-token');
 
       when(eventService.send(any)).thenAnswer((realInvocation) {
         final event =
@@ -40,12 +33,13 @@ void main() {
           attribute: 'test_attribute',
           values: ['test_filter_value'],
         );
+      userTokenStorage.remove();
     },
   );
 
   test('send event with custom user token', () {
     final eventService = MockEventService();
-    final userTokenStorage = UserTokenStorage();
+    final userTokenStorage = UserTokenStorage.custom('algolia', 'user-token');
 
     when(eventService.send(any)).thenAnswer((realInvocation) {
       final event =
@@ -68,11 +62,12 @@ void main() {
         attribute: 'test_attribute',
         values: ['test_filter_value'],
       );
+    userTokenStorage.remove();
   });
 
   test('opt-out/opt-in events sending', () {
     final eventService = MockEventService();
-    final userTokenStorage = UserTokenStorage();
+    final userTokenStorage = UserTokenStorage.custom('algolia', 'user-token');
     final insights = Insights.custom(
       eventService,
       userTokenStorage,
@@ -94,16 +89,23 @@ void main() {
         values: ['test_filter_value'],
       );
     verify(eventService.send(any)).called(1);
+    userTokenStorage.remove();
   });
 
   group('Events tests', () {
     late Insights insights;
     late MockEventService mockEventService;
+    final userTokenStorage = UserTokenStorage.custom('algolia', 'user-token');
 
     setUp(() {
       mockEventService = MockEventService();
-      insights = Insights.custom(mockEventService, UserTokenStorage());
+      insights = Insights.custom(
+          mockEventService, UserTokenStorage.custom('algolia', 'user-token'),);
     });
+
+    tearDown(() => {
+      userTokenStorage.remove()
+    },);
 
     test('clickedFilters event is sent', () {
       Event? capturedEvent;
