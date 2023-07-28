@@ -232,8 +232,8 @@ Future<FacetSearchResponse> mockResponse(Invocation inv) async {
     'processingTimeMS': '0',
     'query': state.facetQuery,
     'facetHits': [
-      {'value': 'facet1', 'count': '5'},
-      {'value': 'facet2', 'count': '10'},
+      {'value': 'facet1', 'count': 5},
+      {'value': 'facet2', 'count': 10},
     ],
   });
 }

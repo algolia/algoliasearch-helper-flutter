@@ -1,7 +1,7 @@
 part of 'multi_search_response.dart';
 
 /// Search for facet values operation response
-final class FacetSearchResponse extends MultiSearchResponse {
+class FacetSearchResponse extends MultiSearchResponse {
   /// Creates [FacetSearchResponse] instance.
   FacetSearchResponse(this.raw)
       : facetHits =
