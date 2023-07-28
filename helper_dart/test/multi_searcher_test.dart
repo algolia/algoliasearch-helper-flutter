@@ -1,12 +1,9 @@
 import 'dart:async';
 
-import 'package:algolia_helper/algolia_helper.dart';
 import 'package:algolia_helper/src/model/multi_search_response.dart';
 import 'package:algolia_helper/src/model/multi_search_state.dart';
 import 'package:algolia_helper/src/searcher/multi_searcher.dart';
-import 'package:algolia_helper/src/service/algolia_client_helper.dart';
 import 'package:algolia_helper/src/service/multi_search_service.dart';
-import 'package:algoliasearch/algoliasearch.dart' as algolia;
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
@@ -164,9 +161,6 @@ void main() {
           .toList();
 
       final initialSubscriptions = <StreamSubscription<SearchResponse>>[];
-      // for (final searcher in initialSearchers) {
-      //   initialSubscriptions.add(searcher.responses.listen(print));
-      // }
 
       final initialStateResponses = [
         SearchResponse({
@@ -194,7 +188,6 @@ void main() {
       // Adding a new HitsSearcher after initial setup
       const newState = SearchState(indexName: 'index3', query: 'q3');
       final newSearcher = multiSearcher.addHitsSearcher(initialState: newState);
-      // final newSubscription = newSearcher.responses.listen(print);
 
       final newResponses = [
         SearchResponse({
@@ -218,24 +211,6 @@ void main() {
 
       // await newSubscription.cancel();
     });
-  });
-
-  test('should properly call Algolia index', () async {
-    final client = algolia.SearchClient(
-      appId: 'latency',
-      apiKey: '1f6fd3a6fb973cb08419fe7d288fa4db',
-    );
-
-    final states = [
-      const SearchState(indexName: 'instant_search_demo_query_suggestions'),
-      FacetSearchState(
-        searchState: const SearchState(indexName: 'instant_search'),
-        facet: 'categories',
-      ),
-    ];
-
-    final responses = await client.multiSearch(states);
-
   });
 
   group('Integration tests', () {

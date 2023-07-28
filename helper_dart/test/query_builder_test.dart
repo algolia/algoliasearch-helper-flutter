@@ -1,4 +1,3 @@
-import 'package:algolia_helper/algolia_helper.dart';
 import 'package:algolia_helper/src/filter.dart';
 import 'package:algolia_helper/src/filter_group.dart';
 import 'package:algolia_helper/src/model/facet.dart';

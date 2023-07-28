@@ -17,5 +17,4 @@ export 'src/model/multi_search_state.dart';
 export 'src/searcher/facet_searcher.dart';
 export 'src/searcher/hits_searcher.dart';
 export 'src/searcher/multi_searcher.dart';
-export 'src/searcher/multi_searcher.dart';
 export 'src/selectable_item.dart';
