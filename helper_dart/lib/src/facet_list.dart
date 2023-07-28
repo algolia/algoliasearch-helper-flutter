@@ -13,9 +13,9 @@ import 'filter.dart';
 import 'filter_group.dart';
 import 'filter_state.dart';
 import 'filters.dart';
-import 'searcher/hits_searcher.dart';
 import 'logger.dart';
 import 'model/facet.dart';
+import 'searcher/hits_searcher.dart';
 import 'selectable_item.dart';
 
 /// FacetList (refinement list) is a filtering components that displays facets,

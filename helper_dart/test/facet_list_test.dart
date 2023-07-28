@@ -1,5 +1,13 @@
-import 'package:algolia_helper/algolia_helper.dart';
+// import 'package:algolia_helper/algolia_helper.dart';
+import 'package:algolia_helper/src/facet_list.dart';
+import 'package:algolia_helper/src/filter.dart';
+import 'package:algolia_helper/src/filter_group.dart';
+import 'package:algolia_helper/src/filter_state.dart';
+import 'package:algolia_helper/src/filters.dart';
 import 'package:algolia_helper/src/model/facet.dart';
+import 'package:algolia_helper/src/model/multi_search_response.dart';
+import 'package:algolia_helper/src/model/multi_search_state.dart';
+import 'package:algolia_helper/src/searcher/hits_searcher.dart';
 import 'package:algolia_insights/algolia_insights.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';

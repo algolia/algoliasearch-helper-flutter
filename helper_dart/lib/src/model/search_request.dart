@@ -1,5 +1,3 @@
-import 'multi_search_state.dart';
-
 class SearchRequest<State> {
   /// Creates [SearchRequest] instance.
   SearchRequest(this.state, [this.attempts = 1]);

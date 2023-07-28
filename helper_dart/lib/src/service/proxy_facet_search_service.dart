@@ -3,12 +3,13 @@ import 'package:rxdart/rxdart.dart';
 import '../model/multi_search_response.dart';
 import '../model/multi_search_state.dart';
 import 'facet_search_service.dart';
-import 'proxy_multi_search_service.dart';
+import 'multi_search_response_receiver.dart';
 
 class ProxyFacetSearchService
-    implements FacetSearchService, ProxyMultiSearchService {
+    implements FacetSearchService, MultiSearchResponseReceiver {
   final _stateStream = BehaviorSubject<FacetSearchState>();
   final _responseStream = BehaviorSubject<FacetSearchResponse>();
+  bool _isDisposed = false;
 
   Stream<FacetSearchState> get state => _stateStream.stream;
 
@@ -41,7 +42,11 @@ class ProxyFacetSearchService
 
   @override
   void dispose() {
+    _isDisposed = true;
     _stateStream.close();
     _responseStream.close();
   }
+
+  @override
+  bool get isDisposed => _isDisposed;
 }

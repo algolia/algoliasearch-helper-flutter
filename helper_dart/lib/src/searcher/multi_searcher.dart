@@ -3,19 +3,23 @@ import 'dart:async';
 import 'package:algolia_insights/algolia_insights.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../../algolia_helper.dart';
+import '../disposable.dart';
+import '../model/multi_search_response.dart';
+import '../model/multi_search_state.dart';
 import '../multi_search_state_provider.dart';
 import '../service/algolia_multi_search_service.dart';
+import '../service/multi_search_response_receiver.dart';
 import '../service/multi_search_service.dart';
 import '../service/proxy_facet_search_service.dart';
 import '../service/proxy_hits_search_service.dart';
-import '../service/proxy_multi_search_service.dart';
+import 'facet_searcher.dart';
+import 'hits_searcher.dart';
 
 class MultiSearcher implements Disposable {
   final MultiSearchService _service;
   final EventTracker _eventTracker;
   List<MultiSearchStateProvider> stateProviders;
-  final List<ProxyMultiSearchService> _services;
+  final List<MultiSearchResponseReceiver> _services;
   StreamSubscription<List<MultiSearchResponse>>? _resultsSubscription;
   bool _isDisposed = false;
 
@@ -50,7 +54,6 @@ class MultiSearcher implements Disposable {
     required SearchState state,
     required String facet,
     String facetQuery = '',
-    int maxFacetHits = 10,
   }) {
     final service = ProxyFacetSearchService();
     final searcher = FacetSearcher.custom(

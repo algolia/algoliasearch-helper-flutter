@@ -34,7 +34,7 @@ packages:
     source: hosted
     version: "0.1.2"
   algolia_insights:
-    dependency: "direct overridden"
+    dependency: "direct main"
     description:
       path: "../insights_dart"
       relative: true

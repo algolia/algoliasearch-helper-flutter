@@ -1,5 +1,9 @@
 import 'package:algolia_helper/algolia_helper.dart';
+import 'package:algolia_helper/src/filter.dart';
+import 'package:algolia_helper/src/filter_group.dart';
 import 'package:algolia_helper/src/model/facet.dart';
+import 'package:algolia_helper/src/model/multi_search_response.dart';
+import 'package:algolia_helper/src/model/multi_search_state.dart';
 import 'package:algolia_helper/src/query_builder.dart';
 import 'package:test/test.dart';
 

@@ -3,12 +3,13 @@ import 'package:rxdart/rxdart.dart';
 import '../model/multi_search_response.dart';
 import '../model/multi_search_state.dart';
 import 'hits_search_service.dart';
-import 'proxy_multi_search_service.dart';
+import 'multi_search_response_receiver.dart';
 
 class ProxyHitsSearchService
-    implements HitsSearchService, ProxyMultiSearchService {
+    implements HitsSearchService, MultiSearchResponseReceiver {
   final _stateStream = BehaviorSubject<SearchState>();
   final _responseStream = BehaviorSubject<SearchResponse>();
+  bool _isDisposed = false;
 
   Stream<SearchState> get state => _stateStream.stream;
 
@@ -41,7 +42,11 @@ class ProxyHitsSearchService
 
   @override
   void dispose() {
+    _isDisposed = true;
     _stateStream.close();
     _responseStream.close();
   }
+
+  @override
+  bool get isDisposed => _isDisposed;
 }

@@ -1,8 +1,9 @@
 import 'dart:async';
 
-import 'package:algolia_helper/algolia_helper.dart';
-import 'package:algolia_helper/src/model/facet.dart';
-import 'package:algolia_helper/src/service/algolia_client_helper.dart';
+import 'package:algolia_helper/src/exception.dart';
+import 'package:algolia_helper/src/model/multi_search_response.dart';
+import 'package:algolia_helper/src/model/multi_search_state.dart';
+import 'package:algolia_helper/src/searcher/facet_searcher.dart';
 import 'package:algolia_helper/src/service/facet_search_service.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -47,7 +48,6 @@ void main() {
   });
 
   group('Unit tests', () {
-
     test('Should emit initial response', () async {
       final searchService = MockFacetSearchService();
       final initial = FacetSearchResponse(const {

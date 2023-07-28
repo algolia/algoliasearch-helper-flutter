@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import 'package:algolia_helper/algolia_helper.dart';
+import 'package:algolia_helper/src/model/multi_search_response.dart';
+import 'package:algolia_helper/src/model/multi_search_state.dart';
+import 'package:algolia_helper/src/searcher/multi_searcher.dart';
 import 'package:algolia_helper/src/service/algolia_client_helper.dart';
 import 'package:algolia_helper/src/service/multi_search_service.dart';
 import 'package:algoliasearch/algoliasearch.dart' as algolia;
@@ -161,9 +164,9 @@ void main() {
           .toList();
 
       final initialSubscriptions = <StreamSubscription<SearchResponse>>[];
-      for (final searcher in initialSearchers) {
-        initialSubscriptions.add(searcher.responses.listen(print));
-      }
+      // for (final searcher in initialSearchers) {
+      //   initialSubscriptions.add(searcher.responses.listen(print));
+      // }
 
       final initialStateResponses = [
         SearchResponse({
@@ -191,7 +194,7 @@ void main() {
       // Adding a new HitsSearcher after initial setup
       const newState = SearchState(indexName: 'index3', query: 'q3');
       final newSearcher = multiSearcher.addHitsSearcher(initialState: newState);
-      final newSubscription = newSearcher.responses.listen(print);
+      // final newSubscription = newSearcher.responses.listen(print);
 
       final newResponses = [
         SearchResponse({
@@ -205,8 +208,7 @@ void main() {
         }),
       ];
 
-      final allStates =
-          [...initialStates, newState];
+      final allStates = [...initialStates, newState];
       when(mockMultiSearchService.search(allStates))
           .thenAnswer((_) => Future.value(newResponses));
 
@@ -214,7 +216,7 @@ void main() {
       await untilCalled(mockMultiSearchService.search(allStates));
       verify(mockMultiSearchService.search(allStates)).called(1);
 
-      await newSubscription.cancel();
+      // await newSubscription.cancel();
     });
   });
 
@@ -234,7 +236,6 @@ void main() {
 
     final responses = await client.multiSearch(states);
 
-    print(responses);
   });
 
   group('Integration tests', () {
@@ -246,23 +247,29 @@ void main() {
       );
 
       final actorsSearcher = multiSearcher.addHitsSearcher(
-        initialState: const SearchState(indexName: 'mobile_demo_actors'),
+        initialState: const SearchState(
+          indexName: 'mobile_demo_actors',
+          hitsPerPage: 1,
+        ),
       );
-
-      actorsSearcher.responses.listen(print);
 
       final moviesSearcher = multiSearcher.addHitsSearcher(
-        initialState: const SearchState(indexName: 'mobile_demo_movies'),
+        initialState: const SearchState(
+          indexName: 'mobile_demo_movies',
+          hitsPerPage: 1,
+        ),
       );
-
-      moviesSearcher.responses.listen(print);
 
       actorsSearcher.query('jack');
       moviesSearcher.query('jack');
 
-      final response = await actorsSearcher.responses.take(1).first;
-      // expect(response.hits.length, 1);
-      // expect(response.query, 'apple');
+      final actorsResponse = await actorsSearcher.responses.take(1).first;
+      expect(actorsResponse.hits.length, 1);
+      expect(actorsResponse.query, 'jack');
+
+      final moviesResponse = await moviesSearcher.responses.take(1).first;
+      expect(moviesResponse.hits.length, 1);
+      expect(moviesResponse.query, 'jack');
     });
 
     test(
@@ -277,11 +284,15 @@ void main() {
         final hitsSearcher = multiSearcher.addHitsSearcher(
           initialState: const SearchState(
             indexName: 'instant_search_demo_query_suggestions',
+            hitsPerPage: 1,
           ),
         );
 
         final facetSearcher = multiSearcher.addFacetSearcher(
-          state: const SearchState(indexName: 'instant_search'),
+          state: const SearchState(
+            indexName: 'instant_search',
+            maxFacetHits: 1,
+          ),
           facet: 'categories',
         );
 
@@ -289,9 +300,10 @@ void main() {
         facetSearcher.query('lap');
 
         final hitsResponse = await hitsSearcher.responses.take(1).first;
-        print(hitsResponse);
+        expect(hitsResponse.hits.length, 1);
+        expect(hitsResponse.query, 'lap');
         final facetResponse = await facetSearcher.responses.take(1).first;
-        print(facetResponse);
+        expect(facetResponse.facetHits.length, 1);
       },
     );
   });

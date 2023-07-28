@@ -25,6 +25,7 @@ final class AlgoliaMultiSearchService extends MultiSearchService {
   Future<List<MultiSearchResponse>> search(
     List<MultiSearchState> states,
   ) async {
+    _log.fine('Start multi search: $states');
     final builders = <QueryBuilder>[];
 
     final unfoldedRequests = <MultiSearchState>[];

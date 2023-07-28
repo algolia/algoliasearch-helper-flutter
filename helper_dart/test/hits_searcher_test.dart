@@ -1,7 +1,14 @@
 import 'dart:async';
 
-import 'package:algolia_helper/algolia_helper.dart';
+import 'package:algolia_helper/src/exception.dart';
+import 'package:algolia_helper/src/filter.dart';
+import 'package:algolia_helper/src/filter_group.dart';
+import 'package:algolia_helper/src/filter_state.dart';
+import 'package:algolia_helper/src/model/multi_search_response.dart';
+import 'package:algolia_helper/src/model/multi_search_state.dart';
+import 'package:algolia_helper/src/searcher/hits_searcher.dart';
 import 'package:algolia_helper/src/service/algolia_client_helper.dart';
+import 'package:algolia_helper/src/service/algolia_hits_search_service.dart';
 import 'package:algolia_helper/src/service/hits_search_service.dart';
 import 'package:algolia_insights/algolia_insights.dart';
 import 'package:algolia_insights/src/event_service.dart';
@@ -21,10 +28,9 @@ void main() {
   group('Integration tests', () {
     test('Successful search operation', () async {
       final helper = HitsSearcher.custom(
-        AlgoliaSearchService(
+        AlgoliaHitsSearchService(
           applicationID: 'latency',
           apiKey: 'af044fb0788d6bb15f807e4420592bc5',
-          extraUserAgents: [],
           disjunctiveFacetingEnabled: true,
         ),
         MockEventTracker(),
@@ -42,10 +48,9 @@ void main() {
 
     test('Failing search operation', () async {
       final helper = HitsSearcher.custom(
-        AlgoliaSearchService(
+        AlgoliaHitsSearchService(
           applicationID: 'latency',
           apiKey: 'UNKNOWN',
-          extraUserAgents: [],
           disjunctiveFacetingEnabled: true,
         ),
         MockEventTracker(),

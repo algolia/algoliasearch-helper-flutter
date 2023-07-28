@@ -1,6 +1,6 @@
+import '../disposable.dart';
 import '../model/multi_search_response.dart';
 
-abstract class ProxyMultiSearchService {
+abstract class MultiSearchResponseReceiver implements Disposable {
   void updateMultiResponse(MultiSearchResponse response);
-  void dispose();
 }
