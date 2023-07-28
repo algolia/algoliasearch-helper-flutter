@@ -1,9 +1,9 @@
 import 'package:rxdart/rxdart.dart';
 
 import '../model/multi_search_response.dart';
+import '../model/multi_search_response_receiver.dart';
 import '../model/multi_search_state.dart';
 import 'facet_search_service.dart';
-import 'multi_search_response_receiver.dart';
 
 class ProxyFacetSearchService
     implements FacetSearchService, MultiSearchResponseReceiver {

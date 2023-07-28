@@ -5,10 +5,10 @@ import 'package:rxdart/rxdart.dart';
 
 import '../disposable.dart';
 import '../model/multi_search_response.dart';
+import '../model/multi_search_response_receiver.dart';
 import '../model/multi_search_state.dart';
-import '../multi_search_state_provider.dart';
+import '../model/multi_search_state_provider.dart';
 import '../service/algolia_multi_search_service.dart';
-import '../service/multi_search_response_receiver.dart';
 import '../service/multi_search_service.dart';
 import '../service/proxy_facet_search_service.dart';
 import '../service/proxy_hits_search_service.dart';

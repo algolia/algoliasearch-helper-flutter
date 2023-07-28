@@ -7,8 +7,8 @@ import '../disposable_mixin.dart';
 import '../logger.dart';
 import '../model/multi_search_response.dart';
 import '../model/multi_search_state.dart';
+import '../model/multi_search_state_provider.dart';
 import '../model/search_request.dart';
-import '../multi_search_state_provider.dart';
 import '../service/algolia_facet_search_service.dart';
 import '../service/facet_search_service.dart';
 
