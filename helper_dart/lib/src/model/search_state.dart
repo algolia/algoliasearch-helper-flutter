@@ -22,6 +22,7 @@ class SearchState extends MultiSearchState {
     this.attributesToRetrieve,
     this.attributesToSnippet,
     this.disjunctiveFacets,
+    this.isDisjunctiveFacetingEnabled = true,
     this.facetFilters,
     this.facets,
     this.filterGroups,
@@ -58,6 +59,9 @@ class SearchState extends MultiSearchState {
 
   /// Disjunctive facets list
   final Set<String>? disjunctiveFacets;
+
+  /// Whether disjunctive faceting is enabled
+  final bool isDisjunctiveFacetingEnabled;
 
   /// Set of filter groups
   final Set<FilterGroup>? filterGroups;
@@ -131,6 +135,7 @@ class SearchState extends MultiSearchState {
     List<String>? tagFilters,
     Set<FilterGroup>? filterGroups,
     Set<String>? disjunctiveFacets,
+    bool? isDisjunctiveFacetingEnabled,
     String? highlightPostTag,
     String? highlightPreTag,
     String? indexName,
@@ -157,6 +162,8 @@ class SearchState extends MultiSearchState {
         tagFilters: tagFilters ?? this.tagFilters,
         filterGroups: filterGroups ?? this.filterGroups,
         disjunctiveFacets: disjunctiveFacets ?? this.disjunctiveFacets,
+        isDisjunctiveFacetingEnabled:
+            isDisjunctiveFacetingEnabled ?? this.isDisjunctiveFacetingEnabled,
         highlightPostTag: highlightPostTag ?? this.highlightPostTag,
         highlightPreTag: highlightPreTag ?? this.highlightPreTag,
         indexName: indexName ?? this.indexName,
@@ -182,6 +189,8 @@ class SearchState extends MultiSearchState {
           hitsPerPage == other.hitsPerPage &&
           facets.equals(other.facets) &&
           disjunctiveFacets.equals(other.disjunctiveFacets) &&
+          isDisjunctiveFacetingEnabled
+              .equals(other.isDisjunctiveFacetingEnabled) &&
           filterGroups.equals(other.filterGroups) &&
           ruleContexts.equals(other.ruleContexts) &&
           facetFilters.equals(other.facetFilters) &&
@@ -208,6 +217,7 @@ class SearchState extends MultiSearchState {
       hitsPerPage.hashCode ^
       facets.hashing() ^
       disjunctiveFacets.hashing() ^
+      isDisjunctiveFacetingEnabled.hashing() ^
       filterGroups.hashing() ^
       ruleContexts.hashing() ^
       facetFilters.hashing() ^
@@ -235,6 +245,7 @@ class SearchState extends MultiSearchState {
       'attributesToRetrieve: $attributesToRetrieve, '
       'attributesToSnippet: $attributesToSnippet, '
       'disjunctiveFacets: $disjunctiveFacets, '
+      'isDisjunctiveFacetingEnabled: $isDisjunctiveFacetingEnabled, '
       'facetFilters: $facetFilters, '
       'facets: $facets, '
       'filterGroups: $filterGroups, '

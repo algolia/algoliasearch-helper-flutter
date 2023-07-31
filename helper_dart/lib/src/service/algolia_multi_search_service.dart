@@ -26,17 +26,22 @@ final class AlgoliaMultiSearchService extends MultiSearchService {
     List<MultiSearchState> states,
   ) async {
     _log.fine('Start multi search: $states');
-    final builders = <QueryBuilder>[];
+    final builders = <QueryBuilder?>[];
 
     final unfoldedRequests = <MultiSearchState>[];
 
     for (final state in states) {
       switch (state) {
         case SearchState():
-          final builder = QueryBuilder(state);
-          builders.add(builder);
-          final queries = builder.build();
-          unfoldedRequests.addAll(queries); // Convert states to queries
+          if (state.isDisjunctiveFacetingEnabled) {
+            final builder = QueryBuilder(state);
+            builders.add(builder);
+            final queries = builder.build();
+            unfoldedRequests.addAll(queries);
+          } else {
+            builders.add(null);
+            unfoldedRequests.add(state);
+          }
         case FacetSearchState():
           unfoldedRequests.add(state);
       }
@@ -51,14 +56,19 @@ final class AlgoliaMultiSearchService extends MultiSearchService {
       switch (response) {
         case SearchResponse():
           final builder = builders.removeAt(0);
-          final queriesCount = builder.totalQueriesCount;
-          final currentUnfoldedResponses = unfoldedResponses
-              .sublist(0, queriesCount)
-              .map((e) => e as SearchResponse)
-              .toList();
-          final mergedResponse = builder.merge(currentUnfoldedResponses);
-          foldedResponses.add(mergedResponse);
-          unfoldedResponses.removeRange(0, queriesCount);
+          if (builder != null) {
+            final queriesCount = builder.totalQueriesCount;
+            final currentUnfoldedResponses = unfoldedResponses
+                .sublist(0, queriesCount)
+                .map((e) => e as SearchResponse)
+                .toList();
+            final mergedResponse = builder.merge(currentUnfoldedResponses);
+            foldedResponses.add(mergedResponse);
+            unfoldedResponses.removeRange(0, queriesCount);
+          } else {
+            foldedResponses.add(response);
+            unfoldedResponses.removeAt(0);
+          }
         case FacetSearchResponse():
           foldedResponses.add(response);
           unfoldedResponses.removeAt(0);
