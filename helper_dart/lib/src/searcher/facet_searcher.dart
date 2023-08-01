@@ -67,7 +67,8 @@ import '../service/facet_search_service.dart';
 /// Listen to the [state] stream to get facet search state changes:
 ///
 /// ```dart
-/// facetSearcher.state.listen((facetSearchState) => print(facetSearchState.query));
+/// facetSearcher.state.listen((facetSearchState) =>
+/// print(facetSearchState.query));
 /// ```
 ///
 /// ## Get facet search results
@@ -280,5 +281,4 @@ class _FacetSearcher with DisposableMixin implements FacetSearcher {
     _request.close();
     _subscriptions.cancel();
   }
-
 }

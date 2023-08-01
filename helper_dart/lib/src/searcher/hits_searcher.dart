@@ -112,7 +112,6 @@ abstract class HitsSearcher implements Disposable, EventDataDelegate {
           clickAnalytics: true,
           isDisjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
         ),
-        disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
         debounce: debounce,
       );
 
@@ -196,7 +195,6 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
       applicationID: applicationID,
       apiKey: apiKey,
       // extraUserAgents: ['algolia-helper-dart ($libVersion)'],
-      disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
     );
     final insights = Insights(applicationID, apiKey);
     return _HitsSearcher.create(

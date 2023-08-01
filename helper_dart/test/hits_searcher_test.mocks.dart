@@ -93,11 +93,6 @@ class MockHitsSearcher extends _i1.Mock implements _i5.HitsSearcher {
         returnValue: '',
       ) as String);
   @override
-  _i6.Stream<_i3.MultiSearchState> get multiSearchState => (super.noSuchMethod(
-        Invocation.getter(#multiSearchState),
-        returnValue: _i6.Stream<_i3.MultiSearchState>.empty(),
-      ) as _i6.Stream<_i3.MultiSearchState>);
-  @override
   void query(String? query) => super.noSuchMethod(
         Invocation.method(
           #query,

@@ -58,11 +58,6 @@ class MockFacetSearcher extends _i1.Mock implements _i3.FacetSearcher {
         returnValue: false,
       ) as bool);
   @override
-  _i4.Stream<_i5.MultiSearchState> get multiSearchState => (super.noSuchMethod(
-        Invocation.getter(#multiSearchState),
-        returnValue: _i4.Stream<_i5.MultiSearchState>.empty(),
-      ) as _i4.Stream<_i5.MultiSearchState>);
-  @override
   void query(String? query) => super.noSuchMethod(
         Invocation.method(
           #query,

@@ -1,6 +1,7 @@
 import 'package:algoliasearch/algoliasearch.dart' as algolia;
 import 'package:logging/logging.dart';
 
+import '../exception.dart';
 import '../lib_version.dart';
 import '../logger.dart';
 import '../model/multi_search_response.dart';
@@ -14,7 +15,6 @@ class AlgoliaHitsSearchService implements HitsSearchService {
   AlgoliaHitsSearchService({
     required String applicationID,
     required String apiKey,
-    required bool disjunctiveFacetingEnabled,
   }) : this.create(
           algolia.SearchClient(
             appId: applicationID,
@@ -28,13 +28,11 @@ class AlgoliaHitsSearchService implements HitsSearchService {
               ],
             ),
           ),
-          disjunctiveFacetingEnabled,
         );
 
   /// Creates [HitsSearchService] instance.
   AlgoliaHitsSearchService.create(
     this._client,
-    this._disjunctiveFacetingEnabled,
   ) : _log = algoliaLogger('SearchService');
 
   /// Search events logger.
@@ -42,9 +40,6 @@ class AlgoliaHitsSearchService implements HitsSearchService {
 
   /// Algolia API client
   final algolia.SearchClient _client;
-
-  /// Disjunctive faceting enablement status
-  final bool _disjunctiveFacetingEnabled;
 
   @override
   Future<SearchResponse> search(SearchState state) =>

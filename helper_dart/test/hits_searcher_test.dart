@@ -31,7 +31,6 @@ void main() {
         AlgoliaHitsSearchService(
           applicationID: 'latency',
           apiKey: 'af044fb0788d6bb15f807e4420592bc5',
-          disjunctiveFacetingEnabled: true,
         ),
         MockEventTracker(),
         const SearchState(
@@ -51,7 +50,6 @@ void main() {
         AlgoliaHitsSearchService(
           applicationID: 'latency',
           apiKey: 'UNKNOWN',
-          disjunctiveFacetingEnabled: true,
         ),
         MockEventTracker(),
         const SearchState(
