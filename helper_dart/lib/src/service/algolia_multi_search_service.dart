@@ -35,8 +35,8 @@ final class AlgoliaMultiSearchService extends MultiSearchService {
         case SearchState():
           if (state.isDisjunctiveFacetingEnabled) {
             final builder = QueryBuilder(state);
-            builders.add(builder);
             final queries = builder.build();
+            builders.add(builder);
             unfoldedRequests.addAll(queries);
           } else {
             builders.add(null);

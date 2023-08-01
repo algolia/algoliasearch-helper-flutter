@@ -11,7 +11,6 @@ import '../filter_state.dart';
 import '../logger.dart';
 import '../model/multi_search_response.dart';
 import '../model/multi_search_state.dart';
-import '../model/multi_search_state_provider.dart';
 import '../model/search_request.dart';
 import '../service/algolia_hits_search_service.dart';
 import '../service/hits_search_service.dart';
@@ -96,8 +95,7 @@ import '../service/hits_search_service.dart';
 /// hitsSearcher.dispose();
 /// ```
 @sealed
-abstract class HitsSearcher
-    implements Disposable, EventDataDelegate, MultiSearchStateProvider {
+abstract class HitsSearcher implements Disposable, EventDataDelegate {
   /// HitsSearcher's factory.
   factory HitsSearcher({
     required String applicationID,
@@ -109,7 +107,11 @@ abstract class HitsSearcher
       _HitsSearcher(
         applicationID: applicationID,
         apiKey: apiKey,
-        state: SearchState(indexName: indexName, clickAnalytics: true),
+        state: SearchState(
+          indexName: indexName,
+          clickAnalytics: true,
+          isDisjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
+        ),
         disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
         debounce: debounce,
       );
@@ -200,7 +202,7 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
     return _HitsSearcher.create(
       service,
       insights,
-      state,
+      state.copyWith(isDisjunctiveFacetingEnabled: disjunctiveFacetingEnabled),
       debounce,
     );
   }
@@ -323,7 +325,4 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
 
   @override
   String? get queryID => lastResponse?.queryID;
-
-  @override
-  Stream<MultiSearchState> get multiSearchState => state;
 }

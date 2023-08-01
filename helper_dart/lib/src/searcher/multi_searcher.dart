@@ -5,9 +5,7 @@ import 'package:rxdart/rxdart.dart';
 
 import '../disposable.dart';
 import '../model/multi_search_response.dart';
-import '../model/multi_search_response_receiver.dart';
 import '../model/multi_search_state.dart';
-import '../model/multi_search_state_provider.dart';
 import '../service/algolia_multi_search_service.dart';
 import '../service/multi_search_service.dart';
 import '../service/proxy_facet_search_service.dart';
@@ -78,8 +76,7 @@ import 'hits_searcher.dart';
 class MultiSearcher implements Disposable {
   final MultiSearchService _service;
   final EventTracker _eventTracker;
-  final List<MultiSearchStateProvider> _stateProviders;
-  final List<MultiSearchResponseReceiver> _responseReceivers;
+  final List<MultiSearcherDelegate> _delegates;
   StreamSubscription<List<MultiSearchResponse>>? _resultsSubscription;
   bool _isDisposed = false;
 
@@ -88,9 +85,7 @@ class MultiSearcher implements Disposable {
   /// - `service`: The [MultiSearchService] to handle multi-search operations.
   /// - `eventTracker`: The [EventTracker] to track events during search
   /// operations.
-  MultiSearcher(this._service, this._eventTracker)
-      : _stateProviders = [],
-        _responseReceivers = [];
+  MultiSearcher(this._service, this._eventTracker) : _delegates = [];
 
   /// Creates a new instance of [MultiSearcher] using Algolia as the search
   /// service.
@@ -106,20 +101,21 @@ class MultiSearcher implements Disposable {
     EventTracker? eventTracker,
   })  : _service = AlgoliaMultiSearchService(applicationID, apiKey),
         _eventTracker = eventTracker ?? Insights(applicationID, apiKey),
-        _stateProviders = [],
-        _responseReceivers = [];
+        _delegates = [];
 
   /// Adds a new [HitsSearcher] to the multi-searcher.
   ///
   /// Returns the created [HitsSearcher] instance.
   HitsSearcher addHitsSearcher({
     required SearchState initialState,
-    bool disjunctiveFacetingEnabled = true,
   }) {
     final service = ProxyHitsSearchService();
-    final searcher = HitsSearcher.custom(service, _eventTracker, initialState);
-    _stateProviders.add(searcher);
-    _responseReceivers.add(service);
+    final searcher = HitsSearcher.custom(
+      service,
+      _eventTracker,
+      initialState,
+    );
+    _addDelegate(service);
     _updateSubscriptions();
     return searcher;
   }
@@ -141,16 +137,19 @@ class MultiSearcher implements Disposable {
         facetQuery: facetQuery,
       ),
     );
-    _stateProviders.add(searcher);
-    _responseReceivers.add(service);
-    _updateSubscriptions();
+    _addDelegate(service);
     return searcher;
+  }
+
+  void _addDelegate(MultiSearcherDelegate delegate) {
+    _delegates.add(delegate);
+    _updateSubscriptions();
   }
 
   void _updateSubscriptions() {
     _resultsSubscription?.cancel();
     _resultsSubscription = Rx.combineLatest(
-      _stateProviders.map((e) => e.multiSearchState),
+      _delegates.map((e) => e.multiSearchState),
       (states) => states.cast<MultiSearchState>(),
     )
         .debounceTime(
@@ -159,7 +158,7 @@ class MultiSearcher implements Disposable {
         .asyncMap(_service.search)
         .listen((responses) {
       for (var i = 0; i < responses.length; i++) {
-        _responseReceivers[i].updateMultiResponse(responses[i]);
+        _delegates[i].updateResponse(responses[i]);
       }
     });
   }
@@ -168,11 +167,40 @@ class MultiSearcher implements Disposable {
   void dispose() {
     _resultsSubscription?.cancel();
     _isDisposed = true;
-    for (var service in _responseReceivers) {
-      service.dispose();
+    for (var delegate in _delegates) {
+      delegate.dispose();
     }
   }
 
   @override
   bool get isDisposed => _isDisposed;
+}
+
+abstract class MultiSearcherDelegate implements Disposable {
+  final _stateStream = BehaviorSubject<MultiSearchState>();
+  final _responseStream = BehaviorSubject<MultiSearchResponse>();
+  bool _isDisposed = false;
+
+  Stream<MultiSearchResponse> get response => _responseStream.stream;
+
+  void updateState(MultiSearchState state) {
+    _stateStream.add(state);
+  }
+
+  void updateResponse(MultiSearchResponse response) {
+    _responseStream.add(response);
+  }
+
+  Stream<MultiSearchState> get multiSearchState =>
+      _stateStream.map((state) => state);
+
+  @override
+  bool get isDisposed => _isDisposed;
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    _stateStream.close();
+    _responseStream.close();
+  }
 }

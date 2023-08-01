@@ -48,7 +48,7 @@ class AlgoliaHitsSearchService implements HitsSearchService {
 
   @override
   Future<SearchResponse> search(SearchState state) =>
-      _disjunctiveFacetingEnabled
+      state.isDisjunctiveFacetingEnabled
           ? _disjunctiveSearch(state)
           : _singleQuerySearch(state);
 

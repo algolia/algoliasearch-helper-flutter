@@ -30,32 +30,17 @@ void main() {
       multiSearcher.dispose();
     });
 
-    test('basic', () async {
-      final states = [
-        const SearchState(indexName: 'index1', query: 'q1'),
-        const SearchState(indexName: 'index2', query: 'q2'),
-        const SearchState(indexName: 'index3', query: 'q3'),
+    test('should invoke MultiSearchService consecutively for each sub-searcher',
+        () async {
+      final initialStates = [
+        const SearchState(indexName: 'index1', query: 'q0'),
+        const SearchState(indexName: 'index2', query: 'q0'),
+        const SearchState(indexName: 'index3', query: 'q0'),
       ];
 
-      final service = MockMultiSearchService();
-
-      when(
-        service.search(states),
-      ).thenAnswer((_) => Future.value([]));
-
-      await service.search(states);
-    });
-
-    test('should invoke MultiSearchService for each HitsSearcher', () async {
-      final states = [
-        const SearchState(indexName: 'index1', query: 'q1'),
-        const SearchState(indexName: 'index2', query: 'q2'),
-        const SearchState(indexName: 'index3', query: 'q3'),
-      ];
-
-      final searchers = [0, 1, 2]
+      final searchers = initialStates
           .map(
-            (i) => multiSearcher.addHitsSearcher(initialState: states[i]),
+            (state) => multiSearcher.addHitsSearcher(initialState: state),
           )
           .toList();
 
@@ -86,14 +71,34 @@ void main() {
         }),
       ];
 
-      when(
-        mockMultiSearchService.search(states),
-      ).thenAnswer((_) => Future.value(responses));
+      final states = [
+        [
+          const SearchState(indexName: 'index1', query: 'q1'),
+          const SearchState(indexName: 'index2', query: 'q0'),
+          const SearchState(indexName: 'index3', query: 'q0'),
+        ],
+        [
+          const SearchState(indexName: 'index1', query: 'q1'),
+          const SearchState(indexName: 'index2', query: 'q2'),
+          const SearchState(indexName: 'index3', query: 'q0'),
+        ],
+        [
+          const SearchState(indexName: 'index1', query: 'q1'),
+          const SearchState(indexName: 'index2', query: 'q2'),
+          const SearchState(indexName: 'index3', query: 'q3'),
+        ],
+      ];
+
+      for (final state in states) {
+        when(
+          mockMultiSearchService.search(state),
+        ).thenAnswer((_) => Future.value(responses));
+      }
 
       for (var i = 0; i < searchers.length; i++) {
-        searchers[i].applyState((state) => states[i]);
-        await untilCalled(mockMultiSearchService.search(states));
-        verify(mockMultiSearchService.search(states)).called(1);
+        searchers[i].query('q${i + 1}');
+        await untilCalled(mockMultiSearchService.search(states[i]));
+        verify(mockMultiSearchService.search(states[i])).called(1);
         final receivedResponse = await completers[i].future;
         expect(receivedResponse, responses[i]);
         clearInteractions(mockMultiSearchService);
@@ -137,8 +142,7 @@ void main() {
           .thenAnswer((_) => Future.value(responses));
 
       for (var searcher in searchers) {
-        searcher
-            .applyState((state) => updatedStates[searchers.indexOf(searcher)]);
+        searcher.query('new_q${searchers.indexOf(searcher) + 1}');
       }
 
       await untilCalled(mockMultiSearchService.search(updatedStates));
@@ -148,21 +152,24 @@ void main() {
 
     test('should handle adding a HitsSearcher after initial setup', () async {
       final initialStates = [
+        const SearchState(indexName: 'index1', query: 'q0'),
+        const SearchState(indexName: 'index2', query: 'q0'),
+      ];
+
+      final expectedStates = [
         const SearchState(indexName: 'index1', query: 'q1'),
         const SearchState(indexName: 'index2', query: 'q2'),
       ];
 
-      final initialSearchers = [0, 1]
+      final initialSearchers = initialStates
           .map(
-            (i) => multiSearcher.addHitsSearcher(
-              initialState: initialStates[i],
+            (state) => multiSearcher.addHitsSearcher(
+              initialState: state,
             ),
           )
           .toList();
 
-      final initialSubscriptions = <StreamSubscription<SearchResponse>>[];
-
-      final initialStateResponses = [
+      final expectedStateResponses = [
         SearchResponse({
           'query': 'q1',
         }),
@@ -171,22 +178,17 @@ void main() {
         }),
       ];
 
-      when(mockMultiSearchService.search(initialStates))
-          .thenAnswer((_) => Future.value(initialStateResponses));
+      when(mockMultiSearchService.search(expectedStates))
+          .thenAnswer((_) => Future.value(expectedStateResponses));
 
-      for (var i = 0; i < initialSearchers.length; i++) {
-        initialSearchers[i].applyState((state) => initialStates[i]);
-        await untilCalled(mockMultiSearchService.search(initialStates));
-        verify(mockMultiSearchService.search(initialStates)).called(1);
-        clearInteractions(mockMultiSearchService);
-      }
-
-      for (final subscription in initialSubscriptions) {
-        await subscription.cancel();
-      }
+      initialSearchers[0].query('q1');
+      initialSearchers[1].query('q2');
+      await untilCalled(mockMultiSearchService.search(expectedStates));
+      verify(mockMultiSearchService.search(expectedStates)).called(1);
+      clearInteractions(mockMultiSearchService);
 
       // Adding a new HitsSearcher after initial setup
-      const newState = SearchState(indexName: 'index3', query: 'q3');
+      const newState = SearchState(indexName: 'index3', query: 'q0');
       final newSearcher = multiSearcher.addHitsSearcher(initialState: newState);
 
       final newResponses = [
@@ -201,13 +203,17 @@ void main() {
         }),
       ];
 
-      final allStates = [...initialStates, newState];
+      final allStates = [
+        ...initialSearchers.map((e) => e.snapshot()),
+        const SearchState(indexName: 'index3', query: 'q3'),
+      ];
       when(mockMultiSearchService.search(allStates))
           .thenAnswer((_) => Future.value(newResponses));
 
-      newSearcher.applyState((state) => newState);
+      newSearcher.query('q3');
       await untilCalled(mockMultiSearchService.search(allStates));
       verify(mockMultiSearchService.search(allStates)).called(1);
+      clearInteractions(mockMultiSearchService);
 
       // await newSubscription.cancel();
     });

@@ -7,7 +7,6 @@ import '../disposable_mixin.dart';
 import '../logger.dart';
 import '../model/multi_search_response.dart';
 import '../model/multi_search_state.dart';
-import '../model/multi_search_state_provider.dart';
 import '../model/search_request.dart';
 import '../service/algolia_facet_search_service.dart';
 import '../service/facet_search_service.dart';
@@ -98,7 +97,7 @@ import '../service/facet_search_service.dart';
 /// ```dart
 /// facetSearcher.dispose();
 /// ```
-abstract class FacetSearcher implements Disposable, MultiSearchStateProvider {
+abstract class FacetSearcher implements Disposable {
   /// FacetSearcher's factory.
   factory FacetSearcher({
     required String applicationID,
@@ -282,6 +281,4 @@ class _FacetSearcher with DisposableMixin implements FacetSearcher {
     _subscriptions.cancel();
   }
 
-  @override
-  Stream<MultiSearchState> get multiSearchState => state;
 }
