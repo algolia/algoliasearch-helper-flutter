@@ -12,6 +12,92 @@ import '../model/search_request.dart';
 import '../service/algolia_facet_search_service.dart';
 import '../service/facet_search_service.dart';
 
+/// Algolia Helpers main entry point for facet search requests and managing
+/// search sessions.
+///
+/// [FacetSearcher] is a component that facilitates facet search operations on
+/// an Algolia index. It handles distinct state changes, including the initial
+/// state, to trigger facet search operations. The state changes are debounced
+/// to ensure that only the last state change triggers the search operation.
+/// Additionally, on new facet search requests, any ongoing search calls for
+/// the previous request are cancelled, allowing only the latest facet search
+/// results to be processed.
+///
+/// ## Create Facet Searcher
+///
+/// Instantiate [FacetSearcher] using the default constructor:
+///
+/// ```dart
+/// final facetSearcher = FacetSearcher(
+///   applicationID: 'MY_APPLICATION_ID',
+///   apiKey: 'MY_API_KEY',
+///   indexName: 'MY_INDEX_NAME',
+///   facet: 'MY_FACET_ATTRIBUTE',
+/// );
+/// ```
+///
+/// Or, using the [FacetSearcher.create] factory:
+///
+/// ```dart
+/// final facetSearcher = FacetSearcher.create(
+///   applicationID: 'MY_APPLICATION_ID',
+///   apiKey: 'MY_API_KEY',
+///   state: FacetSearchState(
+///     searchState: SearchState(indexName: 'MY_INDEX_NAME'),
+///     facet: 'MY_FACET_ATTRIBUTE',
+///   ),
+/// );
+/// ```
+///
+/// ## Run facet search queries
+///
+/// Execute facet search queries using the [query] method:
+///
+/// ```dart
+/// facetSearcher.query('book');
+/// ```
+///
+/// Or, use the [applyState] method for more parameters:
+///
+/// ```dart
+/// facetSearcher.applyState((state) => state.copyWith(query: 'book'));
+/// ```
+///
+/// ## Get facet search state
+///
+/// Listen to the [state] stream to get facet search state changes:
+///
+/// ```dart
+/// facetSearcher.state.listen((facetSearchState) => print(facetSearchState.query));
+/// ```
+///
+/// ## Get facet search results
+///
+/// Listen to the [responses] stream to get facet search responses:
+///
+/// ```dart
+/// facetSearcher.responses.listen((response) {
+///   print('${response.nbHits} hits found');
+///   for (var hit in response.hits) {
+///     print("> ${hit['objectID']}");
+///   }
+/// });
+/// ```
+///
+/// Use [snapshot] to get the latest facet search response value submitted
+/// by the [responses] stream:
+///
+/// ```dart
+/// var response = facetSearcher.snapshot();
+/// ```
+///
+/// ## Dispose
+///
+/// Call [dispose] to release underlying resources:
+///
+/// ```dart
+/// facetSearcher.dispose();
+/// ```
 abstract class FacetSearcher implements Disposable, MultiSearchStateProvider {
   /// FacetSearcher's factory.
   factory FacetSearcher({
@@ -76,6 +162,7 @@ abstract class FacetSearcher implements Disposable, MultiSearchStateProvider {
   void rerun();
 }
 
+/// Default implementation of [FacetSearcher].
 class _FacetSearcher with DisposableMixin implements FacetSearcher {
   /// FacetSearcher's factory.
   factory _FacetSearcher({
