@@ -162,6 +162,7 @@ class _MultiSearcher with DisposableMixin implements MultiSearcher {
           eventTracker,
           debounce,
           [],
+          CompositeDisposable(),
         );
 
   _MultiSearcher._(
@@ -169,6 +170,7 @@ class _MultiSearcher with DisposableMixin implements MultiSearcher {
     this._eventTracker,
     this.debounce,
     this._delegates,
+    this._disposables,
   );
 
   /// Events logger
@@ -183,7 +185,10 @@ class _MultiSearcher with DisposableMixin implements MultiSearcher {
   final EventTracker _eventTracker;
 
   final List<MultiSearcherDelegate> _delegates;
+
   StreamSubscription<List<MultiSearchResponse>>? _resultsSubscription;
+
+  final CompositeDisposable _disposables;
 
   @override
   HitsSearcher addHitsSearcher({
@@ -214,6 +219,7 @@ class _MultiSearcher with DisposableMixin implements MultiSearcher {
 
   void _addDelegate(MultiSearcherDelegate delegate) {
     _delegates.add(delegate);
+    _disposables.add(delegate);
     _updateSubscriptions();
   }
 
@@ -238,9 +244,7 @@ class _MultiSearcher with DisposableMixin implements MultiSearcher {
   void doDispose() {
     _log.fine('MultiSearcher disposed');
     _resultsSubscription?.cancel();
-    for (var delegate in _delegates) {
-      delegate.dispose();
-    }
+    _disposables.dispose();
   }
 }
 
