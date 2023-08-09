@@ -13,20 +13,20 @@ part of 'multi_search_state.dart';
 /// ```
 final class FacetSearchState extends MultiSearchState {
   /// Creates [FacetSearchState] instance.
-  FacetSearchState({
+  const FacetSearchState({
     required this.facet,
     required this.searchState,
     this.facetQuery = '',
   });
 
   /// Facet name to search for
-  String facet;
+  final String facet;
 
   /// Text to search inside the facet’s values.
-  String facetQuery;
+  final String facetQuery;
 
   /// Search operation state
-  SearchState searchState;
+  final SearchState searchState;
 
   /// Make a copy of the search state.
   FacetSearchState copyWith({

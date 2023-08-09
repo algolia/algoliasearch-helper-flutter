@@ -21,8 +21,8 @@ void main() {
       final helper = FacetSearcher.create(
         applicationID: 'latency',
         apiKey: 'af044fb0788d6bb15f807e4420592bc5',
-        state: FacetSearchState(
-          searchState: const SearchState(
+        state: const FacetSearchState(
+          searchState: SearchState(
             indexName: 'instant_search',
             query: 'apple',
             maxFacetHits: 1,
@@ -61,9 +61,9 @@ void main() {
       when(searchService.search(any)).thenAnswer((_) => Future.value(initial));
       final searcher = FacetSearcher.custom(
         searchService,
-        FacetSearchState(
+        const FacetSearchState(
           facet: '',
-          searchState: const SearchState(indexName: 'myIndex'),
+          searchState: SearchState(indexName: 'myIndex'),
         ),
       );
 
@@ -76,10 +76,10 @@ void main() {
 
       final searcher = FacetSearcher.custom(
         searchService,
-        FacetSearchState(
+        const FacetSearchState(
           facet: '',
           facetQuery: 'cat',
-          searchState: const SearchState(indexName: 'myIndex'),
+          searchState: SearchState(indexName: 'myIndex'),
         ),
       );
 
@@ -93,9 +93,9 @@ void main() {
       final searchService = MockFacetSearchService();
       final searcher = FacetSearcher.custom(
         searchService,
-        FacetSearchState(
+        const FacetSearchState(
           facet: '',
-          searchState: const SearchState(indexName: 'myIndex'),
+          searchState: SearchState(indexName: 'myIndex'),
         ),
       );
 
@@ -112,9 +112,9 @@ void main() {
 
       final searcher = FacetSearcher.custom(
         searchService,
-        FacetSearchState(
+        const FacetSearchState(
           facet: '',
-          searchState: const SearchState(indexName: 'myIndex'),
+          searchState: SearchState(indexName: 'myIndex'),
         ),
       );
 
@@ -137,9 +137,9 @@ void main() {
 
       final searcher = FacetSearcher.custom(
         searchService,
-        FacetSearchState(
+        const FacetSearchState(
           facet: '',
-          searchState: const SearchState(indexName: 'myIndex'),
+          searchState: SearchState(indexName: 'myIndex'),
         ),
       );
 
@@ -169,9 +169,9 @@ void main() {
 
       final searcher = FacetSearcher.custom(
         searchService,
-        FacetSearchState(
+        const FacetSearchState(
           facet: '',
-          searchState: const SearchState(indexName: 'myIndex'),
+          searchState: SearchState(indexName: 'myIndex'),
         ),
       );
 
@@ -196,9 +196,9 @@ void main() {
 
       final searcher = FacetSearcher.custom(
         searchService,
-        FacetSearchState(
+        const FacetSearchState(
           facet: '',
-          searchState: const SearchState(indexName: 'myIndex'),
+          searchState: SearchState(indexName: 'myIndex'),
         ),
       );
 
