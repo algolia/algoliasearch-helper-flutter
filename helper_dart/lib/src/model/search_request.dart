@@ -1,4 +1,6 @@
-class SearchRequest<State> {
+import '../../algolia_helper.dart';
+
+class SearchRequest<State extends MultiSearchState> {
   /// Creates [SearchRequest] instance.
   SearchRequest(this.state, [this.attempts = 1]);
 
