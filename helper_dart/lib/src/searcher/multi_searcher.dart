@@ -248,10 +248,9 @@ class _MultiSearcher with DisposableMixin implements MultiSearcher {
   }
 }
 
-abstract class MultiSearcherDelegate implements Disposable {
+abstract class MultiSearcherDelegate with DisposableMixin {
   final _stateStream = BehaviorSubject<MultiSearchState>();
   final _responseStream = BehaviorSubject<MultiSearchResponse>();
-  bool _isDisposed = false;
 
   Stream<MultiSearchResponse> get response => _responseStream.stream;
 
@@ -267,11 +266,7 @@ abstract class MultiSearcherDelegate implements Disposable {
       _stateStream.map((state) => state);
 
   @override
-  bool get isDisposed => _isDisposed;
-
-  @override
   void dispose() {
-    _isDisposed = true;
     _stateStream.close();
     _responseStream.close();
   }
