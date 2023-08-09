@@ -262,8 +262,7 @@ abstract class MultiSearcherDelegate with DisposableMixin {
     _responseStream.add(response);
   }
 
-  Stream<MultiSearchState> get multiSearchState =>
-      _stateStream.map((state) => state);
+  Stream<MultiSearchState> get multiSearchState => _stateStream;
 
   @override
   void dispose() {
