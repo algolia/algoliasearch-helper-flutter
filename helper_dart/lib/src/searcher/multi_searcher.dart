@@ -1,9 +1,13 @@
 import 'dart:async';
 
 import 'package:algolia_insights/algolia_insights.dart';
+import 'package:logging/logging.dart';
+import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../disposable.dart';
+import '../disposable_mixin.dart';
+import '../logger.dart';
 import '../model/multi_search_response.dart';
 import '../model/multi_search_state.dart';
 import '../service/algolia_multi_search_service.dart';
@@ -17,9 +21,11 @@ import 'hits_searcher.dart';
 /// Algolia Helpers.
 ///
 /// The [MultiSearcher] enables you to search for hits and facet values in
-/// different indices of the same Algolia application simultaneously. You can
-/// add multiple [HitsSearcher] and [FacetSearcher] instances to the
-/// [MultiSearcher], each targeting different indices or facets,
+/// different indices of the same Algolia application simultaneously.
+/// It generates and manages [HitsSearcher] and [FacetSearcher] instances
+/// internally. Once created, these searchers behave like their independently
+/// instantiated counterparts.
+///
 ///
 /// ## Create MultiSearcher
 ///
@@ -27,18 +33,8 @@ import 'hits_searcher.dart';
 ///
 /// ```dart
 /// final multiSearcher = MultiSearcher(
-///   _service,
-///   _eventTracker,
-/// );
-/// ```
-///
-/// Or, use the `algolia` named constructor to create a [MultiSearcher] with
-/// Algolia as the search service:
-///
-/// ```dart
-/// final multiSearcher = MultiSearcher.algolia(
-///   'MY_APPLICATION_ID',
-///   'MY_API_KEY',
+///   applicationID: 'MY_APPLICATION_ID',
+///   apiKey: 'MY_API_KEY',
 ///   eventTracker: Insights('MY_APPLICATION_ID', 'MY_API_KEY'),
 /// );
 /// ```
@@ -52,7 +48,7 @@ import 'hits_searcher.dart';
 ///
 /// ```dart
 /// final hitsSearcher = multiSearcher.addHitsSearcher(
-///   initialState: SearchState(indexName: 'MY_INDEX_NAME'),
+///   initialState: const SearchState(indexName: 'MY_INDEX_NAME'),
 /// );
 /// ```
 ///
@@ -60,9 +56,13 @@ import 'hits_searcher.dart';
 ///
 /// ```dart
 /// final facetSearcher = multiSearcher.addFacetSearcher(
-///   state: SearchState(indexName: 'MY_INDEX_NAME'),
-///   facet: 'category',
-///   facetQuery: 'shoes',
+///   initialState: const FacetSearchState(
+///     facet: 'category',
+///     facetQuery: 'shoes',
+///     searchState: SearchState(
+///       indexName: 'MY_INDEX_NAME',
+///     ),
+///   )
 /// );
 /// ```
 ///
@@ -73,20 +73,7 @@ import 'hits_searcher.dart';
 /// ```dart
 /// multiSearcher.dispose();
 /// ```
-class MultiSearcher implements Disposable {
-  final MultiSearchService _service;
-  final EventTracker _eventTracker;
-  final List<MultiSearcherDelegate> _delegates;
-  StreamSubscription<List<MultiSearchResponse>>? _resultsSubscription;
-  bool _isDisposed = false;
-
-  /// Creates a new instance of [MultiSearcher].
-  ///
-  /// - `service`: The [MultiSearchService] to handle multi-search operations.
-  /// - `eventTracker`: The [EventTracker] to track events during search
-  /// operations.
-  MultiSearcher(this._service, this._eventTracker) : _delegates = [];
-
+abstract class MultiSearcher implements Disposable {
   /// Creates a new instance of [MultiSearcher] using Algolia as the search
   /// service.
   ///
@@ -95,17 +82,110 @@ class MultiSearcher implements Disposable {
   /// - `eventTracker`: (optional) The [EventTracker] to track events during
   /// search operations. If not provided, an [Insights] instance will be used by
   /// default.
-  MultiSearcher.algolia(
-    String applicationID,
-    String apiKey, {
+  factory MultiSearcher({
+    required String applicationID,
+    required String apiKey,
     EventTracker? eventTracker,
-  })  : _service = AlgoliaMultiSearchService(applicationID, apiKey),
-        _eventTracker = eventTracker ?? Insights(applicationID, apiKey),
-        _delegates = [];
+    Duration debounce = const Duration(milliseconds: 100),
+  }) =>
+      _MultiSearcher(
+        applicationID: applicationID,
+        apiKey: apiKey,
+        eventTracker: eventTracker,
+        debounce: debounce,
+      );
+
+  /// Creates [MultiSearcher] using a custom [MultiSearchService] and
+  /// [EventTracker].
+  /// ///
+  /// - `service`: The [MultiSearchService] to handle multi-search operations.
+  /// - `eventTracker`: The [EventTracker] to track events during search
+  /// operations.
+  @internal
+  factory MultiSearcher.custom(
+    MultiSearchService searchService,
+    EventTracker eventTracker, [
+    Duration debounce = const Duration(milliseconds: 100),
+  ]) =>
+      _MultiSearcher.create(
+        searchService,
+        eventTracker,
+        debounce,
+      );
 
   /// Adds a new [HitsSearcher] to the multi-searcher.
   ///
   /// Returns the created [HitsSearcher] instance.
+  HitsSearcher addHitsSearcher({
+    required SearchState initialState,
+  });
+
+  /// Adds a new [FacetSearcher] to the multi-searcher.
+  ///
+  /// Returns the created [FacetSearcher] instance.
+  FacetSearcher addFacetSearcher({
+    required FacetSearchState initialState,
+  });
+}
+
+class _MultiSearcher with DisposableMixin implements MultiSearcher {
+  /// MultiSearcher's factory.
+  factory _MultiSearcher({
+    required String applicationID,
+    required String apiKey,
+    EventTracker? eventTracker,
+    Duration debounce = const Duration(milliseconds: 100),
+  }) {
+    final service = AlgoliaMultiSearchService(
+      applicationID,
+      apiKey,
+    );
+    final actualEventTracker = eventTracker ??
+        Insights(
+          applicationID,
+          apiKey,
+        );
+    return _MultiSearcher.create(
+      service,
+      actualEventTracker,
+      debounce,
+    );
+  }
+
+  /// HitSearcher's constructor, for internal and test use only.
+  _MultiSearcher.create(
+    MultiSearchService searchService,
+    EventTracker eventTracker, [
+    Duration debounce = const Duration(milliseconds: 100),
+  ]) : this._(
+          searchService,
+          eventTracker,
+          debounce,
+          [],
+        );
+
+  _MultiSearcher._(
+    this._service,
+    this._eventTracker,
+    this.debounce,
+    this._delegates,
+  );
+
+  /// Events logger
+  final Logger _log = algoliaLogger('MultiSearcher');
+
+  /// Service handling search requests
+  final MultiSearchService _service;
+
+  /// Searchers state update debounce duration
+  final Duration debounce;
+
+  final EventTracker _eventTracker;
+
+  final List<MultiSearcherDelegate> _delegates;
+  StreamSubscription<List<MultiSearchResponse>>? _resultsSubscription;
+
+  @override
   HitsSearcher addHitsSearcher({
     required SearchState initialState,
   }) {
@@ -116,26 +196,17 @@ class MultiSearcher implements Disposable {
       initialState,
     );
     _addDelegate(service);
-    _updateSubscriptions();
     return searcher;
   }
 
-  /// Adds a new [FacetSearcher] to the multi-searcher.
-  ///
-  /// Returns the created [FacetSearcher] instance.
+  @override
   FacetSearcher addFacetSearcher({
-    required SearchState state,
-    required String facet,
-    String facetQuery = '',
+    required FacetSearchState initialState,
   }) {
     final service = ProxyFacetSearchService();
     final searcher = FacetSearcher.custom(
       service,
-      FacetSearchState(
-        searchState: state,
-        facet: facet,
-        facetQuery: facetQuery,
-      ),
+      initialState,
     );
     _addDelegate(service);
     return searcher;
@@ -164,16 +235,13 @@ class MultiSearcher implements Disposable {
   }
 
   @override
-  void dispose() {
+  void doDispose() {
+    _log.fine('MultiSearcher disposed');
     _resultsSubscription?.cancel();
-    _isDisposed = true;
     for (var delegate in _delegates) {
       delegate.dispose();
     }
   }
-
-  @override
-  bool get isDisposed => _isDisposed;
 }
 
 abstract class MultiSearcherDelegate implements Disposable {

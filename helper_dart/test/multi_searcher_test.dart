@@ -23,7 +23,10 @@ void main() {
     setUp(() {
       mockMultiSearchService = MockMultiSearchService();
       mockEventTracker = MockEventTracker();
-      multiSearcher = MultiSearcher(mockMultiSearchService, mockEventTracker);
+      multiSearcher = MultiSearcher.custom(
+        mockMultiSearchService,
+        mockEventTracker,
+      );
     });
 
     tearDown(() {
@@ -221,9 +224,9 @@ void main() {
 
   group('Integration tests', () {
     test('should properly call Algolia multi-index service', () async {
-      final multiSearcher = MultiSearcher.algolia(
-        'latency',
-        '1f6fd3a6fb973cb08419fe7d288fa4db',
+      final multiSearcher = MultiSearcher(
+        applicationID: 'latency',
+        apiKey: '1f6fd3a6fb973cb08419fe7d288fa4db',
         eventTracker: MockEventTracker(),
       );
 
@@ -256,9 +259,9 @@ void main() {
     test(
       'should properly call Algolia hits and facet multi-index service',
       () async {
-        final multiSearcher = MultiSearcher.algolia(
-          'latency',
-          '1f6fd3a6fb973cb08419fe7d288fa4db',
+        final multiSearcher = MultiSearcher(
+          applicationID: 'latency',
+          apiKey: '1f6fd3a6fb973cb08419fe7d288fa4db',
           eventTracker: MockEventTracker(),
         );
 
@@ -270,11 +273,13 @@ void main() {
         );
 
         final facetSearcher = multiSearcher.addFacetSearcher(
-          state: const SearchState(
-            indexName: 'instant_search',
-            maxFacetHits: 1,
+          initialState: const FacetSearchState(
+            facet: 'categories',
+            searchState: SearchState(
+              indexName: 'instant_search',
+              maxFacetHits: 1,
+            ),
           ),
-          facet: 'categories',
         );
 
         hitsSearcher.query('lap');
