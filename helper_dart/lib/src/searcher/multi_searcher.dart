@@ -227,7 +227,7 @@ class _MultiSearcher with DisposableMixin implements MultiSearcher {
     _resultsSubscription?.cancel();
     _resultsSubscription = Rx.combineLatest(
       _delegates.map((e) => e.multiSearchState),
-      (states) => states.cast<MultiSearchState>(),
+      (states) => states,
     )
         .debounceTime(
           const Duration(milliseconds: 100),
@@ -265,7 +265,7 @@ abstract class MultiSearcherDelegate with DisposableMixin {
   Stream<MultiSearchState> get multiSearchState => _stateStream;
 
   @override
-  void dispose() {
+  void doDispose() {
     _stateStream.close();
     _responseStream.close();
   }
