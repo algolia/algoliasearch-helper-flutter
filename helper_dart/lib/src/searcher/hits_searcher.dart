@@ -196,7 +196,10 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
       apiKey: apiKey,
       // extraUserAgents: ['algolia-helper-dart ($libVersion)'],
     );
-    final insights = Insights(applicationID, apiKey);
+    final insights = Insights(
+      applicationID: applicationID,
+      apiKey: apiKey,
+    );
     return _HitsSearcher.create(
       service,
       insights,

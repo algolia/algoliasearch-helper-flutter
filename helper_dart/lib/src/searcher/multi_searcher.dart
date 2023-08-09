@@ -142,8 +142,8 @@ class _MultiSearcher with DisposableMixin implements MultiSearcher {
     );
     final actualEventTracker = eventTracker ??
         Insights(
-          applicationID,
-          apiKey,
+          applicationID: applicationID,
+          apiKey: apiKey,
         );
     return _MultiSearcher.create(
       service,

@@ -14,13 +14,15 @@ class AlgoliaEventService implements EventService {
   /// Logger instance
   final Logger _log;
 
-  AlgoliaEventService(
-    String applicationID,
-    String apiKey,
-  ) : this.create(
+  AlgoliaEventService({
+    required String applicationID,
+    required String apiKey,
+    String? region,
+  }) : this.create(
           InsightsClient(
             appId: applicationID,
             apiKey: apiKey,
+            region: region,
             options: const ClientOptions(
               agentSegments: [
                 AgentSegment(

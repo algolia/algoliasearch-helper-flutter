@@ -44,12 +44,20 @@ class Insights implements EventTracker {
   /// Entity managing the user token generation and storage
   final UserTokenStorage _userTokenStorage;
 
-  factory Insights(String applicationID, String apiKey) {
+  factory Insights({
+    required String applicationID,
+    required String apiKey,
+    String? region,
+  }) {
     if (_insightsPool.containsKey(applicationID)) {
       return _insightsPool[applicationID]!;
     }
     final insights = Insights.custom(
-      AlgoliaEventService(applicationID, apiKey),
+      AlgoliaEventService(
+        applicationID: applicationID,
+        apiKey: apiKey,
+        region: region,
+      ),
       UserTokenStorage(),
     );
     _insightsPool[applicationID] = insights;
