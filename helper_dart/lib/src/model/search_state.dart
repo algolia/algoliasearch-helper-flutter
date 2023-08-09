@@ -13,7 +13,7 @@ part of 'multi_search_state.dart';
 ///   attributesToRetrieve: ['name', 'description', 'price'],
 /// );
 /// ```
-class SearchState extends MultiSearchState {
+class SearchState implements MultiSearchState {
   /// Creates [SearchState] instance.
   const SearchState({
     required this.indexName,

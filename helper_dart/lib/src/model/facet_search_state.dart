@@ -11,7 +11,7 @@ part of 'multi_search_state.dart';
 ///   facetQuery: 'samsung',
 /// );
 /// ```
-final class FacetSearchState extends MultiSearchState {
+final class FacetSearchState implements MultiSearchState {
   /// Creates [FacetSearchState] instance.
   const FacetSearchState({
     required this.facet,
