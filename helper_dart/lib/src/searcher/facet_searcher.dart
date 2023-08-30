@@ -98,7 +98,7 @@ import '../service/facet_search_service.dart';
 /// ```dart
 /// facetSearcher.dispose();
 /// ```
-abstract class FacetSearcher implements Disposable {
+abstract interface class FacetSearcher implements Disposable {
   /// FacetSearcher's factory.
   factory FacetSearcher({
     required String applicationID,

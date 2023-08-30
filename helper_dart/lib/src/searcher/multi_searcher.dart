@@ -20,9 +20,9 @@ import 'hits_searcher.dart';
 /// Core component for multi-search requests and managing search sessions in
 /// Algolia Helpers.
 ///
-/// The [MultiSearcher] enables you to search for hits and facet values in
-/// different indices of the same Algolia application simultaneously.
-/// It generates and manages [HitsSearcher] and [FacetSearcher] instances
+/// The [MultiSearcher] lets you simultaneously search for hits and facet values
+/// in different indices of the same Algolia application .
+/// It instantiates and manages [HitsSearcher] and [FacetSearcher] instances
 /// internally. Once created, these searchers behave like their independently
 /// instantiated counterparts.
 ///
@@ -73,7 +73,7 @@ import 'hits_searcher.dart';
 /// ```dart
 /// multiSearcher.dispose();
 /// ```
-abstract class MultiSearcher implements Disposable {
+abstract interface class MultiSearcher implements Disposable {
   /// Creates a new instance of [MultiSearcher] using Algolia as the search
   /// service.
   ///
@@ -82,6 +82,8 @@ abstract class MultiSearcher implements Disposable {
   /// - `eventTracker`: (optional) The [EventTracker] to track events during
   /// search operations. If not provided, an [Insights] instance will be used by
   /// default.
+  /// - `debounce`: The time duration to wait before sending a search request.
+  /// Defaults to 100 milliseconds.
   factory MultiSearcher({
     required String applicationID,
     required String apiKey,
@@ -97,10 +99,12 @@ abstract class MultiSearcher implements Disposable {
 
   /// Creates [MultiSearcher] using a custom [MultiSearchService] and
   /// [EventTracker].
-  /// ///
+  ///
   /// - `service`: The [MultiSearchService] to handle multi-search operations.
   /// - `eventTracker`: The [EventTracker] to track events during search
   /// operations.
+  /// - `debounce`: The time duration to wait before sending a search request.
+  /// Defaults to 100 milliseconds.
   @internal
   factory MultiSearcher.custom(
     MultiSearchService searchService,
@@ -128,6 +132,8 @@ abstract class MultiSearcher implements Disposable {
   });
 }
 
+/// `_MultiSearcher` handles the actual operations and business logic behind
+/// the interface, ensuring encapsulation and separation of concerns.
 class _MultiSearcher with DisposableMixin implements MultiSearcher {
   /// MultiSearcher's factory.
   factory _MultiSearcher({
@@ -248,20 +254,43 @@ class _MultiSearcher with DisposableMixin implements MultiSearcher {
   }
 }
 
+/// `MultiSearcherDelegate` serves as an abstract unit within the composite
+/// `MultiSearcher`. It abstracts the underlying details of individual search
+/// units like `HitsSearcher` and `FacetSearcher`, focusing primarily on
+/// exposing their states and providing mechanisms to update their responses.
 abstract class MultiSearcherDelegate with DisposableMixin {
+  /// A private stream to manage the state of the encapsulated search units.
   final _stateStream = BehaviorSubject<MultiSearchState>();
+
+  /// A private stream to manage the responses from the encapsulated search
+  /// units.
   final _responseStream = BehaviorSubject<MultiSearchResponse>();
 
+  /// Provides public access to the stream of search responses.
+  ///
+  /// Enables subscribers to listen to and react to the search responses of the
+  /// encapsulated units.
   Stream<MultiSearchResponse> get response => _responseStream.stream;
 
+  /// Updates the state of the encapsulated search unit.
+  ///
+  /// - Parameters:
+  ///   - `state`: The new [MultiSearchState] to set for the search unit.
   void updateState(MultiSearchState state) {
     _stateStream.add(state);
   }
 
+  /// Updates the response of the encapsulated search unit.
+  ///
+  /// - Parameters:
+  ///   - `response`: The new [MultiSearchResponse] to set for the search unit.
   void updateResponse(MultiSearchResponse response) {
     _responseStream.add(response);
   }
 
+  /// Provides public access to the stream of the encapsulated search units'
+  /// states. Enables subscribers to listen to and react to the state changes of
+  /// the encapsulated units.
   Stream<MultiSearchState> get multiSearchState => _stateStream;
 
   @override

@@ -95,7 +95,7 @@ import '../service/hits_search_service.dart';
 /// hitsSearcher.dispose();
 /// ```
 @sealed
-abstract class HitsSearcher implements Disposable, EventDataDelegate {
+abstract interface class HitsSearcher implements Disposable, EventDataDelegate {
   /// HitsSearcher's factory.
   factory HitsSearcher({
     required String applicationID,
