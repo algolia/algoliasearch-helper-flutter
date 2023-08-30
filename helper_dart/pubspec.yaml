@@ -4,10 +4,13 @@ version: 0.3.3
 repository: https://github.com/algolia/algoliasearch-helper-flutter/tree/main/helper_dart
 environment:
   sdk: '>=3.0.0 <4.0.0'
+  flutter: '>=1.17.0'
 dependencies:
   algolia_insights: ^0.1.2
   algoliasearch: ^0.1.2
   collection: ^1.16.0
+  flutter:
+    sdk: flutter
   logging: ^1.0.2
   meta: ^1.7.0
   rxdart: ^0.27.4
