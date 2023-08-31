@@ -5,7 +5,7 @@ import '../lib_version.dart';
 import '../logger.dart';
 import '../model/multi_search_response.dart';
 import '../model/multi_search_state.dart';
-import 'algolia_client_helper.dart';
+import 'algolia_client_extensions.dart';
 import 'facet_search_service.dart';
 
 class AlgoliaFacetSearchService implements FacetSearchService {
@@ -43,12 +43,16 @@ class AlgoliaFacetSearchService implements FacetSearchService {
   Future<FacetSearchResponse> search(FacetSearchState state) async {
     _log.fine('Run facet search with state: $state');
     try {
-      final response = await _client.facetSearch(state);
-      _log.fine('Facet search response: $response');
-      return response;
+      final res = await _client.search(
+        searchMethodParams: algolia.SearchMethodParams(
+          requests: [state.toRequest()],
+        ),
+      );
+      return algolia.SearchForFacetValuesResponse.fromJson(
+        res.results.first as Map<String, dynamic>,
+      ).toSearchResponse();
     } catch (exception) {
-      _log.severe('Facet search exception: $exception');
-      rethrow;
+      throw _client.launderException(exception);
     }
   }
 }

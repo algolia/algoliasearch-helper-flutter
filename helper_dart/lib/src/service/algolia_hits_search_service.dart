@@ -7,7 +7,7 @@ import '../logger.dart';
 import '../model/multi_search_response.dart';
 import '../model/multi_search_state.dart';
 import '../query_builder.dart';
-import 'algolia_client_helper.dart';
+import 'algolia_client_extensions.dart';
 import 'hits_search_service.dart';
 
 class AlgoliaHitsSearchService implements HitsSearchService {
@@ -63,7 +63,7 @@ class AlgoliaHitsSearchService implements HitsSearchService {
       return response.toSearchResponse();
     } catch (exception) {
       _log.severe('Search exception: $exception');
-      throw _launderException(exception);
+      throw _client.launderException(exception);
     }
   }
 
@@ -73,20 +73,15 @@ class AlgoliaHitsSearchService implements HitsSearchService {
     try {
       final queryBuilder = QueryBuilder(state);
       final queries = queryBuilder.build().map((it) => it.toRequest()).toList();
-      final responses = await _client.searchMultiIndex(
+      final rawResponses = await _client.searchMultiIndex(
         queries: queries,
       );
+      final responses = rawResponses.map((e) => e.toSearchResponse()).toList();
       _log.fine('Search responses: $responses');
-      return queryBuilder
-          .merge(responses.results.map((r) => r.toSearchResponse()).toList());
+      return queryBuilder.merge(responses);
     } catch (exception) {
       _log.severe('Search exception thrown: $exception');
-      throw _launderException(exception);
+      throw _client.launderException(exception);
     }
   }
-
-  /// Coerce an [AlgoliaException] to a [SearchError].
-  Exception _launderException(error) => error is algolia.AlgoliaApiException
-      ? error.toSearchError()
-      : Exception(error);
 }

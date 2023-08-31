@@ -7,83 +7,11 @@ import '../model/multi_search_response.dart';
 import '../model/multi_search_state.dart';
 
 extension ClientHelperAdapter on algolia.SearchClient {
-  Future<List<MultiSearchResponse>> multiSearch(
-    List<MultiSearchState> states,
-  ) async {
-    try {
-      final requests = states.map((state) {
-        switch (state) {
-          case SearchState():
-            return state.toRequest();
-          case FacetSearchState():
-            return state.toRequest();
-        }
-      }).toList();
-      final result = await post(
-        path: '/indexes/*/queries',
-        body: algolia.SearchMethodParams(requests: requests).toJson(),
-      );
-      final results = (result as Map)['results'] as List<dynamic>;
-
-      final responses = <MultiSearchResponse>[];
-
-      for (final result in results) {
-        if (result is Map<String, dynamic>) {
-          if (result.containsKey('facetHits')) {
-            final facetSearchResponse =
-                algolia.SearchForFacetValuesResponse.fromJson(result)
-                    .toSearchResponse();
-            responses.add(facetSearchResponse);
-          } else {
-            final hitsSearchResponse =
-                algolia.SearchResponse.fromJson(result).toSearchResponse();
-            responses.add(hitsSearchResponse);
-          }
-        }
-      }
-      return responses;
-    } catch (exception) {
-      throw _launderException(exception);
-    }
-  }
-
-  Future<SearchResponse> search(SearchState state) async {
-    try {
-      final result = await post(
-        path: '/indexes/*/queries',
-        body:
-            algolia.SearchMethodParams(requests: [state.toRequest()]).toJson(),
-      );
-      final rawResponse = ((result as Map)['results'] as List<dynamic>).first
-          as Map<String, dynamic>;
-      return algolia.SearchResponse.fromJson(rawResponse).toSearchResponse();
-    } catch (exception) {
-      throw _launderException(exception);
-    }
-  }
-
-  Future<FacetSearchResponse> facetSearch(
-    FacetSearchState state,
-  ) async {
-    try {
-      final result = await post(
-        path: '/indexes/*/queries',
-        body:
-            algolia.SearchMethodParams(requests: [state.toRequest()]).toJson(),
-      );
-      final rawResponse = ((result as Map)['results'] as List<dynamic>).first
-          as Map<String, dynamic>;
-      return algolia.SearchForFacetValuesResponse.fromJson(rawResponse)
-          .toSearchResponse();
-    } catch (exception) {
-      throw _launderException(exception);
-    }
-  }
-
   /// Coerce an [AlgoliaException] to a [SearchError].
-  Exception _launderException(error) => error is algolia.AlgoliaApiException
-      ? error.toSearchError()
-      : Exception(error);
+  Exception launderException(dynamic error) =>
+      error is algolia.AlgoliaApiException
+          ? error.toSearchError()
+          : Exception(error);
 }
 
 /// Extensions over [AlgoliaException].

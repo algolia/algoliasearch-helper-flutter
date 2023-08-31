@@ -7,7 +7,7 @@ import 'package:algolia_helper/src/filter_state.dart';
 import 'package:algolia_helper/src/model/multi_search_response.dart';
 import 'package:algolia_helper/src/model/multi_search_state.dart';
 import 'package:algolia_helper/src/searcher/hits_searcher.dart';
-import 'package:algolia_helper/src/service/algolia_client_helper.dart';
+import 'package:algolia_helper/src/service/algolia_client_extensions.dart';
 import 'package:algolia_helper/src/service/algolia_hits_search_service.dart';
 import 'package:algolia_helper/src/service/hits_search_service.dart';
 import 'package:algolia_insights/algolia_insights.dart';

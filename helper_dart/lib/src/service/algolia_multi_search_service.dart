@@ -5,7 +5,7 @@ import '../logger.dart';
 import '../model/multi_search_response.dart';
 import '../model/multi_search_state.dart';
 import '../multi_search_state_folder.dart';
-import 'algolia_client_helper.dart';
+import 'algolia_client_extensions.dart';
 import 'multi_search_service.dart';
 
 final class AlgoliaMultiSearchService extends MultiSearchService {
@@ -28,9 +28,38 @@ final class AlgoliaMultiSearchService extends MultiSearchService {
     _log.fine('Start multi search: $states');
     final folder = MultiSearchStateFolder();
     final unfoldedRequests = folder.unfoldStates(states);
-    final unfoldedResponses = await _client.multiSearch(unfoldedRequests);
-    _log.fine('Received responses: $unfoldedResponses');
-    final foldedResponses = folder.foldResponses(unfoldedResponses);
-    return foldedResponses;
+    final requests = unfoldedRequests.map((state) {
+      switch (state) {
+        case SearchState():
+          return state.toRequest();
+        case FacetSearchState():
+          return state.toRequest();
+      }
+    }).toList();
+    try {
+      final responses = await _client.search(
+        searchMethodParams: algolia.SearchMethodParams(requests: requests),
+      );
+      final unfoldedResponses = responses.results
+          .map((result) {
+            if (result is Map<String, dynamic>) {
+              if (result.containsKey('facetHits')) {
+                return algolia.SearchForFacetValuesResponse.fromJson(result)
+                    .toSearchResponse();
+              } else {
+                return algolia.SearchResponse.fromJson(result)
+                    .toSearchResponse();
+              }
+            }
+          })
+          .where((response) => response != null)
+          .map((response) => response!)
+          .toList();
+      _log.fine('Received responses: $unfoldedResponses');
+      final foldedResponses = folder.foldResponses(unfoldedResponses);
+      return foldedResponses;
+    } catch (exception) {
+      throw _client.launderException(exception);
+    }
   }
 }
