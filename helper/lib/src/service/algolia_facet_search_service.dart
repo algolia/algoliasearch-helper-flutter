@@ -41,17 +41,22 @@ class AlgoliaFacetSearchService implements FacetSearchService {
 
   @override
   Future<FacetSearchResponse> search(FacetSearchState state) async {
-    _log.fine('Run facet search with state: $state');
+    _log.fine('run search with state: $state');
     try {
-      final res = await _client.search(
+      final rawResponse = await _client.search(
         searchMethodParams: algolia.SearchMethodParams(
-          requests: [state.toRequest()],
+          requests: [
+            state.toRequest(),
+          ],
         ),
       );
-      return algolia.SearchForFacetValuesResponse.fromJson(
-        res.results.first as Map<String, dynamic>,
+      final response = algolia.SearchForFacetValuesResponse.fromJson(
+        rawResponse.results.first as Map<String, dynamic>,
       ).toSearchResponse();
+      _log.fine('received response: $response');
+      return response;
     } catch (exception) {
+      _log.severe('exception: $exception');
       throw _client.launderException(exception);
     }
   }

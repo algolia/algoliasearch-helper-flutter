@@ -143,8 +143,8 @@ class _MultiSearcher with DisposableMixin implements MultiSearcher {
     Duration debounce = const Duration(milliseconds: 100),
   }) {
     final service = AlgoliaMultiSearchService(
-      applicationID,
-      apiKey,
+      applicationID: applicationID,
+      apiKey: apiKey,
     );
     final actualEventTracker = eventTracker ??
         Insights(

@@ -15,8 +15,10 @@ final class AlgoliaMultiSearchService extends MultiSearchService {
   /// Algolia API client
   final algolia.SearchClient _client;
 
-  AlgoliaMultiSearchService(String applicationID, String apiKey)
-      : this.create(algolia.SearchClient(appId: applicationID, apiKey: apiKey));
+  AlgoliaMultiSearchService({
+    required String applicationID,
+    required String apiKey,
+  }) : this.create(algolia.SearchClient(appId: applicationID, apiKey: apiKey));
 
   AlgoliaMultiSearchService.create(this._client)
       : _log = algoliaLogger('MultiSearchService');
@@ -25,7 +27,7 @@ final class AlgoliaMultiSearchService extends MultiSearchService {
   Future<List<MultiSearchResponse>> search(
     List<MultiSearchState> states,
   ) async {
-    _log.fine('Start multi search: $states');
+    _log.fine('run search with states: $states');
     final folder = MultiSearchStateFolder();
     final unfoldedRequests = folder.unfoldStates(states);
     final requests = unfoldedRequests.map((state) {
@@ -55,10 +57,11 @@ final class AlgoliaMultiSearchService extends MultiSearchService {
           .where((response) => response != null)
           .map((response) => response!)
           .toList();
-      _log.fine('Received responses: $unfoldedResponses');
+      _log.fine('received responses: $unfoldedResponses');
       final foldedResponses = folder.foldResponses(unfoldedResponses);
       return foldedResponses;
     } catch (exception) {
+      _log.severe('exception: $exception');
       throw _client.launderException(exception);
     }
   }

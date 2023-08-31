@@ -48,20 +48,22 @@ class AlgoliaHitsSearchService implements HitsSearchService {
 
   /// Build a single search request using [state] and get a search result.
   Future<SearchResponse> _singleQuerySearch(SearchState state) async {
-    _log.fine('Run search with state: $state');
+    _log.fine('run search with state: $state');
     try {
-      final result = await _client.post(
-        path: '/indexes/*/queries',
-        body: algolia.SearchMethodParams(requests: [state.toRequest()]),
+      final rawResponse = await _client.search(
+        searchMethodParams: algolia.SearchMethodParams(
+          requests: [
+            state.toRequest(),
+          ],
+        ),
       );
-      final results = (result as Map)['results'] as List<Map<String, dynamic>>;
       final response = algolia.SearchResponse.fromJson(
-        results.first,
-      );
-      _log.fine('Search response: $response');
-      return response.toSearchResponse();
+        rawResponse.results.first as Map<String, dynamic>,
+      ).toSearchResponse();
+      _log.fine('received response: $response');
+      return response;
     } catch (exception) {
-      _log.severe('Search exception: $exception');
+      _log.severe('exception: $exception');
       throw _client.launderException(exception);
     }
   }
