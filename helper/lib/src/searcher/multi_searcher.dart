@@ -200,6 +200,7 @@ class _MultiSearcher with DisposableMixin implements MultiSearcher {
   HitsSearcher addHitsSearcher({
     required SearchState initialState,
   }) {
+    _log.finest('add hits searcher for index ${initialState.indexName}');
     final service = ProxyHitsSearchService();
     final searcher = HitsSearcher.custom(
       service,
@@ -214,6 +215,9 @@ class _MultiSearcher with DisposableMixin implements MultiSearcher {
   FacetSearcher addFacetSearcher({
     required FacetSearchState initialState,
   }) {
+    _log.finest(
+        'add facet searcher for index ${initialState.searchState.indexName}, '
+            'attribute: ${initialState.facet}');
     final service = ProxyFacetSearchService();
     final searcher = FacetSearcher.custom(
       service,
