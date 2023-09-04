@@ -29,9 +29,9 @@ class _MyHomePageState extends State<MyHomePage> {
   // Create a hits searcher.
   // The Searcher performs search requests and obtains search result
   final searcher = HitsSearcher(
-    applicationID: 'MY_APPLICATION_ID',
-    apiKey: 'MY_API_KEY',
-    indexName: 'MY_INDEX_NAME',
+    applicationID: 'latency',
+    apiKey: '1f6fd3a6fb973cb08419fe7d288fa4db',
+    indexName: 'instant_search',
   );
 
   @override
@@ -74,10 +74,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         text: TextSpan(
                           style: Theme.of(context).textTheme.titleSmall,
                           children:
-                              hit.getHighlightedString('title').toInlineSpans(),
+                              hit.getHighlightedString('name').toInlineSpans(),
                         ),
                       ),
-                      subtitle: Text((hit['genre'] as List).join(', ')),
                     );
                   },
                 );

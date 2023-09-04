@@ -29,7 +29,7 @@ void main() {
   hitsSearcher.responses.listen((response) {
     print("Search query '${response.query}' (${response.nbHits} hits found)");
     for (var hit in response.hits) {
-      print("> ${hit['title']}");
+      print("> ${hit['name']}");
     }
   });
 

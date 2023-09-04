@@ -7,9 +7,9 @@ void main() {
   // Create a hits searcher.
   // The Searcher performs search requests and obtains search result
   final searcher = HitsSearcher(
-    applicationID: 'MY_APPLICATION_ID',
-    apiKey: 'MY_API_KEY',
-    indexName: 'MY_INDEX_NAME',
+    applicationID: 'latency',
+    apiKey: '1f6fd3a6fb973cb08419fe7d288fa4db',
+    indexName: 'instant_search',
   )
     // Create a connection between the searcher and the filter state
     ..connectFilterState(filterState);
@@ -19,7 +19,7 @@ void main() {
   final facetList = FacetList(
     searcher: searcher,
     filterState: filterState,
-    attribute: 'actors',
+    attribute: 'brand',
   );
 
   // Listen to facet lists with selection status.
@@ -36,7 +36,7 @@ void main() {
   searcher.responses.listen((response) {
     print("Search query '${response.query}' '(${response.nbHits} hits found)");
     for (var hit in response.hits) {
-      print("> ${hit['title']}");
+      print("> ${hit['name']}");
     }
   });
 
@@ -44,20 +44,20 @@ void main() {
   searcher.query('a');
 
   // Apply a facet filter
-  facetList.toggle('Samuel L. Jackson');
+  facetList.toggle('Samsung');
 
   facetList.eventTracker.clickedFilters(
     eventName: 'did click filters',
-    values: ['Samuel L. Jackson'],
+    values: ['Samsung'],
   );
 
   facetList.eventTracker.viewedFilters(
     eventName: 'viewed filters',
-    values: ['Samuel L. Jackson'],
+    values: ['Samsung'],
   );
 
   facetList.eventTracker.convertedFilters(
     eventName: 'converted filters',
-    values: ['Samuel L. Jackson'],
+    values: ['Samsung'],
   );
 }

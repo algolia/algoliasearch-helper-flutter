@@ -29,9 +29,9 @@ class SearchController {
 
   // 2.1 Create a hits searcher to performs search requests and get results
   late final searcher = HitsSearcher(
-    applicationID: 'MY_APPLICATION_ID',
-    apiKey: 'MY_API_KEY',
-    indexName: 'MY_INDEX_NAME',
+    applicationID: 'latency',
+    apiKey: '1f6fd3a6fb973cb08419fe7d288fa4db',
+    indexName: 'instant_search',
   )
     // 2.2. Create a connection between the searcher and the filter state
     ..connectFilterState(filterState);
@@ -40,7 +40,7 @@ class SearchController {
   late final FacetList facetList = FacetList(
     searcher: searcher,
     filterState: filterState,
-    attribute: 'genre',
+    attribute: 'brand',
     persistent: true,
   );
 
@@ -107,10 +107,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       text: TextSpan(
                         style: Theme.of(context).textTheme.titleSmall,
                         children:
-                            hit.getHighlightedString('title').toInlineSpans(),
+                            hit.getHighlightedString('name').toInlineSpans(),
                       ),
                     ),
-                    subtitle: Text((hit['genre'] as List).join(', ')),
                   );
                 },
               );
@@ -137,7 +136,7 @@ class _FiltersPageState extends State<FiltersPage> {
     final facetList = context.read<SearchController>().facetList;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Genre'),
+        title: const Text('Brand'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
