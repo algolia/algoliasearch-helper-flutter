@@ -29,3 +29,8 @@ scripts:
     packageFilters:
       flutter: true
       dirExists: test
+
+command:
+  version:
+    hooks:
+      post: ./sync.sh
