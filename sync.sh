@@ -6,8 +6,12 @@ else
   sed_arg=('-i' '-e')
 fi
 
-for dir in packages/*/ ; do
-  dir=${dir%/}
-  version=$(grep "^version:" "${dir}/pubspec.yaml" | sed 's/version: //')
-  sed "${sed_arg[@]}" "s/^const packageVersion = .*;$/const packageVersion = '$version';/" "${dir}/lib/src/version.dart";
-done
+echo "packages: $MELOS_PACKAGES"
+echo "name: $MELOS_PACKAGE_NAME"
+echo "version: $MELOS_PACKAGE_VERSION"
+echo "path: $MELOS_PACKAGE_VERSION"
+#for dir in packages/*/ ; do
+#  dir=${dir%/}
+#  version=$(grep "^version:" "${dir}/pubspec.yaml" | sed 's/version: //')
+#  sed "${sed_arg[@]}" "s/^const packageVersion = .*;$/const packageVersion = '$version';/" "${dir}/lib/src/version.dart";
+#done
