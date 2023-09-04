@@ -33,4 +33,4 @@ scripts:
 command:
   version:
     hooks:
-      post: ./sync.sh
+      post: ./sync_version.sh
