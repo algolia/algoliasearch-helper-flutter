@@ -1,3 +1,4 @@
+import 'model/facet.dart';
 import 'model/multi_search_response.dart';
 
 /// Extension over [Hit].
@@ -29,6 +30,32 @@ extension Highlightable on Hit {
       inverted: inverted,
     );
   }
+}
+
+/// Extension over [Facet].
+extension HighlightableFacet on Facet {
+  /// Get [HighlightedString] of the value of a [Facet].
+  /// - [preTag] and [postTag] indicate the highlighted substrings
+  /// (default values: <em> and </em> accordingly)
+  /// - [inverted] flag inverts the highlighted and non-highlighted substrings
+  /// if set
+  ///
+  /// ## Example
+  ///
+  /// ```dart
+  /// var highlightedString = facet.getHighlightedString();
+  /// ```
+  HighlightedString getHighlightedString(
+      {
+        String preTag = '<em>',
+        String postTag = '</em>',
+        bool inverted = false,
+      }) => HighlightedString.of(
+      highlighted as String,
+      preTag: preTag,
+      postTag: postTag,
+      inverted: inverted,
+    );
 }
 
 /// Highlighted string as a list of [tokens].
