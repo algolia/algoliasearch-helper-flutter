@@ -31,7 +31,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   // Create a hits searcher.
   // The Searcher performs search requests and obtains search result
-  final FacetSearcher facetSearcher = FacetSearcher(
+  final facetSearcher = FacetSearcher(
     applicationID: 'latency',
     apiKey: '1f6fd3a6fb973cb08419fe7d288fa4db',
     indexName: 'instant_search',
