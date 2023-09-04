@@ -54,6 +54,19 @@ class _MyHomePageState extends State<MyHomePage> {
         ));
   }
 
+  SizedBox header(String title) =>
+      SizedBox(
+        width: double.infinity,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 15),
+          child: Text(
+            title,
+            textAlign: TextAlign.left,
+            style: const TextStyle(fontWeight: FontWeight.w800),
+          ),
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,6 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       body: Column(children: [
+        header('Brands'),
         Expanded(
           child: StreamBuilder<FacetSearchResponse>(
             // Listen and display facet search results
@@ -112,6 +126,8 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
         ),
+        const Divider(),
+        header('Items'),
         Expanded(
           child: StreamBuilder<SearchResponse>(
             // Listen and display hits search results
