@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2023-09-04
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`algolia_helper_flutter` - `v0.4.0`](#algolia_helper_flutter---v040)
+ - [`algolia_insights` - `v0.2.0`](#algolia_insights---v020)
+
+---
+
+#### `algolia_helper_flutter` - `v0.4.0`
+
+ - test
+
+#### `algolia_insights` - `v0.2.0`
+
+ - test
+
+
 ## 2023-07-17
 
 ### Changes

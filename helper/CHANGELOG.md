@@ -1,3 +1,7 @@
+## 0.4.0
+
+ - test
+
 ## 0.3.3
 
 - **FIX**: use app documents directory to store the user token if possible (#88).
