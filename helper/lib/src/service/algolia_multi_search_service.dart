@@ -1,6 +1,7 @@
 import 'package:algoliasearch/algoliasearch.dart' as algolia;
 import 'package:logging/logging.dart';
 
+import '../lib_version.dart';
 import '../logger.dart';
 import '../model/multi_search_response.dart';
 import '../model/multi_search_state.dart';
@@ -18,7 +19,20 @@ final class AlgoliaMultiSearchService extends MultiSearchService {
   AlgoliaMultiSearchService({
     required String applicationID,
     required String apiKey,
-  }) : this.create(algolia.SearchClient(appId: applicationID, apiKey: apiKey));
+  }) : this.create(
+          algolia.SearchClient(
+            appId: applicationID,
+            apiKey: apiKey,
+            options: const algolia.ClientOptions(
+              agentSegments: [
+                algolia.AgentSegment(
+                  value: 'algolia-helper-dart',
+                  version: libVersion,
+                )
+              ],
+            ),
+          ),
+        );
 
   AlgoliaMultiSearchService.create(this._client)
       : _log = algoliaLogger('MultiSearchService');
