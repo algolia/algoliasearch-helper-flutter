@@ -1,3 +1,8 @@
+## 0.2.0
+
+ - **FEAT**: Insights becomes a Flutter package (#92).
+ - **FIX**: Add named parameters for Insights instantiation.
+
 ## 0.1.2
 
  - **FIX**: use app documents directory to store the user token if possible (#88).

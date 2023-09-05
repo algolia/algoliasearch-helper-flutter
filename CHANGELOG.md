@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2023-09-05
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`algolia_insights` - `v0.2.0`](#algolia_insights---v020)
+ - [`algolia_helper_flutter` - `v0.4.0`](#algolia_helper_flutter---v040)
+
+---
+
+#### `algolia_insights` - `v0.2.0`
+
+ - **FEAT**: Insights becomes a Flutter package (#92).
+ - **FIX**: Add named parameters for Insights instantiation.
+
+#### `algolia_helper_flutter` - `v0.4.0`
+
+ - **FEAT**: MultiSearcher and FacetSearcher (#92).
+ - **FEAT**: Highlighting extension for Facet.
+ - **FEAT**: Official Dart client integration.
+ - **CHORE**: Merge `algolia_helper_dart` to `algolia_helper_flutter` packages.
+
 ## 2023-07-17
 
 ### Changes
