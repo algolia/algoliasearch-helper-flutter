@@ -2,7 +2,8 @@ analyzer:
   strong-mode:
     implicit-casts: false
   exclude:
-    - insights_dart/example/*.dart
+    - insights/example/*.dart
+    - helper/example/*.dart
 
 linter:
   rules:

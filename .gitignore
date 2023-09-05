@@ -24,6 +24,8 @@ migrate_working_dir/
 # Flutter/Dart/Pub related
 # Libraries should not include pubspec.lock, per https://dart.dev/guides/libraries/private-files#pubspeclock.
 /pubspec.lock
+helper/pubspec.lock 
+insights/pubspec.lock
 **/doc/api/
 .dart_tool/
 .packages
@@ -31,5 +33,13 @@ build/
 pubspec_overrides.yaml
 
 # Local usertoken storage
-insights_dart/usertoken.hive
-insights_dart/usertoken.lock
+insights/usertoken.hive
+insights/usertoken.lock
+
+# Temp test directories
+helper/.flutter-plugins
+helper/.flutter-plugins-dependencies
+helper/coverage/
+insights/.flutter-plugins
+insights/.flutter-plugins-dependencies
+insights/coverage/

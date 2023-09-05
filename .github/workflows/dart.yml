@@ -76,7 +76,7 @@ jobs:
       - name: "Bootstrap Workspace"
         run: melos bootstrap
       - name: "Flutter Test"
-        run: melos run test:all
+        run: melos run test
 
   pana:
     runs-on: ubuntu-latest

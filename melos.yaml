@@ -1,9 +1,8 @@
 name: algolia_helper
 
 packages:
-  - helper_dart
-  - helper_flutter
-  - insights_dart
+  - helper
+  - insights
 
 scripts:
   analyze:
@@ -24,21 +23,14 @@ scripts:
       Run `pub publish --dry-run` in all packages.
        - Note: you can also rely on your IDEs Dart Analysis / Issues window.
 
-
-  test:all:
-    run: melos run test:dart --no-select && melos run test:flutter --no-select
-    description: Run all Dart & Flutter tests in this project.
-
-  test:dart:
-    run: melos exec -c 1 --fail-fast -- "flutter test --coverage"
-    description: Run Dart tests for a specific package in this project.
-    packageFilters:
-      flutter: false
-      dirExists: test
-
-  test:flutter:
+  test:
     run: melos exec -c 1 --fail-fast -- "flutter test --coverage"
     description: Run Flutter tests for a specific package in this project.
     packageFilters:
       flutter: true
       dirExists: test
+
+command:
+  version:
+    hooks:
+      post: ./sync_version.sh
