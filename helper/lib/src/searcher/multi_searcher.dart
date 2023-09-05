@@ -264,7 +264,7 @@ class _MultiSearcher with DisposableMixin implements MultiSearcher {
 /// exposing their states and providing mechanisms to update their responses.
 abstract class MultiSearcherDelegate with DisposableMixin {
   /// A private stream to manage the state of the encapsulated search units.
-  final _stateStream = PublishSubject<MultiSearchState>();
+  final _stateStream = BehaviorSubject<MultiSearchState>();
 
   /// A private stream to manage the responses from the encapsulated search
   /// units.
