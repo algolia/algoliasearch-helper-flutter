@@ -1,3 +1,10 @@
+## 0.4.0
+
+ - **FEAT**: MultiSearcher and FacetSearcher (#92).
+ - **FEAT**: Highlighting extension for Facet.
+ - **FEAT**: Official Dart client integration.
+ - **CHORE**: Merge `algolia_helper_dart` to `algolia_helper_flutter` packages.
+
 ## 0.3.3
 
 - **FIX**: use app documents directory to store the user token if possible (#88).

@@ -1,6 +1,6 @@
 ## Algolia Insights for Dart
 
-Algolia Insights is a Dart library for tracking and analyzing user behavior on search and discovery experiences powered
+Algolia Insights is a Flutter library for tracking and analyzing user behavior on search and discovery experiences powered
 by Algolia. The purpose of Algolia Insights is to provide a simple and flexible way to track events such as clicks,
 conversions, and views on search results. This data can then be used to personalize the search experience for each user
 by providing insights into what users are searching for and how they are interacting with the search results.
@@ -63,7 +63,7 @@ insights.userToken = 'user-123';
 
 ### Documentation
 
-For more information on how to use Algolia Insights with Dart, see the [official documentation](https://www.algolia.com/doc/guides/building-search-ui/going-further/send-insights-events/flutter/).
+For more information on how to use Algolia Insights with Flutter, see the [official documentation](https://www.algolia.com/doc/guides/building-search-ui/going-further/send-insights-events/flutter/).
 
 ### Contributions
 
