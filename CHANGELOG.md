@@ -15,6 +15,32 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`algolia_helper_flutter` - `v0.4.1`](#algolia_helper_flutter---v041)
+ - [`algolia_insights` - `v0.2.1`](#algolia_insights---v021)
+
+---
+
+#### `algolia_helper_flutter` - `v0.4.1`
+
+ - **CHORE**: Fix pana issues (#95).
+
+#### `algolia_insights` - `v0.2.1`
+
+ - **CHORE**: Fix pana issues (#95).
+
+
+## 2023-09-05
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`algolia_insights` - `v0.2.0`](#algolia_insights---v020)
  - [`algolia_helper_flutter` - `v0.4.0`](#algolia_helper_flutter---v040)
 

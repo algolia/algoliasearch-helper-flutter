@@ -1,3 +1,7 @@
+## 0.4.1
+
+ - **CHORE**: Fix pana issues (#95).
+
 ## 0.4.0
 
  - **FEAT**: MultiSearcher and FacetSearcher (#92).
