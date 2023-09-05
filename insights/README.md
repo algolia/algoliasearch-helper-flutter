@@ -1,4 +1,4 @@
-## Algolia Insights for Dart
+## Algolia Insights for Flutter
 
 Algolia Insights is a Flutter library for tracking and analyzing user behavior on search and discovery experiences powered
 by Algolia. The purpose of Algolia Insights is to provide a simple and flexible way to track events such as clicks,
@@ -13,7 +13,7 @@ Add the Algolia Insights package to your pubspec.yaml file:
 
 ```yaml
 dependencies:
-  algolia_insights: ^0.1.0
+  algolia_insights: ^0.2.0
 ```
 
 ### Initializing the Insights
@@ -25,8 +25,8 @@ Algolia application ID and API key.
 import 'package:algolia_insights/algolia_insights.dart';
 
 Insights insights = Insights(
-  'YourApplicationID',
-  'YourAPIKey',
+  applicationID: 'YourApplicationID',
+  apiKey: 'YourAPIKey',
 );
 ```
 
