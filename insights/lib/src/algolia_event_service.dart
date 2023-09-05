@@ -26,7 +26,7 @@ class AlgoliaEventService implements EventService {
             options: const ClientOptions(
               agentSegments: [
                 AgentSegment(
-                  value: 'algolia-insights-dart',
+                  value: 'algolia-insights-flutter',
                   version: libVersion,
                 )
               ],

@@ -26,7 +26,7 @@ final class AlgoliaMultiSearchService extends MultiSearchService {
             options: const algolia.ClientOptions(
               agentSegments: [
                 algolia.AgentSegment(
-                  value: 'algolia-helper-dart',
+                  value: 'algolia-helper-flutter',
                   version: libVersion,
                 )
               ],
