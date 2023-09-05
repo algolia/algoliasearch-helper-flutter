@@ -6,10 +6,10 @@
 
 ## 📦 Packages
 
-| Package                          | Description                 | Version                                                                                                                    | Release stage                                                            |
-|----------------------------------|-----------------------------|----------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
-| [algolia_insights](insights)     | Algolia Insights for Dart   | [![pub package](https://img.shields.io/pub/v/algolia_insights.svg)](https://pub.dev/packages/algolia_insights)             | ![alpha version](https://img.shields.io/badge/release-alpha-yellowgreen) |
-| [algolia_helper_flutter](helper) | Algolia Helpers for Flutter | [![pub package](https://img.shields.io/pub/v/algolia_helper_flutter.svg)](https://pub.dev/packages/algolia_helper_flutter) | ![alpha version](https://img.shields.io/badge/release-alpha-yellowgreen) |
+| Package                          | Description                 | Version                                                                                                                    | Release stage                                                          |
+|----------------------------------|-----------------------------|----------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------|
+| [algolia_insights](insights)     | Algolia Insights for Dart   | [![pub package](https://img.shields.io/pub/v/algolia_insights.svg)](https://pub.dev/packages/algolia_insights)             | ![beta version](https://img.shields.io/badge/release-beta-yellowgreen) |
+| [algolia_helper_flutter](helper) | Algolia Helpers for Flutter | [![pub package](https://img.shields.io/pub/v/algolia_helper_flutter.svg)](https://pub.dev/packages/algolia_helper_flutter) | ![beta version](https://img.shields.io/badge/release-beta-yellowgreen) |
 
 ## 📄 Documentation
 
