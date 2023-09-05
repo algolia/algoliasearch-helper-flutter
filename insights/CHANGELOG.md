@@ -1,3 +1,7 @@
+## 0.2.1
+
+ - **CHORE**: Fix pana issues (#95).
+
 ## 0.2.0
 
  - **FEAT**: Insights becomes a Flutter package (#92).
