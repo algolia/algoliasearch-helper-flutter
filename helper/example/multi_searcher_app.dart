@@ -47,15 +47,14 @@ class _MyHomePageState extends State<MyHomePage> {
     );
     facetSearcher = multiSearcher.addFacetSearcher(
         initialState: const FacetSearchState(
-          facet: 'brand',
-          searchState: SearchState(
-            indexName: 'instant_search',
-          ),
-        ));
+      facet: 'brand',
+      searchState: SearchState(
+        indexName: 'instant_search',
+      ),
+    ));
   }
 
-  SizedBox header(String title) =>
-      SizedBox(
+  SizedBox header(String title) => SizedBox(
         width: double.infinity,
         child: Padding(
           padding: const EdgeInsets.only(left: 15),
@@ -146,7 +145,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         text: TextSpan(
                           style: Theme.of(context).textTheme.titleSmall,
                           children:
-                          hit.getHighlightedString('name').toInlineSpans(),
+                              hit.getHighlightedString('name').toInlineSpans(),
                         ),
                       ),
                     );

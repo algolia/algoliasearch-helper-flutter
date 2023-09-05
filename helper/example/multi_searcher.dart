@@ -17,11 +17,11 @@ void main() {
   // Instantiate a facet searcher from multi searcher
   final facetSearcher = multiSearcher.addFacetSearcher(
       initialState: const FacetSearchState(
-        facet: 'brand',
-        searchState: SearchState(
-          indexName: 'instant_search',
-        ),
-      ));
+    facet: 'brand',
+    searchState: SearchState(
+      indexName: 'instant_search',
+    ),
+  ));
 
   // Use facet and hits searcher as independent components
 

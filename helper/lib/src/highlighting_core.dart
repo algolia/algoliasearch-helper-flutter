@@ -45,17 +45,17 @@ extension HighlightableFacet on Facet {
   /// ```dart
   /// var highlightedString = facet.getHighlightedString();
   /// ```
-  HighlightedString getHighlightedString(
-      {
-        String preTag = '<em>',
-        String postTag = '</em>',
-        bool inverted = false,
-      }) => HighlightedString.of(
-      highlighted as String,
-      preTag: preTag,
-      postTag: postTag,
-      inverted: inverted,
-    );
+  HighlightedString getHighlightedString({
+    String preTag = '<em>',
+    String postTag = '</em>',
+    bool inverted = false,
+  }) =>
+      HighlightedString.of(
+        highlighted as String,
+        preTag: preTag,
+        postTag: postTag,
+        inverted: inverted,
+      );
 }
 
 /// Highlighted string as a list of [tokens].
