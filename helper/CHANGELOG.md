@@ -1,3 +1,7 @@
+## 0.4.1
+
+ - **FEAT**: MultiSearcher and FacetSearcher (#92).
+
 ## 0.4.0
 
  - **FEAT**: MultiSearcher and FacetSearcher (#92).

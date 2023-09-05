@@ -1,3 +1,7 @@
+## 0.2.1
+
+ - **FEAT**: MultiSearcher and FacetSearcher (#92).
+
 ## 0.2.0
 
  - **FEAT**: Insights becomes a Flutter package (#92).
