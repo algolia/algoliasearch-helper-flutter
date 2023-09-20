@@ -49,6 +49,12 @@ extension AlgolisSearchStateExt on SearchState {
       userToken: userToken,
       filters: filters,
       clickAnalytics: clickAnalytics,
+      aroundLatLng: aroundLatLng,
+      aroundLatLngViaIP: aroundLatLngViaIP,
+      aroundPrecision: aroundPrecision,
+      aroundRadius: aroundRadius,
+      minimumAroundRadius: minimumAroundRadius,
+      insideBoundingBox: insideBoundingBox,
     );
     return search;
   }

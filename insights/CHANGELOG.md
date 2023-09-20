@@ -1,3 +1,7 @@
+## 0.2.2
+
+- **CHORE**: Update dependencies to be more relaxed.
+
 ## 0.2.1
 
  - **CHORE**: Fix pana issues (#95).
