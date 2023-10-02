@@ -1,8 +1,3 @@
-## 0.5.0
-
-- **FEAT**: Add geospatial query support.
-- **CHORE**: Update dependencies to be more relaxed.
-
 ## 0.4.1
 
  - **CHORE**: Fix pana issues (#95).
