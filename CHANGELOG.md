@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2023-10-02
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`algolia_helper_flutter` - `v0.5.0`](#algolia_helper_flutter---v050)
+ - [`algolia_insights` - `v0.2.2`](#algolia_insights---v022)
+
+---
+
+#### `algolia_helper_flutter` - `v0.5.0`
+
+ - **FEAT**(GeoSearch): add geospatial query support (#105).
+
+#### `algolia_insights` - `v0.2.2`
+
+ - **FEAT**(GeoSearch): add geospatial query support (#105).
+
+
 ## 2023-09-05
 
 ### Changes
