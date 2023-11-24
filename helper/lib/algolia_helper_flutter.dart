@@ -13,6 +13,7 @@ export 'src/filter_state.dart';
 export 'src/filters.dart';
 export 'src/highlighting.dart';
 export 'src/highlighting_core.dart';
+export 'src/model/facet.dart';
 export 'src/model/multi_search_response.dart';
 export 'src/model/multi_search_state.dart';
 export 'src/searcher/facet_searcher.dart';
