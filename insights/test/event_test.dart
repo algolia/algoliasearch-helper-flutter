@@ -301,6 +301,84 @@ void main() {
           equals(filterValues.map((v) => Uri.encodeComponent('$attribute:$v'))),
         );
       });
+    test('should fail event conversion with empty payload', () {
+      var event = Event.clickHitsAfterSearch(
+        eventName,
+        indexName,
+        userToken,
+        queryID,
+        [],
+        [],
+        timestamp: timestamp,
+      );
+      expect(event.toAlgoliaEvent(), null);
+
+      event = Event.clickHits(
+        eventName,
+        indexName,
+        userToken,
+        [],
+        timestamp: timestamp,
+      );
+      expect(event.toAlgoliaEvent(), null);
+
+      event = Event.convertHitsAfterSearch(
+        eventName,
+        indexName,
+        userToken,
+        queryID,
+        [],
+        timestamp: timestamp,
+      );
+      expect(event.toAlgoliaEvent(), null);
+
+      event = Event.convertHits(
+        eventName,
+        indexName,
+        userToken,
+        [],
+        timestamp: timestamp,
+      );
+      expect(event.toAlgoliaEvent(), null);
+
+      event = Event.viewHits(
+        eventName,
+        indexName,
+        userToken,
+        [],
+        timestamp: timestamp,
+      );
+      expect(event.toAlgoliaEvent(), null);
+
+      event = Event.clickFilters(
+        eventName,
+        indexName,
+        userToken,
+        attribute,
+        [],
+        timestamp: timestamp,
+      );
+      expect(event.toAlgoliaEvent(), null);
+
+      event = Event.viewFilters(
+        eventName,
+        indexName,
+        userToken,
+        attribute,
+        [],
+        timestamp: timestamp,
+      );
+      expect(event.toAlgoliaEvent(), null);
+
+      event = Event.convertFilters(
+        eventName,
+        indexName,
+        userToken,
+        attribute,
+        [],
+        timestamp: timestamp,
+      );
+      expect(event.toAlgoliaEvent(), null);
     });
   });
 }

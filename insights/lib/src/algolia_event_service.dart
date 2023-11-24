@@ -56,7 +56,7 @@ extension AlgoliaEventConversion on Event {
     switch (type) {
       case EventType.click:
         final objectIDs = this.objectIDs;
-        if (objectIDs != null) {
+        if (objectIDs != null && objectIDs.isNotEmpty) {
           final queryID = this.queryID;
           final positions = this.positions;
           if (queryID != null && positions != null) {
@@ -82,7 +82,9 @@ extension AlgoliaEventConversion on Event {
           }
         }
         final filterValues = this.filterValues;
-        if (filterValues != null) {
+        if (filterValues != null &&
+            filterValues.isNotEmpty &&
+            attribute != null) {
           return ClickedFilters(
             eventName: eventName,
             eventType: ClickEvent.click,
@@ -97,7 +99,7 @@ extension AlgoliaEventConversion on Event {
         break;
       case EventType.conversion:
         final objectIDs = this.objectIDs;
-        if (objectIDs != null) {
+        if (objectIDs != null && objectIDs.isNotEmpty) {
           final queryID = this.queryID;
           if (queryID != null) {
             return ConvertedObjectIDsAfterSearch(
@@ -121,7 +123,9 @@ extension AlgoliaEventConversion on Event {
           }
         }
         final filterValues = this.filterValues;
-        if (filterValues != null) {
+        if (filterValues != null &&
+            filterValues.isNotEmpty &&
+            attribute != null) {
           return ConvertedFilters(
             eventName: eventName,
             eventType: ConversionEvent.conversion,
@@ -136,7 +140,7 @@ extension AlgoliaEventConversion on Event {
         break;
       case EventType.view:
         final objectIDs = this.objectIDs;
-        if (objectIDs != null) {
+        if (objectIDs != null && objectIDs.isNotEmpty) {
           return ViewedObjectIDs(
             eventName: eventName,
             eventType: ViewEvent.view,
@@ -147,7 +151,9 @@ extension AlgoliaEventConversion on Event {
           );
         }
         final filterValues = this.filterValues;
-        if (filterValues != null) {
+        if (filterValues != null &&
+            filterValues.isNotEmpty &&
+            attribute != null) {
           return ViewedFilters(
             eventName: eventName,
             eventType: ViewEvent.view,
