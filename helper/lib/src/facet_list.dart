@@ -308,7 +308,7 @@ class _FacetList with DisposableMixin implements FacetList {
       if (!selections.contains(selection)) {
         eventTracker.clickedFilters(
           eventName: 'Filter Applied',
-          values: [selection],
+          values: [Uri.encodeComponent('$attribute:$selection')],
         );
       }
     });
