@@ -130,6 +130,7 @@ extension AlgoliaEventConversion on Event {
                 .map((val) => Uri.encodeComponent('$attribute:$val'))
                 .toList(),
             userToken: userToken,
+            timestamp: timestamp?.millisecondsSinceEpoch,
           );
         }
         break;
