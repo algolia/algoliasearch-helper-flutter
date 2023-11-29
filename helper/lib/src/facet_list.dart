@@ -77,52 +77,46 @@ import 'selectable_item.dart';
 abstract class FacetList implements Disposable {
   /// Create [FacetList] instance.
   factory FacetList({
-    required HitsSearcher searcher,
+    required Stream<List<Facet>> facetsStream,
     required FilterState filterState,
     required String attribute,
     FilterOperator operator = FilterOperator.or,
     SelectionMode selectionMode = SelectionMode.multiple,
     bool persistent = false,
+    FilterEventTracker? eventTracker,
   }) =>
       _FacetList(
-        searcher: searcher,
+        facetsStream: facetsStream,
         filterState: filterState,
         attribute: attribute,
         groupID: FilterGroupID(attribute, operator),
         selectionMode: selectionMode,
         persistent: persistent,
-        eventTracker: FilterEventTracker(
-          searcher.eventTracker.tracker,
-          searcher,
-          attribute,
-        ),
+        eventTracker: eventTracker,
       );
 
   /// Create [FacetList] instance.
   factory FacetList.create({
-    required HitsSearcher searcher,
+    required Stream<List<Facet>> facetsStream,
     required FilterState filterState,
     required String attribute,
     required FilterGroupID groupID,
     SelectionMode selectionMode = SelectionMode.multiple,
     bool persistent = false,
+    FilterEventTracker? eventTracker,
   }) =>
       _FacetList(
-        searcher: searcher,
+        facetsStream: facetsStream,
         filterState: filterState,
         attribute: attribute,
         groupID: groupID,
         selectionMode: selectionMode,
         persistent: persistent,
-        eventTracker: FilterEventTracker(
-          searcher.eventTracker.tracker,
-          searcher,
-          attribute,
-        ),
+        eventTracker: eventTracker,
       );
 
   /// Insights events tracking component
-  FilterEventTracker get eventTracker;
+  FilterEventTracker? get eventTracker;
 
   /// Facet filter attribute
   String get attribute;
@@ -148,7 +142,7 @@ typedef SelectableFacet = SelectableItem<Facet>;
 class _FacetList with DisposableMixin implements FacetList {
   /// Create [_FacetList] instance.
   _FacetList({
-    required this.searcher,
+    required this.facetsStream,
     required this.filterState,
     required this.attribute,
     required this.groupID,
@@ -156,38 +150,25 @@ class _FacetList with DisposableMixin implements FacetList {
     required this.persistent,
     required this.eventTracker,
   }) {
-    if (searcher.isDisposed) {
-      _log.warning('creating an instance with disposed searcher');
-    }
-
     if (filterState.isDisposed) {
       _log.warning('creating an instance with disposed filter state');
     }
 
-    // Setup search state by adding `attribute` to the search state
-    searcher.applyState(
-      (state) => state.copyWith(
-        facets: List.from((state.facets ?? [])..add(attribute)),
-        disjunctiveFacets: groupID.operator == FilterOperator.or
-            ? {...?state.disjunctiveFacets, attribute}
-            : state.disjunctiveFacets,
-      ),
-    );
-
     _subscriptions
       ..add(_facets.connect())
       ..add(_responseFacets.connect())
-      ..add(_selections.connect());
+      ..add(
+        _selections.connect(),
+      );
   }
 
-  /// Hits Searcher component
-  final HitsSearcher searcher;
+  final Stream<List<Facet>> facetsStream;
 
   /// FilterState component.
   final FilterState filterState;
 
   @override
-  final FilterEventTracker eventTracker;
+  final FilterEventTracker? eventTracker;
 
   @override
   final String attribute;
@@ -204,16 +185,33 @@ class _FacetList with DisposableMixin implements FacetList {
   /// Events logger
   final Logger _log = algoliaLogger('FacetList');
 
-  /// Selectable facets lists stream.
-  late final _facets = _selectableFacetsStream()
-      .distinct(const DeepCollectionEquality().equals)
-      .publishValue();
+  /// Selectable facets lists stream combining [_responseFacets]
+  /// and [_selections]
+  late final _facets = Rx.combineLatest2(
+    _responseFacets,
+    _selections,
+    (List<Facet> facets, Set<String> selections) {
+      final facetsList = _buildSelectableFacets(facets, selections);
+      return persistent
+          ? _buildPersistentSelectableFacets(facetsList, selections)
+          : facetsList;
+    },
+  ).distinct(const DeepCollectionEquality().equals).publishValue();
 
   /// List of facets lists values from search responses.
-  late final _responseFacets = _searcherFacetsStream().publishValue();
+  late final _responseFacets = facetsStream.publishValue();
 
   /// Set of selected facet values from the filter state.
-  late final _selections = _filtersSelectionsStream().publishValue();
+  late final _selections = filterState.filters
+      .map(
+        (filters) =>
+            filters
+                .getFacetFilters(groupID)
+                ?.map((e) => e.value.toString())
+                .toSet() ??
+            {},
+      )
+      .publishValue();
 
   /// Streams subscriptions composite.
   final CompositeSubscription _subscriptions = CompositeSubscription();
@@ -223,19 +221,6 @@ class _FacetList with DisposableMixin implements FacetList {
 
   @override
   List<SelectableFacet>? snapshot() => _facets.valueOrNull;
-
-  /// Create stream of [SelectableFacet] lists from
-  /// [_responseFacets] and [_selections].
-  Stream<List<SelectableFacet>> _selectableFacetsStream() => Rx.combineLatest2(
-        _responseFacets,
-        _selections,
-        (List<Facet> facets, Set<String> selections) {
-          final facetsList = _buildSelectableFacets(facets, selections);
-          return persistent
-              ? _buildPersistentSelectableFacets(facetsList, selections)
-              : facetsList;
-        },
-      );
 
   /// Builds a list of [SelectableFacet] from [facets] and [selections].
   List<SelectableFacet> _buildSelectableFacets(
@@ -272,24 +257,6 @@ class _FacetList with DisposableMixin implements FacetList {
           .toList()
         ..addAll(facetsList);
 
-  /// Build facets lists stream from [searcher].
-  Stream<List<Facet>> _searcherFacetsStream() => searcher.responses.map(
-        (response) =>
-            response.disjunctiveFacets[attribute] ??
-            response.facets[attribute] ??
-            [],
-      );
-
-  /// Build selections stream from [filterState] filters updates.
-  Stream<Set<String>> _filtersSelectionsStream() => filterState.filters.map(
-        (filters) =>
-            filters
-                .getFacetFilters(groupID)
-                ?.map((e) => e.value.toString())
-                .toSet() ??
-            {},
-      );
-
   @override
   void toggle(String value) {
     _trackClickIfNeeded(value);
@@ -306,7 +273,7 @@ class _FacetList with DisposableMixin implements FacetList {
   void _trackClickIfNeeded(String selection) {
     _selections.first.then((selections) {
       if (!selections.contains(selection)) {
-        eventTracker.clickedFilters(
+        eventTracker?.clickedFilters(
           eventName: 'Filter Applied',
           values: [selection],
         );

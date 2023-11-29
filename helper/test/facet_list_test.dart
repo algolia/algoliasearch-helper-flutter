@@ -3,6 +3,7 @@ import 'package:algolia_helper_flutter/src/filter.dart';
 import 'package:algolia_helper_flutter/src/filter_group.dart';
 import 'package:algolia_helper_flutter/src/filter_state.dart';
 import 'package:algolia_helper_flutter/src/filters.dart';
+import 'package:algolia_helper_flutter/src/hits_searcher_facet_list_extension.dart';
 import 'package:algolia_helper_flutter/src/model/facet.dart';
 import 'package:algolia_helper_flutter/src/model/multi_search_response.dart';
 import 'package:algolia_helper_flutter/src/model/multi_search_state.dart';
@@ -20,18 +21,16 @@ import 'hits_searcher_test.mocks.dart';
 void main() {
   group('Build facets list', () {
     test('Get facet items and select', () async {
-      final searcher = mockHitsSearcher({
-        'facets': {
-          'color': {
-            'red': 1,
-            'green': 1,
-            'blue': 1,
-          }
-        }
-      });
+      final facetStream = Stream<List<Facet>>.value(
+        [
+          const Facet('red', 1),
+          const Facet('green', 1),
+          const Facet('blue', 1),
+        ],
+      );
 
       final facetList = FacetList(
-        searcher: searcher,
+        facetsStream: facetStream,
         filterState: FilterState(),
         attribute: 'color',
       )..toggle('blue');
@@ -54,17 +53,15 @@ void main() {
     });
 
     test('Get facet items with persistent selection', () async {
-      final searcher = mockHitsSearcher({
-        'facets': {
-          'color': {
-            'red': 1,
-            'green': 1,
-          }
-        }
-      });
+      final facetStream = Stream<List<Facet>>.value(
+        [
+          const Facet('red', 1),
+          const Facet('green', 1),
+        ],
+      );
 
       final facetList = FacetList(
-        searcher: searcher,
+        facetsStream: facetStream,
         filterState: FilterState(),
         attribute: 'color',
         persistent: true,
@@ -87,17 +84,15 @@ void main() {
     });
 
     test('Get facet items without persistent selection', () async {
-      final searcher = mockHitsSearcher({
-        'facets': {
-          'color': {
-            'red': 1,
-            'green': 1,
-          }
-        }
-      });
+      final facetStream = Stream<List<Facet>>.value(
+        [
+          const Facet('red', 1),
+          const Facet('green', 1),
+        ],
+      );
 
       final facetList = FacetList(
-        searcher: searcher,
+        facetsStream: facetStream,
         filterState: FilterState(),
         attribute: 'color',
       )..toggle('blue');
@@ -113,11 +108,11 @@ void main() {
 
     test('Build FacetList with conjunctive/disjunctive facets', () {
       final searcher = mockHitsSearcher();
+      final filterState = FilterState();
 
       // Create a disjunctive FacetList
-      FacetList(
-        searcher: searcher,
-        filterState: FilterState(),
+      searcher.buildFacetList(
+        filterState: filterState,
         attribute: 'color',
       );
 
@@ -131,9 +126,8 @@ void main() {
       );
 
       // Create a conjunctive FacetList
-      FacetList(
-        searcher: searcher,
-        filterState: FilterState(),
+      searcher.buildFacetList(
+        filterState: filterState,
         attribute: 'type',
         operator: FilterOperator.and,
       );
@@ -148,11 +142,7 @@ void main() {
       );
 
       // Create another disjunctive FacetList
-      FacetList(
-        searcher: searcher,
-        filterState: FilterState(),
-        attribute: 'brand',
-      );
+      searcher.buildFacetList(filterState: filterState, attribute: 'brand');
 
       expect(
         searcher.snapshot(),
@@ -167,12 +157,19 @@ void main() {
 
   group('Update filter state', () {
     test('Selection should update filter state', () async {
-      final searcher = mockHitsSearcher();
+      final facetStream = Stream<List<Facet>>.value(
+        [
+          const Facet('red', 1),
+          const Facet('green', 1),
+          const Facet('blue', 1),
+        ],
+      );
+
       const groupID = FilterGroupID('color', FilterOperator.or);
       final filterState = FilterState();
 
       FacetList.create(
-        searcher: searcher,
+        facetsStream: facetStream,
         filterState: filterState,
         attribute: 'color',
         groupID: groupID,
@@ -191,13 +188,13 @@ void main() {
     });
 
     test('Filter State should update facets list (persistent)', () async {
-      final searcher = mockHitsSearcher();
+      final facetStream = Stream<List<Facet>>.value([]);
 
       const groupID = FilterGroupID('color', FilterOperator.or);
       final filterState = FilterState();
 
       final facetList = FacetList.create(
-        searcher: searcher,
+        facetsStream: facetStream,
         filterState: filterState,
         attribute: 'color',
         groupID: groupID,
@@ -215,11 +212,11 @@ void main() {
     });
 
     test('Single selection should clear filters', () async {
-      final searcher = mockHitsSearcher({
-        'facets': {
-          'color': {'red': 1}
-        }
-      });
+      final facetStream = Stream<List<Facet>>.value(
+        [
+          const Facet('red', 1),
+        ],
+      );
 
       const groupID = FilterGroupID('color', FilterOperator.or);
       final filterState = FilterState()
@@ -229,7 +226,7 @@ void main() {
         ]);
 
       final facetList = FacetList.create(
-        searcher: searcher,
+        facetsStream: facetStream,
         filterState: filterState,
         attribute: 'color',
         groupID: groupID,
@@ -246,11 +243,11 @@ void main() {
     });
 
     test('Multiple selection should not clear filters', () async {
-      final searcher = mockHitsSearcher({
-        'facets': {
-          'color': {'red': 1}
-        }
-      });
+      final facetStream = Stream<List<Facet>>.value(
+        [
+          const Facet('red', 1),
+        ],
+      );
 
       const groupID = FilterGroupID('color', FilterOperator.or);
       final filterState = FilterState()
@@ -260,7 +257,7 @@ void main() {
         ]);
 
       FacetList.create(
-        searcher: searcher,
+        facetsStream: facetStream,
         filterState: filterState,
         attribute: 'color',
         groupID: groupID,
@@ -279,11 +276,11 @@ void main() {
     });
 
     test('Facet persistent selection', () async {
-      final searcher = mockHitsSearcher({
-        'facets': {
-          'color': {'red': 1}
-        }
-      });
+      final facetStream = Stream<List<Facet>>.value(
+        [
+          const Facet('red', 1),
+        ],
+      );
 
       const groupID = FilterGroupID('color', FilterOperator.or);
       final filterState = FilterState()
@@ -293,7 +290,7 @@ void main() {
         ]);
 
       final facetList = FacetList.create(
-        searcher: searcher,
+        facetsStream: facetStream,
         filterState: filterState,
         attribute: 'color',
         groupID: groupID,
@@ -320,13 +317,12 @@ void main() {
   });
 
   test('Should pass clicked facet values to event tracker', () async {
-    final searchService = MockHitsSearchService();
-    final initial = SearchResponse({
-      'facets': {
-        'color': {'red': 1}
-      }
-    });
-    when(searchService.search(any)).thenAnswer((_) => Future.value(initial));
+    final facetStream = Stream<List<Facet>>.value(
+      [
+        const Facet('red', 1),
+      ],
+    );
+
     final eventTracker = MockEventTracker();
 
     when(
@@ -342,12 +338,6 @@ void main() {
       expect(realInvocation.positionalArguments[2], 'red');
     });
 
-    final searcher = HitsSearcher.custom(
-      searchService,
-      eventTracker,
-      const SearchState(indexName: 'myIndex'),
-    );
-
     const groupID = FilterGroupID('color', FilterOperator.or);
     final filterState = FilterState()
       ..add(groupID, [
@@ -355,11 +345,16 @@ void main() {
       ]);
 
     FacetList.create(
-      searcher: searcher,
+      facetsStream: facetStream,
       filterState: filterState,
       attribute: 'color',
       groupID: groupID,
       persistent: true,
+      eventTracker: FilterEventTracker(
+        eventTracker,
+        MockEventDataDelegate('test-index', 'test-query-id'),
+        'color',
+      ),
     ).toggle('red');
   });
 
@@ -413,6 +408,16 @@ void main() {
       ).called(1);
     });
   });
+}
+
+class MockEventDataDelegate implements EventDataDelegate {
+  @override
+  String indexName;
+
+  @override
+  String? queryID;
+
+  MockEventDataDelegate(this.indexName, this.queryID);
 }
 
 HitsSearcher mockHitsSearcher([Map<String, dynamic> json = const {}]) {

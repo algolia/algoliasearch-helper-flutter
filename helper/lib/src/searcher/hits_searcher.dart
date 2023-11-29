@@ -103,6 +103,7 @@ abstract interface class HitsSearcher implements Disposable, EventDataDelegate {
     required String indexName,
     bool disjunctiveFacetingEnabled = true,
     Duration debounce = const Duration(milliseconds: 100),
+    bool insights = false,
   }) =>
       _HitsSearcher(
         applicationID: applicationID,
@@ -113,6 +114,7 @@ abstract interface class HitsSearcher implements Disposable, EventDataDelegate {
           isDisjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
         ),
         debounce: debounce,
+        insights: insights,
       );
 
   /// HitsSearcher's factory.
@@ -122,6 +124,7 @@ abstract interface class HitsSearcher implements Disposable, EventDataDelegate {
     required SearchState state,
     bool disjunctiveFacetingEnabled = true,
     Duration debounce = const Duration(milliseconds: 100),
+    bool insights = false,
   }) =>
       _HitsSearcher(
         applicationID: applicationID,
@@ -129,13 +132,14 @@ abstract interface class HitsSearcher implements Disposable, EventDataDelegate {
         state: state.copyWith(clickAnalytics: true),
         disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
         debounce: debounce,
+        insights: insights,
       );
 
   /// Creates [HitsSearcher] using a custom [HitsSearchService].
   @internal
   factory HitsSearcher.custom(
     HitsSearchService searchService,
-    EventTracker eventTracker,
+    EventTracker? eventTracker,
     SearchState state, [
     Duration debounce = const Duration(milliseconds: 100),
   ]) =>
@@ -146,7 +150,7 @@ abstract interface class HitsSearcher implements Disposable, EventDataDelegate {
         debounce,
       );
 
-  HitsEventTracker get eventTracker;
+  HitsEventTracker? get eventTracker;
 
   /// Search state stream
   Stream<SearchState> get state;
@@ -190,19 +194,25 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
     required SearchState state,
     bool disjunctiveFacetingEnabled = true,
     Duration debounce = const Duration(milliseconds: 100),
+    bool insights = false,
   }) {
     final service = AlgoliaHitsSearchService(
       applicationID: applicationID,
       apiKey: apiKey,
-      // extraUserAgents: ['algolia-helper-dart ($libVersion)'],
     );
-    final insights = Insights(
-      applicationID: applicationID,
-      apiKey: apiKey,
-    );
+
+    EventTracker? eventTracker;
+
+    if (insights) {
+      eventTracker = Insights(
+        applicationID: applicationID,
+        apiKey: apiKey,
+      );
+    }
+
     return _HitsSearcher.create(
       service,
-      insights,
+      eventTracker,
       state.copyWith(isDisjunctiveFacetingEnabled: disjunctiveFacetingEnabled),
       debounce,
     );
@@ -211,7 +221,7 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   /// HitSearcher's constructor, for internal and test use only.
   _HitsSearcher.create(
     HitsSearchService searchService,
-    EventTracker eventTracker,
+    EventTracker? eventTracker,
     SearchState state, [
     Duration debounce = const Duration(milliseconds: 100),
   ]) : this._(
@@ -224,11 +234,13 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   /// HitsSearcher's private constructor
   _HitsSearcher._(
     this.searchService,
-    EventTracker eventTracker,
+    EventTracker? eventTracker,
     this._request,
     this.debounce,
   ) {
-    this.eventTracker = HitsEventTracker(eventTracker, this);
+    if (eventTracker != null) {
+      this.eventTracker = HitsEventTracker(eventTracker, this);
+    }
     _subscriptions.add(_responses.connect());
   }
 
@@ -245,7 +257,7 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   final HitsSearchService searchService;
 
   @override
-  late final HitsEventTracker eventTracker;
+  late final HitsEventTracker? eventTracker;
 
   /// Search state debounce duration
   final Duration debounce;
@@ -260,7 +272,7 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
       .switchMap((req) => Stream.fromFuture(searchService.search(req.state)))
       .doOnData((value) {
     lastResponse = value;
-    eventTracker.viewedObjects(
+    eventTracker?.viewedObjects(
       eventName: 'Hits Viewed',
       objectIDs: value.hits.map((hit) => hit['objectID'].toString()).toList(),
     );
