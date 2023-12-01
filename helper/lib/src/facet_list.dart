@@ -9,9 +9,7 @@ import 'package:rxdart/rxdart.dart';
 import 'disposable.dart';
 import 'disposable_mixin.dart';
 import 'extensions.dart';
-import 'filter_group.dart';
 import 'filter_state.dart';
-import 'filter_state_group_accessor.dart';
 import 'logger.dart';
 import 'model/facet.dart';
 import 'searcher/hits_searcher.dart';
@@ -76,23 +74,14 @@ abstract class FacetList implements Disposable {
   /// Create [FacetList] instance.
   factory FacetList({
     required Stream<List<Facet>> facetsStream,
-    required FilterState filterState,
-    required String attribute,
-    FilterOperator operator = FilterOperator.or,
+    required SelectionState state,
     SelectionMode selectionMode = SelectionMode.multiple,
     bool persistent = false,
     FilterEventTracker? eventTracker,
   }) =>
       _FacetList(
         facetsStream: facetsStream,
-        state: FiltersGroupAccessor(
-          filterState: filterState,
-          groupID: FilterGroupID(
-            attribute,
-            operator,
-          ),
-          attribute: attribute,
-        ),
+        state: state,
         selectionMode: selectionMode,
         persistent: persistent,
         eventTracker: eventTracker,
@@ -101,24 +90,21 @@ abstract class FacetList implements Disposable {
   /// Create [FacetList] instance.
   factory FacetList.create({
     required Stream<List<Facet>> facetsStream,
-    required FilterState filterState,
-    required String attribute,
-    required FilterGroupID groupID,
+    required SelectionState state,
     SelectionMode selectionMode = SelectionMode.multiple,
     bool persistent = false,
     FilterEventTracker? eventTracker,
   }) =>
       _FacetList(
         facetsStream: facetsStream,
-        state: FiltersGroupAccessor(
-          filterState: filterState,
-          groupID: groupID,
-          attribute: attribute,
-        ),
+        state: state,
         selectionMode: selectionMode,
         persistent: persistent,
         eventTracker: eventTracker,
       );
+
+  /// Selection state
+  SelectionState get state;
 
   /// Insights events tracking component
   FilterEventTracker? get eventTracker;
@@ -140,7 +126,7 @@ enum SelectionMode { single, multiple }
 /// [Facet] with selection status.
 typedef SelectableFacet = SelectableItem<Facet>;
 
-abstract class SelectionsState {
+abstract class SelectionState {
   /// Gets a stream of the current selection set.
   ///
   /// This stream emits the latest set of selected items as `Set<String>`.
@@ -187,7 +173,8 @@ class _FacetList with DisposableMixin implements FacetList {
   /// Whether the facets can have single or multiple selections.
   final SelectionMode selectionMode;
 
-  final SelectionsState state;
+  @override
+  final SelectionState state;
 
   /// Should the selection be kept even if it does not match current results.
   final bool persistent;

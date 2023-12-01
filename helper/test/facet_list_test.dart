@@ -2,6 +2,7 @@ import 'package:algolia_helper_flutter/src/facet_list.dart';
 import 'package:algolia_helper_flutter/src/filter.dart';
 import 'package:algolia_helper_flutter/src/filter_group.dart';
 import 'package:algolia_helper_flutter/src/filter_state.dart';
+import 'package:algolia_helper_flutter/src/filter_state_group_accessor.dart';
 import 'package:algolia_helper_flutter/src/filters.dart';
 import 'package:algolia_helper_flutter/src/hits_searcher_facet_list_extension.dart';
 import 'package:algolia_helper_flutter/src/model/facet.dart';
@@ -11,6 +12,7 @@ import 'package:algolia_helper_flutter/src/searcher/hits_searcher.dart';
 import 'package:algolia_insights/algolia_insights.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:test/test.dart';
 
 import 'facet_list_test.mocks.dart';
@@ -31,8 +33,7 @@ void main() {
 
       final facetList = FacetList(
         facetsStream: facetStream,
-        filterState: FilterState(),
-        attribute: 'color',
+        state: MockSelectionState(),
       )..toggle('blue');
 
       await expectLater(
@@ -62,8 +63,7 @@ void main() {
 
       final facetList = FacetList(
         facetsStream: facetStream,
-        filterState: FilterState(),
-        attribute: 'color',
+        state: MockSelectionState(),
         persistent: true,
       )..toggle('blue');
 
@@ -93,8 +93,7 @@ void main() {
 
       final facetList = FacetList(
         facetsStream: facetStream,
-        filterState: FilterState(),
-        attribute: 'color',
+        state: MockSelectionState(),
       )..toggle('blue');
 
       await expectLater(
@@ -168,11 +167,15 @@ void main() {
       const groupID = FilterGroupID('color', FilterOperator.or);
       final filterState = FilterState();
 
+      final filterSelectionState = FiltersGroupAccessor(
+        filterState: filterState,
+        groupID: groupID,
+        attribute: 'color',
+      );
+
       FacetList.create(
         facetsStream: facetStream,
-        filterState: filterState,
-        attribute: 'color',
-        groupID: groupID,
+        state: filterSelectionState,
       ).toggle('red');
 
       await expectLater(
@@ -193,11 +196,15 @@ void main() {
       const groupID = FilterGroupID('color', FilterOperator.or);
       final filterState = FilterState();
 
+      final filterSelectionState = FiltersGroupAccessor(
+        filterState: filterState,
+        groupID: groupID,
+        attribute: 'color',
+      );
+
       final facetList = FacetList.create(
         facetsStream: facetStream,
-        filterState: filterState,
-        attribute: 'color',
-        groupID: groupID,
+        state: filterSelectionState,
         persistent: true,
       );
 
@@ -225,11 +232,15 @@ void main() {
           Filter.facet('color', 'green'),
         ]);
 
+      final filterSelectionState = FiltersGroupAccessor(
+        filterState: filterState,
+        groupID: groupID,
+        attribute: 'color',
+      );
+
       final facetList = FacetList.create(
         facetsStream: facetStream,
-        filterState: filterState,
-        attribute: 'color',
-        groupID: groupID,
+        state: filterSelectionState,
         selectionMode: SelectionMode.single,
       );
 
@@ -256,11 +267,15 @@ void main() {
           Filter.facet('color', 'green'),
         ]);
 
+      final filterSelectionState = FiltersGroupAccessor(
+        filterState: filterState,
+        groupID: groupID,
+        attribute: 'color',
+      );
+
       FacetList.create(
         facetsStream: facetStream,
-        filterState: filterState,
-        attribute: 'color',
-        groupID: groupID,
+        state: filterSelectionState,
       ).toggle('red');
 
       await expectLater(
@@ -289,11 +304,15 @@ void main() {
           Filter.facet('color', 'green'),
         ]);
 
+      final filterSelectionState = FiltersGroupAccessor(
+        filterState: filterState,
+        groupID: groupID,
+        attribute: 'color',
+      );
+
       final facetList = FacetList.create(
         facetsStream: facetStream,
-        filterState: filterState,
-        attribute: 'color',
-        groupID: groupID,
+        state: filterSelectionState,
         persistent: true,
       );
 
@@ -338,17 +357,9 @@ void main() {
       expect(realInvocation.positionalArguments[2], 'red');
     });
 
-    const groupID = FilterGroupID('color', FilterOperator.or);
-    final filterState = FilterState()
-      ..add(groupID, [
-        Filter.facet('color', 'green'),
-      ]);
-
     FacetList.create(
       facetsStream: facetStream,
-      filterState: filterState,
-      attribute: 'color',
-      groupID: groupID,
+      state: MockSelectionState(),
       persistent: true,
       eventTracker: FilterEventTracker(
         eventTracker,
@@ -408,6 +419,32 @@ void main() {
       ).called(1);
     });
   });
+}
+
+class MockSelectionState implements SelectionState {
+  MockSelectionState() {
+    _selectionsSubject.add(<String>{});
+  }
+
+  @override
+  void applySelectionsDiff(
+    Set<String> selectionsToAdd,
+    Set<String>? selectionsToRemove,
+  ) {
+    var currentSelections = _selectionsSubject.value;
+    currentSelections = selectionsToRemove == null
+        ? {}
+        : currentSelections.difference(selectionsToRemove.toSet())
+      ..addAll(selectionsToAdd);
+
+    _selectionsSubject.add(currentSelections);
+  }
+
+  final BehaviorSubject<Set<String>> _selectionsSubject =
+      BehaviorSubject<Set<String>>();
+
+  @override
+  Stream<Set<String>> get selections => _selectionsSubject.stream;
 }
 
 class MockEventDataDelegate implements EventDataDelegate {

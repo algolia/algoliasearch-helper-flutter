@@ -3,20 +3,23 @@ import 'package:algolia_insights/algolia_insights.dart';
 import 'facet_list.dart';
 import 'filter_group.dart';
 import 'filter_state.dart';
+import 'filter_state_group_accessor.dart';
 import 'searcher/hits_searcher.dart';
 
 extension HitsSearcherFacetListExtension on HitsSearcher {
   static FilterEventTracker? _makeEventTracker(
-      HitsSearcher searcher, String attribute) {
-    if (searcher.eventTracker != null) {
-      FilterEventTracker(
-        searcher.eventTracker!.tracker,
-        searcher,
-        attribute,
-      );
-    } else {
+    HitsSearcher searcher,
+    String attribute,
+  ) {
+    if (searcher.eventTracker == null) {
       return null;
     }
+
+    return FilterEventTracker(
+      searcher.eventTracker!.tracker,
+      searcher,
+      attribute,
+    );
   }
 
   FacetList buildFacetList({
@@ -35,6 +38,7 @@ extension HitsSearcherFacetListExtension on HitsSearcher {
             : state.disjunctiveFacets,
       ),
     );
+
     // Extract the Stream<List<Facet>> from HitsSearcher
     final facetsStream = responses.map(
       (response) =>
@@ -43,11 +47,19 @@ extension HitsSearcherFacetListExtension on HitsSearcher {
           [],
     );
 
+    // Establish the filter group accessor proxy as selection state
+    final state = FiltersGroupAccessor(
+      filterState: filterState,
+      groupID: FilterGroupID(
+        attribute,
+        operator,
+      ),
+      attribute: attribute,
+    );
+
     return FacetList(
       facetsStream: facetsStream,
-      filterState: filterState,
-      attribute: attribute,
-      operator: operator,
+      state: state,
       selectionMode: selectionMode,
       persistent: persistent,
       eventTracker: _makeEventTracker(this, attribute),

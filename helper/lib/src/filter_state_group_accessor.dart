@@ -5,7 +5,7 @@ import 'filter.dart';
 import 'filter_group.dart';
 import 'filter_state.dart';
 
-class FiltersGroupAccessor extends SelectionsState {
+class FiltersGroupAccessor extends SelectionState {
   /// FilterState component.
   final FilterState filterState;
 
