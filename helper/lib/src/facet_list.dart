@@ -159,7 +159,7 @@ class _FacetList with DisposableMixin implements FacetList {
   }) {
     _subscriptions
       ..add(_facets.connect())
-      ..add(_responseFacets.connect())
+      ..add(_inputFacets.connect())
       ..add(
         _selections.connect(),
       );
@@ -182,10 +182,10 @@ class _FacetList with DisposableMixin implements FacetList {
   /// Events logger
   final Logger _log = algoliaLogger('FacetList');
 
-  /// Selectable facets lists stream combining [_responseFacets]
+  /// Selectable facets lists stream combining [_inputFacets]
   /// and [_selections]
   late final _facets = Rx.combineLatest2(
-    _responseFacets,
+    _inputFacets,
     _selections,
     (List<Facet> facets, Set<String> selections) {
       final facetsList = _buildSelectableFacets(facets, selections);
@@ -195,8 +195,8 @@ class _FacetList with DisposableMixin implements FacetList {
     },
   ).distinct(const DeepCollectionEquality().equals).publishValue();
 
-  /// List of facets lists values from search responses.
-  late final _responseFacets = facetsStream.publishValue();
+  /// Stream of input facets lists values.
+  late final _inputFacets = facetsStream.publishValue();
 
   /// Set of selected facet values from the filter state.
   late final _selections = state.selections.publishValue();
@@ -270,7 +270,7 @@ class _FacetList with DisposableMixin implements FacetList {
   /// In case of persistent selection, current selections are kept.
   Future<Set<String>> _facetsToRemove() async {
     final currentFilters =
-        (await _responseFacets.first).map((facet) => facet.value).toSet();
+        (await _inputFacets.first).map((facet) => facet.value).toSet();
     if (!persistent) return currentFilters;
 
     final currentSelections = (await _selections.first).toSet();
