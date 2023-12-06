@@ -87,7 +87,9 @@ extension AlgoliaEventConversion on Event {
             eventName: eventName,
             eventType: ClickEvent.click,
             index: indexName,
-            filters: filterValues.toList(),
+            filters: filterValues
+                .map((val) => Uri.encodeComponent('$attribute:$val'))
+                .toList(),
             userToken: userToken,
             timestamp: timestamp?.millisecondsSinceEpoch,
           );
@@ -124,8 +126,11 @@ extension AlgoliaEventConversion on Event {
             eventName: eventName,
             eventType: ConversionEvent.conversion,
             index: indexName,
-            filters: filterValues.toList(),
+            filters: filterValues
+                .map((val) => Uri.encodeComponent('$attribute:$val'))
+                .toList(),
             userToken: userToken,
+            timestamp: timestamp?.millisecondsSinceEpoch,
           );
         }
         break;
@@ -147,7 +152,9 @@ extension AlgoliaEventConversion on Event {
             eventName: eventName,
             eventType: ViewEvent.view,
             index: indexName,
-            filters: filterValues.toList(),
+            filters: filterValues
+                .map((val) => Uri.encodeComponent('$attribute:$val'))
+                .toList(),
             userToken: userToken,
             timestamp: timestamp?.millisecondsSinceEpoch,
           );
