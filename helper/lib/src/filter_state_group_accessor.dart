@@ -1,5 +1,3 @@
-import 'package:rxdart/rxdart.dart';
-
 import 'facet_list.dart';
 import 'filter.dart';
 import 'filter_group.dart';
@@ -14,18 +12,6 @@ class FiltersGroupAccessor extends SelectionState {
 
   /// Filter attribute
   final String attribute;
-
-  /// Set of selected facet values from the filter state.
-  late final _selections = filterState.filters
-      .map(
-        (filters) =>
-            filters
-                .getFacetFilters(groupID)
-                ?.map((e) => e.value.toString())
-                .toSet() ??
-            {},
-      )
-      .publishValue();
 
   FiltersGroupAccessor({
     required this.filterState,
