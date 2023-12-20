@@ -74,12 +74,21 @@ class AlgoliaHitsSearchService implements HitsSearchService {
     try {
       final queryBuilder = QueryBuilder(state);
       final queries = queryBuilder.build().map((it) => it.toRequest()).toList();
-      final rawResponses = await _client.searchMultiIndex(
-        queries: queries,
+      final responses = await _client.search(
+        searchMethodParams: algolia.SearchMethodParams(requests: queries),
       );
-      final responses = rawResponses.map((e) => e.toSearchResponse()).toList();
       _log.fine('Search responses: $responses');
-      return queryBuilder.merge(responses);
+      final unfoldedResponses = responses.results
+          .map((result) {
+            if (result is Map<String, dynamic>) {
+              return algolia.SearchResponse.fromJson(result).toSearchResponse();
+            }
+          })
+          .where((response) => response != null)
+          .map((response) => response!)
+          .toList();
+      final foldedResponses = queryBuilder.merge(unfoldedResponses);
+      return foldedResponses;
     } catch (exception) {
       _log.severe('Search exception thrown: $exception');
       throw _client.launderException(exception);

@@ -306,20 +306,23 @@ class SearchState implements MultiSearchState {
   /// The rectangle is defined by two diagonally opposite points (hereafter `p1`
   /// and `p2`), hence by 4 floats: `p1Lat`, `p1Lng`, `p2Lat`, `p2Lng`.
   ///
-  /// For example: `insideBoundingBox = [ 47.3165, 4.9665, 47.3424, 5.0201 ]`
+  /// For example: `insideBoundingBox = [[47.3165, 4.9665, 47.3424, 5.0201]]`
   ///
   /// **Usage notes**
-  ///   - You may specify multiple bounding boxes, in which case the search will
-  ///     use the union (OR) of the rectangles. To do this, pass either:
-  ///     - more than 4 values (must be a multiple of 4: 8, 12…); example:
-  ///       `47.3165,4.9665,47.3424,5.0201,40.9234,2.1185,38.6430,1.9916`;
-  ///   - [aroundLatLng] and [aroundLatLngViaIP] will be ignored if used along
-  ///     with this parameter.
+  ///   - You may specify multiple bounding boxes, in which case the search will use the
+  ///     union (OR) of the rectangles. To do this, pass a list of lists of
+  ///     floats (each inner array must contain exactly 4 values); example:
+  ///     [
+  ///       [47.3165, 4.9665, 47.3424, 5.0201],
+  ///       [40.9234, 2.1185, 38.6430, 1.9916]
+  ///     ];
+  ///   - [aroundLatLng] and [aroundLatLngViaIP] will be ignored if used along with this
+  ///     parameter.
   ///   - Be careful when your coordinates cross over the `180th meridian`.
   ///
   /// Source: [Learn more](https://www.algolia.com/doc/api-reference/api-parameters/insideBoundingBox/)
   ///
-  final List<double>? insideBoundingBox;
+  final List<List<double>>? insideBoundingBox;
 
   /// Make a copy of the search state.
   SearchState copyWith({
@@ -352,7 +355,7 @@ class SearchState implements MultiSearchState {
     dynamic aroundRadius,
     int? aroundPrecision,
     int? minimumAroundRadius,
-    List<double>? insideBoundingBox,
+    List<List<double>>? insideBoundingBox,
   }) =>
       SearchState(
         attributesToHighlight:
