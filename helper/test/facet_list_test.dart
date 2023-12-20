@@ -376,12 +376,12 @@ void main() {
     setUp(() {
       eventTracker = MockFilterEventTracker();
       facetList = MockFacetList();
-      when(facetList.attribute).thenReturn('color');
+      // when(facetList.attribute).thenReturn('color');
       when(facetList.eventTracker).thenReturn(eventTracker);
     });
 
     test('clickedFilters', () {
-      facetList.eventTracker.clickedFilters(
+      facetList.eventTracker?.clickedFilters(
         eventName: 'Filter Selected',
         values: ['red'],
       );
@@ -394,7 +394,7 @@ void main() {
     });
 
     test('viewedFilters', () {
-      facetList.eventTracker.viewedFilters(
+      facetList.eventTracker?.viewedFilters(
         eventName: 'Product View',
         values: ['green'],
       );
@@ -407,7 +407,7 @@ void main() {
     });
 
     test('convertedFilters', () {
-      facetList.eventTracker.convertedFilters(
+      facetList.eventTracker?.convertedFilters(
         eventName: 'Conversion',
         values: ['blue', 'green'],
       );

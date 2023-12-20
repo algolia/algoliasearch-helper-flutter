@@ -5,10 +5,10 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i4;
 
-import 'package:algolia_helper_flutter/src/facet_list.dart' as _i3;
+import 'package:algolia_helper_flutter/src/facet_list.dart' as _i2;
 import 'package:algolia_helper_flutter/src/model/facet.dart' as _i6;
 import 'package:algolia_helper_flutter/src/selectable_item.dart' as _i5;
-import 'package:algolia_insights/algolia_insights.dart' as _i2;
+import 'package:algolia_insights/algolia_insights.dart' as _i3;
 import 'package:mockito/mockito.dart' as _i1;
 
 // ignore_for_file: type=lint
@@ -22,9 +22,9 @@ import 'package:mockito/mockito.dart' as _i1;
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-class _FakeFilterEventTracker_0 extends _i1.SmartFake
-    implements _i2.FilterEventTracker {
-  _FakeFilterEventTracker_0(
+class _FakeSelectionState_0 extends _i1.SmartFake
+    implements _i2.SelectionState {
+  _FakeSelectionState_0(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -33,7 +33,7 @@ class _FakeFilterEventTracker_0 extends _i1.SmartFake
         );
 }
 
-class _FakeEventTracker_1 extends _i1.SmartFake implements _i2.EventTracker {
+class _FakeEventTracker_1 extends _i1.SmartFake implements _i3.EventTracker {
   _FakeEventTracker_1(
     Object parent,
     Invocation parentInvocation,
@@ -44,7 +44,7 @@ class _FakeEventTracker_1 extends _i1.SmartFake implements _i2.EventTracker {
 }
 
 class _FakeEventDataDelegate_2 extends _i1.SmartFake
-    implements _i2.EventDataDelegate {
+    implements _i3.EventDataDelegate {
   _FakeEventDataDelegate_2(
     Object parent,
     Invocation parentInvocation,
@@ -57,24 +57,19 @@ class _FakeEventDataDelegate_2 extends _i1.SmartFake
 /// A class which mocks [FacetList].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockFacetList extends _i1.Mock implements _i3.FacetList {
+class MockFacetList extends _i1.Mock implements _i2.FacetList {
   MockFacetList() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i2.FilterEventTracker get eventTracker => (super.noSuchMethod(
-        Invocation.getter(#eventTracker),
-        returnValue: _FakeFilterEventTracker_0(
+  _i2.SelectionState get state => (super.noSuchMethod(
+        Invocation.getter(#state),
+        returnValue: _FakeSelectionState_0(
           this,
-          Invocation.getter(#eventTracker),
+          Invocation.getter(#state),
         ),
-      ) as _i2.FilterEventTracker);
-  @override
-  String get attribute => (super.noSuchMethod(
-        Invocation.getter(#attribute),
-        returnValue: '',
-      ) as String);
+      ) as _i2.SelectionState);
   @override
   _i4.Stream<List<_i5.SelectableItem<_i6.Facet>>> get facets =>
       (super.noSuchMethod(
@@ -108,21 +103,21 @@ class MockFacetList extends _i1.Mock implements _i3.FacetList {
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockFilterEventTracker extends _i1.Mock
-    implements _i2.FilterEventTracker {
+    implements _i3.FilterEventTracker {
   MockFilterEventTracker() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i2.EventTracker get tracker => (super.noSuchMethod(
+  _i3.EventTracker get tracker => (super.noSuchMethod(
         Invocation.getter(#tracker),
         returnValue: _FakeEventTracker_1(
           this,
           Invocation.getter(#tracker),
         ),
-      ) as _i2.EventTracker);
+      ) as _i3.EventTracker);
   @override
-  set tracker(_i2.EventTracker? _tracker) => super.noSuchMethod(
+  set tracker(_i3.EventTracker? _tracker) => super.noSuchMethod(
         Invocation.setter(
           #tracker,
           _tracker,
@@ -130,15 +125,15 @@ class MockFilterEventTracker extends _i1.Mock
         returnValueForMissingStub: null,
       );
   @override
-  _i2.EventDataDelegate get delegate => (super.noSuchMethod(
+  _i3.EventDataDelegate get delegate => (super.noSuchMethod(
         Invocation.getter(#delegate),
         returnValue: _FakeEventDataDelegate_2(
           this,
           Invocation.getter(#delegate),
         ),
-      ) as _i2.EventDataDelegate);
+      ) as _i3.EventDataDelegate);
   @override
-  set delegate(_i2.EventDataDelegate? _delegate) => super.noSuchMethod(
+  set delegate(_i3.EventDataDelegate? _delegate) => super.noSuchMethod(
         Invocation.setter(
           #delegate,
           _delegate,
