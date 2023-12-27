@@ -4,6 +4,7 @@ import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
+import 'Sequencer.dart';
 import 'disposable.dart';
 import 'disposable_mixin.dart';
 import 'filter.dart';
@@ -121,6 +122,8 @@ class _FilterState with DisposableMixin implements FilterState {
   /// Events logger
   final Logger _log = algoliaLogger('FilterState');
 
+  final sequencer = Sequencer();
+
   /// Hot stream controller of [StatelessFilters].
   final BehaviorSubject<StatelessFilters> _filters =
       BehaviorSubject.seeded(StatelessFilters());
@@ -188,7 +191,7 @@ class _FilterState with DisposableMixin implements FilterState {
     }
     final current = _filters.value;
     final updated = await builder(current);
-    _filters.sink.add(updated);
+    _filters.value = updated;
     _log.finest('FilterState updated: $updated');
   }
 
@@ -202,7 +205,7 @@ class _FilterState with DisposableMixin implements FilterState {
     }
     final current = _filters.value;
     final updated = builder(current);
-    _filters.sink.add(updated);
+    _filters.value = updated;
     _log.finest('FilterState updated: $updated');
   }
 }

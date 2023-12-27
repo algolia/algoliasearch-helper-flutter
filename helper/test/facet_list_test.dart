@@ -419,6 +419,39 @@ void main() {
       ).called(1);
     });
   });
+
+  test('Toggle two facets', () async {
+    final searcher = mockHitsSearcher({
+      'facets': {
+        'color': {
+          'red': 1,
+          'green': 1,
+          'blue': 1,
+        }
+      }
+    });
+
+    final filterState = FilterState();
+    final facetList = searcher.buildFacetList(
+      filterState: filterState,
+      attribute: 'color',
+    );
+
+    final toggleFacets = ['red', 'blue'];
+    await delay();
+
+    for (final facet in toggleFacets) {
+      facetList.toggle(facet);
+    }
+    await delay();
+    final filters = filterState.snapshot();
+    expect(filters.facetGroups, {
+      const FilterGroupID('color', FilterOperator.or): {
+        Filter.facet('color', 'red'),
+        Filter.facet('color', 'blue'),
+      }
+    });
+  });
 }
 
 class MockSelectionState implements SelectionState {
@@ -444,7 +477,10 @@ class MockSelectionState implements SelectionState {
       BehaviorSubject<Set<String>>();
 
   @override
-  Stream<Set<String>> get selections => _selectionsSubject.stream;
+  Stream<Set<String>> get selectionsStream => _selectionsSubject.stream;
+
+  @override
+  Set<String> get selections => _selectionsSubject.value;
 }
 
 class MockEventDataDelegate implements EventDataDelegate {
