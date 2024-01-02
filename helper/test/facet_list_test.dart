@@ -2,7 +2,9 @@ import 'package:algolia_helper_flutter/src/facet_list.dart';
 import 'package:algolia_helper_flutter/src/filter.dart';
 import 'package:algolia_helper_flutter/src/filter_group.dart';
 import 'package:algolia_helper_flutter/src/filter_state.dart';
+import 'package:algolia_helper_flutter/src/filter_state_group_accessor.dart';
 import 'package:algolia_helper_flutter/src/filters.dart';
+import 'package:algolia_helper_flutter/src/hits_searcher_facet_list_extension.dart';
 import 'package:algolia_helper_flutter/src/model/facet.dart';
 import 'package:algolia_helper_flutter/src/model/multi_search_response.dart';
 import 'package:algolia_helper_flutter/src/model/multi_search_state.dart';
@@ -10,6 +12,7 @@ import 'package:algolia_helper_flutter/src/searcher/hits_searcher.dart';
 import 'package:algolia_insights/algolia_insights.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:test/test.dart';
 
 import 'facet_list_test.mocks.dart';
@@ -20,20 +23,17 @@ import 'hits_searcher_test.mocks.dart';
 void main() {
   group('Build facets list', () {
     test('Get facet items and select', () async {
-      final searcher = mockHitsSearcher({
-        'facets': {
-          'color': {
-            'red': 1,
-            'green': 1,
-            'blue': 1,
-          }
-        }
-      });
+      final facetStream = Stream<List<Facet>>.value(
+        [
+          const Facet('red', 1),
+          const Facet('green', 1),
+          const Facet('blue', 1),
+        ],
+      );
 
       final facetList = FacetList(
-        searcher: searcher,
-        filterState: FilterState(),
-        attribute: 'color',
+        facetsStream: facetStream,
+        state: MockSelectionState(),
       )..toggle('blue');
 
       await expectLater(
@@ -54,19 +54,16 @@ void main() {
     });
 
     test('Get facet items with persistent selection', () async {
-      final searcher = mockHitsSearcher({
-        'facets': {
-          'color': {
-            'red': 1,
-            'green': 1,
-          }
-        }
-      });
+      final facetStream = Stream<List<Facet>>.value(
+        [
+          const Facet('red', 1),
+          const Facet('green', 1),
+        ],
+      );
 
       final facetList = FacetList(
-        searcher: searcher,
-        filterState: FilterState(),
-        attribute: 'color',
+        facetsStream: facetStream,
+        state: MockSelectionState(),
         persistent: true,
       )..toggle('blue');
 
@@ -87,19 +84,16 @@ void main() {
     });
 
     test('Get facet items without persistent selection', () async {
-      final searcher = mockHitsSearcher({
-        'facets': {
-          'color': {
-            'red': 1,
-            'green': 1,
-          }
-        }
-      });
+      final facetStream = Stream<List<Facet>>.value(
+        [
+          const Facet('red', 1),
+          const Facet('green', 1),
+        ],
+      );
 
       final facetList = FacetList(
-        searcher: searcher,
-        filterState: FilterState(),
-        attribute: 'color',
+        facetsStream: facetStream,
+        state: MockSelectionState(),
       )..toggle('blue');
 
       await expectLater(
@@ -113,11 +107,11 @@ void main() {
 
     test('Build FacetList with conjunctive/disjunctive facets', () {
       final searcher = mockHitsSearcher();
+      final filterState = FilterState();
 
       // Create a disjunctive FacetList
-      FacetList(
-        searcher: searcher,
-        filterState: FilterState(),
+      searcher.buildFacetList(
+        filterState: filterState,
         attribute: 'color',
       );
 
@@ -131,9 +125,8 @@ void main() {
       );
 
       // Create a conjunctive FacetList
-      FacetList(
-        searcher: searcher,
-        filterState: FilterState(),
+      searcher.buildFacetList(
+        filterState: filterState,
         attribute: 'type',
         operator: FilterOperator.and,
       );
@@ -148,11 +141,7 @@ void main() {
       );
 
       // Create another disjunctive FacetList
-      FacetList(
-        searcher: searcher,
-        filterState: FilterState(),
-        attribute: 'brand',
-      );
+      searcher.buildFacetList(filterState: filterState, attribute: 'brand');
 
       expect(
         searcher.snapshot(),
@@ -167,15 +156,26 @@ void main() {
 
   group('Update filter state', () {
     test('Selection should update filter state', () async {
-      final searcher = mockHitsSearcher();
+      final facetStream = Stream<List<Facet>>.value(
+        [
+          const Facet('red', 1),
+          const Facet('green', 1),
+          const Facet('blue', 1),
+        ],
+      );
+
       const groupID = FilterGroupID('color', FilterOperator.or);
       final filterState = FilterState();
 
-      FacetList.create(
-        searcher: searcher,
+      final filterSelectionState = FiltersGroupAccessor(
         filterState: filterState,
-        attribute: 'color',
         groupID: groupID,
+        attribute: 'color',
+      );
+
+      FacetList.create(
+        facetsStream: facetStream,
+        state: filterSelectionState,
       ).toggle('red');
 
       await expectLater(
@@ -191,16 +191,20 @@ void main() {
     });
 
     test('Filter State should update facets list (persistent)', () async {
-      final searcher = mockHitsSearcher();
+      final facetStream = Stream<List<Facet>>.value([]);
 
       const groupID = FilterGroupID('color', FilterOperator.or);
       final filterState = FilterState();
 
-      final facetList = FacetList.create(
-        searcher: searcher,
+      final filterSelectionState = FiltersGroupAccessor(
         filterState: filterState,
-        attribute: 'color',
         groupID: groupID,
+        attribute: 'color',
+      );
+
+      final facetList = FacetList.create(
+        facetsStream: facetStream,
+        state: filterSelectionState,
         persistent: true,
       );
 
@@ -215,11 +219,11 @@ void main() {
     });
 
     test('Single selection should clear filters', () async {
-      final searcher = mockHitsSearcher({
-        'facets': {
-          'color': {'red': 1}
-        }
-      });
+      final facetStream = Stream<List<Facet>>.value(
+        [
+          const Facet('red', 1),
+        ],
+      );
 
       const groupID = FilterGroupID('color', FilterOperator.or);
       final filterState = FilterState()
@@ -228,11 +232,15 @@ void main() {
           Filter.facet('color', 'green'),
         ]);
 
-      final facetList = FacetList.create(
-        searcher: searcher,
+      final filterSelectionState = FiltersGroupAccessor(
         filterState: filterState,
-        attribute: 'color',
         groupID: groupID,
+        attribute: 'color',
+      );
+
+      final facetList = FacetList.create(
+        facetsStream: facetStream,
+        state: filterSelectionState,
         selectionMode: SelectionMode.single,
       );
 
@@ -246,11 +254,11 @@ void main() {
     });
 
     test('Multiple selection should not clear filters', () async {
-      final searcher = mockHitsSearcher({
-        'facets': {
-          'color': {'red': 1}
-        }
-      });
+      final facetStream = Stream<List<Facet>>.value(
+        [
+          const Facet('red', 1),
+        ],
+      );
 
       const groupID = FilterGroupID('color', FilterOperator.or);
       final filterState = FilterState()
@@ -259,11 +267,15 @@ void main() {
           Filter.facet('color', 'green'),
         ]);
 
-      FacetList.create(
-        searcher: searcher,
+      final filterSelectionState = FiltersGroupAccessor(
         filterState: filterState,
-        attribute: 'color',
         groupID: groupID,
+        attribute: 'color',
+      );
+
+      FacetList.create(
+        facetsStream: facetStream,
+        state: filterSelectionState,
       ).toggle('red');
 
       await expectLater(
@@ -279,11 +291,11 @@ void main() {
     });
 
     test('Facet persistent selection', () async {
-      final searcher = mockHitsSearcher({
-        'facets': {
-          'color': {'red': 1}
-        }
-      });
+      final facetStream = Stream<List<Facet>>.value(
+        [
+          const Facet('red', 1),
+        ],
+      );
 
       const groupID = FilterGroupID('color', FilterOperator.or);
       final filterState = FilterState()
@@ -292,11 +304,15 @@ void main() {
           Filter.facet('color', 'green'),
         ]);
 
-      final facetList = FacetList.create(
-        searcher: searcher,
+      final filterSelectionState = FiltersGroupAccessor(
         filterState: filterState,
-        attribute: 'color',
         groupID: groupID,
+        attribute: 'color',
+      );
+
+      final facetList = FacetList.create(
+        facetsStream: facetStream,
+        state: filterSelectionState,
         persistent: true,
       );
 
@@ -320,13 +336,12 @@ void main() {
   });
 
   test('Should pass clicked facet values to event tracker', () async {
-    final searchService = MockHitsSearchService();
-    final initial = SearchResponse({
-      'facets': {
-        'color': {'red': 1}
-      }
-    });
-    when(searchService.search(any)).thenAnswer((_) => Future.value(initial));
+    final facetStream = Stream<List<Facet>>.value(
+      [
+        const Facet('red', 1),
+      ],
+    );
+
     final eventTracker = MockEventTracker();
 
     when(
@@ -342,24 +357,15 @@ void main() {
       expect(realInvocation.positionalArguments[2], 'red');
     });
 
-    final searcher = HitsSearcher.custom(
-      searchService,
-      eventTracker,
-      const SearchState(indexName: 'myIndex'),
-    );
-
-    const groupID = FilterGroupID('color', FilterOperator.or);
-    final filterState = FilterState()
-      ..add(groupID, [
-        Filter.facet('color', 'green'),
-      ]);
-
     FacetList.create(
-      searcher: searcher,
-      filterState: filterState,
-      attribute: 'color',
-      groupID: groupID,
+      facetsStream: facetStream,
+      state: MockSelectionState(),
       persistent: true,
+      eventTracker: FilterEventTracker(
+        eventTracker,
+        MockEventDataDelegate('test-index', 'test-query-id'),
+        'color',
+      ),
     ).toggle('red');
   });
 
@@ -370,12 +376,12 @@ void main() {
     setUp(() {
       eventTracker = MockFilterEventTracker();
       facetList = MockFacetList();
-      when(facetList.attribute).thenReturn('color');
+      // when(facetList.attribute).thenReturn('color');
       when(facetList.eventTracker).thenReturn(eventTracker);
     });
 
     test('clickedFilters', () {
-      facetList.eventTracker.clickedFilters(
+      facetList.eventTracker?.clickedFilters(
         eventName: 'Filter Selected',
         values: ['red'],
       );
@@ -388,7 +394,7 @@ void main() {
     });
 
     test('viewedFilters', () {
-      facetList.eventTracker.viewedFilters(
+      facetList.eventTracker?.viewedFilters(
         eventName: 'Product View',
         values: ['green'],
       );
@@ -401,7 +407,7 @@ void main() {
     });
 
     test('convertedFilters', () {
-      facetList.eventTracker.convertedFilters(
+      facetList.eventTracker?.convertedFilters(
         eventName: 'Conversion',
         values: ['blue', 'green'],
       );
@@ -413,6 +419,42 @@ void main() {
       ).called(1);
     });
   });
+}
+
+class MockSelectionState implements SelectionState {
+  MockSelectionState() {
+    _selectionsSubject.add(<String>{});
+  }
+
+  @override
+  void applySelectionsDiff(
+    Set<String> selectionsToAdd,
+    Set<String>? selectionsToRemove,
+  ) {
+    var currentSelections = _selectionsSubject.value;
+    currentSelections = selectionsToRemove == null
+        ? {}
+        : currentSelections.difference(selectionsToRemove.toSet())
+      ..addAll(selectionsToAdd);
+
+    _selectionsSubject.add(currentSelections);
+  }
+
+  final BehaviorSubject<Set<String>> _selectionsSubject =
+      BehaviorSubject<Set<String>>();
+
+  @override
+  Stream<Set<String>> get selections => _selectionsSubject.stream;
+}
+
+class MockEventDataDelegate implements EventDataDelegate {
+  @override
+  String indexName;
+
+  @override
+  String? queryID;
+
+  MockEventDataDelegate(this.indexName, this.queryID);
 }
 
 HitsSearcher mockHitsSearcher([Map<String, dynamic> json = const {}]) {

@@ -9,10 +9,7 @@ import 'package:rxdart/rxdart.dart';
 import 'disposable.dart';
 import 'disposable_mixin.dart';
 import 'extensions.dart';
-import 'filter.dart';
-import 'filter_group.dart';
 import 'filter_state.dart';
-import 'filters.dart';
 import 'logger.dart';
 import 'model/facet.dart';
 import 'searcher/hits_searcher.dart';
@@ -38,8 +35,7 @@ import 'selectable_item.dart';
 /// final filterState = FilterState();
 ///
 /// // Create a FacetList
-/// final facetList = FacetList(
-///  searcher: searcher,
+/// final facetList = searcher.buildFacetList(
 ///  filterState: filterState,
 ///  attribute: 'MY_ATTRIBUTE',
 /// );
@@ -77,55 +73,41 @@ import 'selectable_item.dart';
 abstract class FacetList implements Disposable {
   /// Create [FacetList] instance.
   factory FacetList({
-    required HitsSearcher searcher,
-    required FilterState filterState,
-    required String attribute,
-    FilterOperator operator = FilterOperator.or,
+    required Stream<List<Facet>> facetsStream,
+    required SelectionState state,
     SelectionMode selectionMode = SelectionMode.multiple,
     bool persistent = false,
+    FilterEventTracker? eventTracker,
   }) =>
       _FacetList(
-        searcher: searcher,
-        filterState: filterState,
-        attribute: attribute,
-        groupID: FilterGroupID(attribute, operator),
+        facetsStream: facetsStream,
+        state: state,
         selectionMode: selectionMode,
         persistent: persistent,
-        eventTracker: FilterEventTracker(
-          searcher.eventTracker.tracker,
-          searcher,
-          attribute,
-        ),
+        eventTracker: eventTracker,
       );
 
   /// Create [FacetList] instance.
   factory FacetList.create({
-    required HitsSearcher searcher,
-    required FilterState filterState,
-    required String attribute,
-    required FilterGroupID groupID,
+    required Stream<List<Facet>> facetsStream,
+    required SelectionState state,
     SelectionMode selectionMode = SelectionMode.multiple,
     bool persistent = false,
+    FilterEventTracker? eventTracker,
   }) =>
       _FacetList(
-        searcher: searcher,
-        filterState: filterState,
-        attribute: attribute,
-        groupID: groupID,
+        facetsStream: facetsStream,
+        state: state,
         selectionMode: selectionMode,
         persistent: persistent,
-        eventTracker: FilterEventTracker(
-          searcher.eventTracker.tracker,
-          searcher,
-          attribute,
-        ),
+        eventTracker: eventTracker,
       );
 
-  /// Insights events tracking component
-  FilterEventTracker get eventTracker;
+  /// Selection state
+  SelectionState get state;
 
-  /// Facet filter attribute
-  String get attribute;
+  /// Insights events tracking component
+  FilterEventTracker? get eventTracker;
 
   /// Stream of [Facet] list with selection status.
   Stream<List<SelectableFacet>> get facets;
@@ -144,59 +126,55 @@ enum SelectionMode { single, multiple }
 /// [Facet] with selection status.
 typedef SelectableFacet = SelectableItem<Facet>;
 
+abstract class SelectionState {
+  /// Gets a stream of the current selection set.
+  ///
+  /// This stream emits the latest set of selected items as `Set<String>`.
+  Stream<Set<String>> get selections;
+
+  /// Applies a differential update to the current selections.
+  ///
+  /// This method applies a set of selections to add and optionally a set
+  /// of selections to remove. If the removal set is `null`, it indicates
+  /// that all existing selections should be cleared.
+  ///
+  /// [selectionsToAdd]: The set of selections to add.
+  /// [selectionsToRemove]: An optional set of selections to remove.
+  /// `null` indicates that all existing selections should be cleared.
+  void applySelectionsDiff(
+    Set<String> selectionsToAdd,
+    Set<String>? selectionsToRemove,
+  );
+}
+
 /// Default implementation of [FacetList].
 class _FacetList with DisposableMixin implements FacetList {
   /// Create [_FacetList] instance.
   _FacetList({
-    required this.searcher,
-    required this.filterState,
-    required this.attribute,
-    required this.groupID,
+    required this.facetsStream,
+    required this.state,
     required this.selectionMode,
     required this.persistent,
     required this.eventTracker,
   }) {
-    if (searcher.isDisposed) {
-      _log.warning('creating an instance with disposed searcher');
-    }
-
-    if (filterState.isDisposed) {
-      _log.warning('creating an instance with disposed filter state');
-    }
-
-    // Setup search state by adding `attribute` to the search state
-    searcher.applyState(
-      (state) => state.copyWith(
-        facets: List.from((state.facets ?? [])..add(attribute)),
-        disjunctiveFacets: groupID.operator == FilterOperator.or
-            ? {...?state.disjunctiveFacets, attribute}
-            : state.disjunctiveFacets,
-      ),
-    );
-
     _subscriptions
       ..add(_facets.connect())
-      ..add(_responseFacets.connect())
-      ..add(_selections.connect());
+      ..add(_inputFacets.connect())
+      ..add(
+        _selections.connect(),
+      );
   }
 
-  /// Hits Searcher component
-  final HitsSearcher searcher;
-
-  /// FilterState component.
-  final FilterState filterState;
+  final Stream<List<Facet>> facetsStream;
 
   @override
-  final FilterEventTracker eventTracker;
-
-  @override
-  final String attribute;
-
-  /// Filter group ID.
-  final FilterGroupID groupID;
+  final FilterEventTracker? eventTracker;
 
   /// Whether the facets can have single or multiple selections.
   final SelectionMode selectionMode;
+
+  @override
+  final SelectionState state;
 
   /// Should the selection be kept even if it does not match current results.
   final bool persistent;
@@ -204,16 +182,23 @@ class _FacetList with DisposableMixin implements FacetList {
   /// Events logger
   final Logger _log = algoliaLogger('FacetList');
 
-  /// Selectable facets lists stream.
-  late final _facets = _selectableFacetsStream()
-      .distinct(const DeepCollectionEquality().equals)
-      .publishValue();
+  /// Selectable facets lists stream combining [_inputFacets]
+  /// and [_selections]
+  late final _facets = Rx.combineLatest2(
+    _inputFacets,
+    _selections,
+    (List<Facet> facets, Set<String> selections) => _selectableFacets(
+      facets,
+      selections,
+      persistent,
+    ),
+  ).distinct(const DeepCollectionEquality().equals).publishValue();
 
-  /// List of facets lists values from search responses.
-  late final _responseFacets = _searcherFacetsStream().publishValue();
+  /// Stream of input facets lists values.
+  late final _inputFacets = facetsStream.publishValue();
 
   /// Set of selected facet values from the filter state.
-  late final _selections = _filtersSelectionsStream().publishValue();
+  late final _selections = state.selections.publishValue();
 
   /// Streams subscriptions composite.
   final CompositeSubscription _subscriptions = CompositeSubscription();
@@ -224,89 +209,10 @@ class _FacetList with DisposableMixin implements FacetList {
   @override
   List<SelectableFacet>? snapshot() => _facets.valueOrNull;
 
-  /// Create stream of [SelectableFacet] lists from
-  /// [_responseFacets] and [_selections].
-  Stream<List<SelectableFacet>> _selectableFacetsStream() => Rx.combineLatest2(
-        _responseFacets,
-        _selections,
-        (List<Facet> facets, Set<String> selections) {
-          final facetsList = _buildSelectableFacets(facets, selections);
-          return persistent
-              ? _buildPersistentSelectableFacets(facetsList, selections)
-              : facetsList;
-        },
-      );
-
-  /// Builds a list of [SelectableFacet] from [facets] and [selections].
-  List<SelectableFacet> _buildSelectableFacets(
-    List<Facet> facets,
-    Set<String> selections,
-  ) =>
-      facets
-          .map(
-            (facet) => SelectableFacet(
-              item: facet,
-              isSelected: selections.contains(facet.value),
-            ),
-          )
-          .toList();
-
-  /// Builds a list of [SelectableFacet] with persistent selections
-  /// from [facetsList] and [selections].
-  List<SelectableFacet> _buildPersistentSelectableFacets(
-    List<SelectableItem<Facet>> facetsList,
-    Set<String> selections,
-  ) =>
-      selections
-          .where(
-            (selection) => facetsList.every(
-              (selectableFacet) => selectableFacet.item.value != selection,
-            ),
-          )
-          .map(
-            (selection) => SelectableFacet(
-              item: Facet(selection, 0),
-              isSelected: true,
-            ),
-          )
-          .toList()
-        ..addAll(facetsList);
-
-  /// Build facets lists stream from [searcher].
-  Stream<List<Facet>> _searcherFacetsStream() => searcher.responses.map(
-        (response) =>
-            response.disjunctiveFacets[attribute] ??
-            response.facets[attribute] ??
-            [],
-      );
-
-  /// Build selections stream from [filterState] filters updates.
-  Stream<Set<String>> _filtersSelectionsStream() => filterState.filters.map(
-        (filters) =>
-            filters
-                .getFacetFilters(groupID)
-                ?.map((e) => e.value.toString())
-                .toSet() ??
-            {},
-      );
-
-  @override
-  void toggle(String value) {
-    _trackClickIfNeeded(value);
-    _selectionsSet(value).then((selections) {
-      filterState.modify((filters) async {
-        final filtersSet =
-            selections.map((value) => Filter.facet(attribute, value)).toSet();
-        filters = await _clearFilters(filters);
-        return filters.add(groupID, filtersSet);
-      });
-    });
-  }
-
   void _trackClickIfNeeded(String selection) {
     _selections.first.then((selections) {
       if (!selections.contains(selection)) {
-        eventTracker.clickedFilters(
+        eventTracker?.clickedFilters(
           eventName: 'Filter Applied',
           values: [selection],
         );
@@ -314,12 +220,114 @@ class _FacetList with DisposableMixin implements FacetList {
     });
   }
 
+  @override
+  void toggle(String value) {
+    _trackClickIfNeeded(value);
+    _log.finest('current selections: $_selections.first -> $value selected');
+    _selectionsSet(_selections, value, selectionMode).then((selections) {
+      switch (selectionMode) {
+        case SelectionMode.single:
+          state.applySelectionsDiff(
+            selections,
+            null,
+          );
+        case SelectionMode.multiple:
+          final input = _inputFacets.first
+              .then((value) => value.map((facet) => facet.value).toSet());
+          final current = _selections.first.then((value) => value.toSet());
+          _facetsToRemove(
+            input,
+            current,
+            persistent,
+          ).then(
+            (toRemove) => state.applySelectionsDiff(
+              selections,
+              toRemove,
+            ),
+          );
+      }
+    });
+  }
+
+  /// Creates a list of `SelectableItem<Facet>` from a given list of `Facet`
+  /// and a set of selections.
+  ///
+  /// This function maps each `Facet` in the provided list to a
+  /// `SelectableFacet` by checking if the facet's value is contained within the
+  /// given set of selections. Each `SelectableFacet` will have its `isSelected`
+  /// property set accordingly. For persistent selections, facets that are
+  /// currently selected but not present in the provided facet list will also be
+  /// included.
+  ///
+  /// [facets]: The list of `Facet` from which the `SelectableFacet` list will
+  /// be created.
+  /// [selections]: The set of currently selected facet values. Each value in
+  /// this set corresponds to a `Facet`'s value that should be marked as
+  /// selected.
+  /// [persistent]: A boolean indicating whether selections should persist even
+  /// when they are not present in the current facet list. If true, facets that
+  /// are selected but not present in the provided list will be added to the
+  /// result with a count of 0.
+  ///
+  /// Returns a list of `SelectableFacet`, which includes all facets from the
+  /// provided list marked as selected or not based on the selections set, and,
+  /// if persistent is true, any additional facets that are selected but not
+  /// present in the initial list.
+  static List<SelectableItem<Facet>> _selectableFacets(
+    List<Facet> facets,
+    Set<String> selections,
+    bool persistent,
+  ) {
+    final facetList = facets
+        .map(
+          (facet) => SelectableFacet(
+            item: facet,
+            isSelected: selections.contains(facet.value),
+          ),
+        )
+        .toList();
+
+    if (!persistent) {
+      return facetList;
+    }
+
+    final presentValues = facets.map((facet) => facet.value).toSet();
+    final persistentFacetList = selections
+        .whereNot(presentValues.contains)
+        .map(
+          (selection) => SelectableFacet(
+            item: Facet(selection, 0),
+            isSelected: true,
+          ),
+        )
+        .toList();
+
+    return [...persistentFacetList, ...facetList];
+  }
+
+  /// Get the set of facets to remove in case of multiple selection mode.
+  /// In case of persistent selection, current selections are kept.
+  static Future<Set<String>> _facetsToRemove(
+    Future<Set<String>> input,
+    Future<Set<String>> current,
+    bool persistent,
+  ) async {
+    final inputValues = await input;
+    if (!persistent) return inputValues;
+
+    final currentValues = await current;
+    return {...inputValues, ...currentValues};
+  }
+
   /// Get new set of selection after a selection operation.
-  /// We use async operation here since [_selections] can take some time to get
+  /// We use async operation here since [selections] can take some time to get
   /// current filters (just after initialization).
-  Future<Set<String>> _selectionsSet(String selection) async {
-    final current = await _selections.first;
-    _log.finest('current facet selections: $current -> $selection selected');
+  static Future<Set<String>> _selectionsSet(
+    Stream<Set<String>> selections,
+    String selection,
+    SelectionMode selectionMode,
+  ) async {
+    final current = await selections.first;
     switch (selectionMode) {
       case SelectionMode.single:
         return current.contains(selection) ? {} : {selection};
@@ -329,31 +337,6 @@ class _FacetList with DisposableMixin implements FacetList {
             ? (set..remove(selection))
             : (set..add(selection));
     }
-  }
-
-  /// Clear filters from [StatelessFilters] depending
-  Future<StatelessFilters> _clearFilters(StatelessFilters filters) async {
-    switch (selectionMode) {
-      case SelectionMode.single:
-        return filters.clear([groupID]);
-      case SelectionMode.multiple:
-        final filtersToRemove = _facetsToRemove();
-        return filters.remove(groupID, await filtersToRemove);
-    }
-  }
-
-  /// Get the set of facets to remove in case of multiple selection mode.
-  /// In case of persistent selection, current selections are kept.
-  Future<Set<FilterFacet>> _facetsToRemove() async {
-    final currentFilters = (await _responseFacets.first)
-        .map((facet) => Filter.facet(attribute, facet.value))
-        .toSet();
-    if (!persistent) return currentFilters;
-
-    final currentSelections = (await _selections.first)
-        .map((selection) => Filter.facet(attribute, selection))
-        .toSet();
-    return {...currentFilters, ...currentSelections};
   }
 
   @override

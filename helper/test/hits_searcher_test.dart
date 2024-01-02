@@ -331,7 +331,7 @@ void main() {
       hitsSearcher
           .applyState((state) => state.copyWith(indexName: 'indexName_asc'));
 
-      hitsSearcher.eventTracker.clickedObjects(
+      hitsSearcher.eventTracker?.clickedObjects(
         eventName: 'clickedObjects',
         objectIDs: objectIDs,
       );
@@ -347,7 +347,7 @@ void main() {
       hitsSearcher
           .applyState((state) => state.copyWith(indexName: 'indexName_desc'));
 
-      hitsSearcher.eventTracker.clickedObjects(
+      hitsSearcher.eventTracker?.clickedObjects(
         eventName: 'clickedObjects',
         objectIDs: objectIDs,
       );
@@ -366,7 +366,7 @@ void main() {
         final objectIDs = ['1', '2'];
         final positions = [1, 2];
 
-        hitsSearcher.eventTracker.clickedObjects(
+        hitsSearcher.eventTracker?.clickedObjects(
           eventName: 'clickedObjects',
           objectIDs: objectIDs,
           positions: positions,
@@ -389,7 +389,7 @@ void main() {
         hitsSearcher.query('query');
         await expectLater(hitsSearcher.responses, emits(matchesQuery('query')));
 
-        hitsSearcher.eventTracker.clickedObjects(
+        hitsSearcher.eventTracker?.clickedObjects(
           eventName: 'clickedObjects',
           objectIDs: objectIDs,
           positions: positions,
@@ -411,7 +411,7 @@ void main() {
       test('calls convertedObjects if queryID is null', () {
         final objectIDs = ['1', '2'];
 
-        hitsSearcher.eventTracker.convertedObjects(
+        hitsSearcher.eventTracker?.convertedObjects(
           eventName: 'convertedObjects',
           objectIDs: objectIDs,
         );
@@ -433,7 +433,7 @@ void main() {
         hitsSearcher.query('query');
         await expectLater(hitsSearcher.responses, emits(matchesQuery('query')));
 
-        hitsSearcher.eventTracker.convertedObjects(
+        hitsSearcher.eventTracker?.convertedObjects(
           eventName: 'convertedObjects',
           objectIDs: objectIDs,
         );
@@ -453,7 +453,7 @@ void main() {
       test('calls viewedObjects', () {
         final objectIDs = ['1', '2'];
 
-        hitsSearcher.eventTracker.viewedObjects(
+        hitsSearcher.eventTracker?.viewedObjects(
           eventName: 'viewedObjects',
           objectIDs: objectIDs,
         );
