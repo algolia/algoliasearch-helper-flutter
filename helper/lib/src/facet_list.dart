@@ -144,9 +144,8 @@ abstract class SelectionState {
   /// [selectionsToAdd]: The set of selections to add.
   /// [selectionsToRemove]: An optional set of selections to remove.
   /// `null` indicates that all existing selections should be cleared.
-  void applySelectionsDiff(
-    Set<String> selectionsToAdd,
-    Set<String>? selectionsToRemove,
+  void setSelections(
+    Set<String> selections,
   );
 }
 
@@ -186,7 +185,7 @@ class _FacetList with DisposableMixin implements FacetList {
   final Logger _log = algoliaLogger('FacetList');
 
   /// Selectable facets lists stream combining [_inputFacets]
-  /// and [_selections]
+  /// and [_selectionsStream]
   late final _facets = Rx.combineLatest2(
     _inputFacets,
     _selectionsStream,
@@ -234,12 +233,19 @@ class _FacetList with DisposableMixin implements FacetList {
   /// Perform toggle operation.
   Future<void> _performToggle(String value) async {
     _trackClickIfNeeded(value);
-    _log.finest('current selections: ${state.selections} -> $value selected');
-    final selections = _facetsToAdd(state.selections, value, selectionMode);
-    state.applySelectionsDiff(
-      selections,
-      null,
-    );
+    final currentSelections = state.selections;
+    _log.finest('current selections: $currentSelections -> $value selected');
+    final Set<String> selectionsToApply;
+    switch (selectionMode) {
+      case SelectionMode.single:
+        selectionsToApply = currentSelections.contains(value) ? {} : {value};
+      case SelectionMode.multiple:
+        final set = currentSelections.modifiable();
+        selectionsToApply = currentSelections.contains(value)
+            ? (set..remove(value))
+            : (set..add(value));
+    }
+    state.setSelections(selectionsToApply);
   }
 
   /// Creates a list of `SelectableItem<Facet>` from a given list of `Facet`
@@ -296,23 +302,6 @@ class _FacetList with DisposableMixin implements FacetList {
         .toList();
 
     return [...persistentFacetList, ...facetList];
-  }
-
-  /// Get new set of selection after a selection operation.
-  static Set<String> _facetsToAdd(
-    Set<String> currentSelections,
-    String newSelection,
-    SelectionMode selectionMode,
-  ) {
-    switch (selectionMode) {
-      case SelectionMode.single:
-        return currentSelections.contains(newSelection) ? {} : {newSelection};
-      case SelectionMode.multiple:
-        final set = currentSelections.modifiable();
-        return currentSelections.contains(newSelection)
-            ? (set..remove(newSelection))
-            : (set..add(newSelection));
-    }
   }
 
   @override

@@ -39,22 +39,13 @@ class FiltersGroupAccessor extends SelectionState {
       {};
 
   @override
-  void applySelectionsDiff(
-    Set<String> selectionsToAdd,
-    Set<String>? selectionsToRemove,
+  void setSelections(
+    Set<String> selections,
   ) {
     filterState.modify((filters) async {
-      if (selectionsToRemove == null) {
-        filters = filters.clear([groupID]);
-      } else {
-        final filtersToRemove = selectionsToRemove.map(
-          (value) => Filter.facet(attribute, value),
-        );
-        filters = filters.remove(groupID, filtersToRemove);
-      }
-      final filtersToAdd = selectionsToAdd
-          .map((value) => Filter.facet(attribute, value))
-          .toSet();
+      filters = filters.clear([groupID]);
+      final filtersToAdd =
+          selections.map((value) => Filter.facet(attribute, value)).toSet();
       return filters.add(groupID, filtersToAdd);
     });
   }

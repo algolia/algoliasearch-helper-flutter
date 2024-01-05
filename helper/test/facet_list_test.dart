@@ -463,18 +463,10 @@ class MockSelectionState implements SelectionState {
   }
 
   @override
-  void applySelectionsDiff(
-    Set<String> selectionsToAdd,
-    Set<String>? selectionsToRemove,
-  ) {
-    var currentSelections = _selectionsSubject.value;
-    currentSelections = selectionsToRemove == null
-        ? {}
-        : currentSelections.difference(selectionsToRemove.toSet())
-      ..addAll(selectionsToAdd);
-
-    _selectionsSubject.add(currentSelections);
-  }
+  void setSelections(
+    Set<String> selections,
+  ) =>
+      _selectionsSubject.add(selections);
 
   final BehaviorSubject<Set<String>> _selectionsSubject =
       BehaviorSubject<Set<String>>();
