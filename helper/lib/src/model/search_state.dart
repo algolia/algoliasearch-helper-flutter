@@ -155,7 +155,7 @@ class SearchState implements MultiSearchState {
   ///   - Note: This setting differs from [aroundLatLng], which allows you to
   ///     specify the exact latitude and longitude of the center of the circle.
   ///   - This parameter will be ignored if used along with [insideBoundingBox]
-  ///     or [insidePolygon]
+  ///     or [`insidePolygon`]
   ///   - We currently only support IPv4 addresses. If the end user has an IPv6
   ///     address, this parameter won’t work as intended.
   ///
@@ -181,7 +181,7 @@ class SearchState implements MultiSearchState {
   ///   - Note: This setting differs from [aroundLatLngViaIP], which uses the
   ///   end user’s IP to determine the geo-coordinates.
   ///   - This parameter will be ignored if used along with [insideBoundingBox]
-  ///   or [insidePolygon]
+  ///   or [`insidePolygon`]
   ///   - To control the maximum size of the radius, you would use
   ///     [aroundRadius].
   ///   - To control the minimum size, you would use [minimumAroundRadius].
