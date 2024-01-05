@@ -1,4 +1,3 @@
-import 'extensions.dart';
 import 'facet_list.dart';
 import 'filter.dart';
 import 'filter_group.dart';
@@ -41,19 +40,10 @@ class FiltersGroupAccessor extends SelectionState {
 
   @override
   void applySelectionsDiff(
-      String value,
     Set<String> selectionsToAdd,
     Set<String>? selectionsToRemove,
-    SelectionMode selectionMode,
   ) {
     filterState.modify((filters) async {
-      final currentSelections = filters
-              .getFacetFilters(groupID)
-              ?.map((e) => e.value.toString())
-              .toSet() ??
-          {};
-      final selections =
-          _selectionsSet(currentSelections, value, selectionMode);
       if (selectionsToRemove == null) {
         filters = filters.clear([groupID]);
       } else {
@@ -67,24 +57,5 @@ class FiltersGroupAccessor extends SelectionState {
           .toSet();
       return filters.add(groupID, filtersToAdd);
     });
-  }
-
-  /// Get new set of selection after a selection operation.
-  /// We use async operation here since [selections] can take some time to get
-  /// current filters (just after initialization).
-  static Set<String> _selectionsSet(
-    Set<String> current,
-    String selection,
-    SelectionMode selectionMode,
-  ) {
-    switch (selectionMode) {
-      case SelectionMode.single:
-        return current.contains(selection) ? {} : {selection};
-      case SelectionMode.multiple:
-        final set = current.modifiable();
-        return current.contains(selection)
-            ? (set..remove(selection))
-            : (set..add(selection));
-    }
   }
 }

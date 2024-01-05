@@ -145,10 +145,8 @@ abstract class SelectionState {
   /// [selectionsToRemove]: An optional set of selections to remove.
   /// `null` indicates that all existing selections should be cleared.
   void applySelectionsDiff(
-    String value,
     Set<String> selectionsToAdd,
     Set<String>? selectionsToRemove,
-    SelectionMode selectionMode,
   );
 }
 
@@ -237,31 +235,11 @@ class _FacetList with DisposableMixin implements FacetList {
   Future<void> _performToggle(String value) async {
     _trackClickIfNeeded(value);
     _log.finest('current selections: ${state.selections} -> $value selected');
-    // final selections = _selectionsSet(state.selections, value, selectionMode);
-    switch (selectionMode) {
-      case SelectionMode.single:
-        state.applySelectionsDiff(
-          value,
-          selections,
-          null,
-          selectionMode,
-        );
-      case SelectionMode.multiple:
-        final input = _inputFacets.first
-            .then((value) => value.map((facet) => facet.value).toSet());
-        await _facetsToRemove(
-          input,
-          selections,
-          persistent,
-        ).then(
-          (toRemove) => state.applySelectionsDiff(
-            value,
-            selections,
-            toRemove,
-            selectionMode,
-          ),
-        );
-    }
+    final selections = _facetsToAdd(state.selections, value, selectionMode);
+    state.applySelectionsDiff(
+      selections,
+      null,
+    );
   }
 
   /// Creates a list of `SelectableItem<Facet>` from a given list of `Facet`
@@ -320,35 +298,20 @@ class _FacetList with DisposableMixin implements FacetList {
     return [...persistentFacetList, ...facetList];
   }
 
-  /// Get the set of facets to remove in case of multiple selection mode.
-  /// In case of persistent selection, current selections are kept.
-  static Future<Set<String>> _facetsToRemove(
-    Future<Set<String>> input,
-    Set<String> current,
-    bool persistent,
-  ) async {
-    final inputValues = await input;
-    if (!persistent) return inputValues;
-
-    return {...inputValues, ...current};
-  }
-
   /// Get new set of selection after a selection operation.
-  /// We use async operation here since [selections] can take some time to get
-  /// current filters (just after initialization).
-  static Set<String> _selectionsSet(
-    Set<String> current,
-    String selection,
+  static Set<String> _facetsToAdd(
+    Set<String> currentSelections,
+    String newSelection,
     SelectionMode selectionMode,
   ) {
     switch (selectionMode) {
       case SelectionMode.single:
-        return current.contains(selection) ? {} : {selection};
+        return currentSelections.contains(newSelection) ? {} : {newSelection};
       case SelectionMode.multiple:
-        final set = current.modifiable();
-        return current.contains(selection)
-            ? (set..remove(selection))
-            : (set..add(selection));
+        final set = currentSelections.modifiable();
+        return currentSelections.contains(newSelection)
+            ? (set..remove(newSelection))
+            : (set..add(newSelection));
     }
   }
 

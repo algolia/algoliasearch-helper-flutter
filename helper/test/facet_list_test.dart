@@ -273,10 +273,13 @@ void main() {
         attribute: 'color',
       );
 
-      FacetList.create(
+      final facetList = FacetList.create(
         facetsStream: facetStream,
         state: filterSelectionState,
-      ).toggle('red');
+      );
+
+      await delay();
+      facetList.toggle('red');
 
       await expectLater(
         filterState.filters,
@@ -316,7 +319,6 @@ void main() {
         persistent: true,
       );
 
-      // await for first emit, a quick select will make it skip
       await delay();
       facetList.toggle('green');
 
@@ -332,6 +334,7 @@ void main() {
           ]
         ]),
       );
+      await delay();
     });
   });
 
