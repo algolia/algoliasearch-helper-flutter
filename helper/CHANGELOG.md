@@ -1,3 +1,9 @@
+## 1.0.0
+
+ - **REFACTOR**(FacetList): refactor facet list component (#118).
+ - **FIX**(facetlist): multiple facet toggle (#120).
+ - **FIX**(facet): export facet model (#112).
+
 ## 0.5.0
 
  - **FEAT**(GeoSearch): add geospatial query support (#105).

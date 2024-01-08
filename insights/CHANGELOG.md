@@ -1,3 +1,10 @@
+## 1.0.0
+
+ - **REFACTOR**(FacetList): refactor facet list component (#118).
+ - **FIX**(facetlist): multiple facet toggle (#120).
+ - **FIX**(insights): avoid empty payload in Insights events (#116).
+ - **FIX**(facetlist): add missing filter attribute for insights event (#115).
+
 ## 0.2.2
 
  - **CHORE**: Update dependencies to be more relaxed.
