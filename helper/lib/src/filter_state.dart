@@ -122,8 +122,6 @@ class _FilterState with DisposableMixin implements FilterState {
   /// Events logger
   final Logger _log = algoliaLogger('FilterState');
 
-  final sequencer = Sequencer();
-
   /// Hot stream controller of [StatelessFilters].
   final BehaviorSubject<StatelessFilters> _filters =
       BehaviorSubject.seeded(StatelessFilters());

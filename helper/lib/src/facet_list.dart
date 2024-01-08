@@ -307,7 +307,7 @@ class _FacetList with DisposableMixin implements FacetList {
   @override
   void doDispose() {
     _log.finest('FacetList disposed');
-    _sequencer.cancel();
+    _sequencer.dispose();
     _subscriptions.cancel();
   }
 }

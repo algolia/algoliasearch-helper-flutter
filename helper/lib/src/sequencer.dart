@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'disposable_mixin.dart';
 import 'logger.dart';
 
 /// A simple sequencer that ensures that tasks are run in order.
-class Sequencer {
+class Sequencer with DisposableMixin {
   final _operationQueue = Queue<Future<void> Function()>();
   var _isProcessing = false;
   var _isCancelled = false;
@@ -17,12 +18,6 @@ class Sequencer {
     if (!_isProcessing) {
       _processQueue();
     }
-  }
-
-  /// Cancels all pending tasks.
-  void cancel() {
-    _isCancelled = true;
-    _log.finest('cancelling ${_operationQueue.length} pending tasks');
   }
 
   /// Processes the queue.
@@ -38,5 +33,11 @@ class Sequencer {
       }
     }
     _isProcessing = false;
+  }
+
+  @override
+  void doDispose() {
+    _isCancelled = true;
+    _log.finest('cancelling ${_operationQueue.length} pending tasks');
   }
 }
