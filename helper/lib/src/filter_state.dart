@@ -188,7 +188,7 @@ class _FilterState with DisposableMixin implements FilterState {
     }
     final current = _filters.value;
     final updated = await builder(current);
-    _filters.sink.add(updated);
+    _filters.value = updated;
     _log.finest('FilterState updated: $updated');
   }
 
@@ -202,7 +202,7 @@ class _FilterState with DisposableMixin implements FilterState {
     }
     final current = _filters.value;
     final updated = builder(current);
-    _filters.sink.add(updated);
+    _filters.value = updated;
     _log.finest('FilterState updated: $updated');
   }
 }

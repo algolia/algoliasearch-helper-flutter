@@ -51,7 +51,7 @@ void main() {
 
     final snapshot = filterState.snapshot();
     expect(snapshot.getGroups(), {
-      groupAndA: {facetA, facetB}
+      groupAndA: {facetA, facetB},
     });
   });
 
@@ -63,7 +63,7 @@ void main() {
     final snapshot = filterState.snapshot();
     expect(snapshot.getGroups(), {
       groupAndA: {facetA},
-      groupAndB: {facetA}
+      groupAndB: {facetA},
     });
   });
 
@@ -74,10 +74,10 @@ void main() {
 
     final snapshot = filterState.snapshot();
     expect(snapshot.facetGroups, {
-      groupAndA: {facetA}
+      groupAndA: {facetA},
     });
     expect(snapshot.numericGroups, {
-      groupAndA: {numeric}
+      groupAndA: {numeric},
     });
   });
 
@@ -88,10 +88,10 @@ void main() {
 
     final snapshot = filterState.snapshot();
     expect(snapshot.facetGroups, {
-      groupAndA: {facetA}
+      groupAndA: {facetA},
     });
     expect(snapshot.numericGroups, {
-      groupAndB: {numeric}
+      groupAndB: {numeric},
     });
   });
 
@@ -102,7 +102,7 @@ void main() {
 
     final snapshot = filterState.snapshot();
     expect(snapshot.facetGroups, {
-      groupAndA: {facetB}
+      groupAndA: {facetB},
     });
   });
 
@@ -122,7 +122,7 @@ void main() {
 
     final snapshot = filterState.snapshot();
     expect(snapshot.facetGroups, {
-      groupAndA: {facetA}
+      groupAndA: {facetA},
     });
   });
 
@@ -134,7 +134,7 @@ void main() {
 
     final snapshot = filterState.snapshot();
     expect(snapshot.facetGroups, {
-      groupAndA: {facetA}
+      groupAndA: {facetA},
     });
   });
 
@@ -162,13 +162,13 @@ void main() {
 
     final snapshot = filterState.snapshot();
     expect(snapshot.facetGroups, {
-      groupAndA: {facetA}
+      groupAndA: {facetA},
     });
     expect(snapshot.numericGroups, {
-      groupAndA: {numeric}
+      groupAndA: {numeric},
     });
     expect(snapshot.tagGroups, {
-      groupAndA: {tag}
+      groupAndA: {tag},
     });
   });
 
@@ -182,7 +182,7 @@ void main() {
 
     final snapshot = filterState.snapshot();
     expect(snapshot.facetGroups, {
-      groupAndB: {facetB}
+      groupAndB: {facetB},
     });
     expect(snapshot.numericGroups.isEmpty, true);
     expect(snapshot.tagGroups.isEmpty, true);
@@ -213,7 +213,7 @@ void main() {
   test('Filter toggle', () {
     final filterState = FilterState()..toggle(groupAndA, facetA);
     expect(filterState.snapshot().facetGroups, {
-      groupAndA: {facetA}
+      groupAndA: {facetA},
     });
 
     filterState.toggle(groupAndA, facetA);

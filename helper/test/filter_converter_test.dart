@@ -101,7 +101,7 @@ void main() {
             Filter.facet('attributeA', 0),
             Filter.facet('attributeA', 1),
           },
-        )
+        ),
       };
 
       const converter = FilterGroupConverter();
@@ -119,7 +119,7 @@ void main() {
             Filter.facet('attributeA', 0),
             Filter.facet('attributeA', 1),
           },
-        )
+        ),
       };
 
       const converter = FilterGroupConverter();
@@ -137,7 +137,7 @@ void main() {
             Filter.tag('a'),
             Filter.tag('b'),
           },
-        )
+        ),
       };
       const converter = FilterGroupConverter();
       expect(converter.unquoted(filterGroups), '(_tags:a OR _tags:b)');
@@ -151,7 +151,7 @@ void main() {
             Filter.range('attributeA', lowerBound: 0, upperBound: 1),
             Filter.comparison('attributeA', NumericOperator.notEquals, 0),
           },
-        )
+        ),
       };
       const converter = FilterGroupConverter();
       expect(
@@ -172,7 +172,7 @@ void main() {
 
     test('Single filter', () {
       final filterGroups = {
-        FilterGroup.facet(filters: {Filter.facet('attributeA', 0)})
+        FilterGroup.facet(filters: {Filter.facet('attributeA', 0)}),
       };
       const converter = FilterGroupConverter();
       expect(converter.unquoted(filterGroups), '(attributeA:0)');

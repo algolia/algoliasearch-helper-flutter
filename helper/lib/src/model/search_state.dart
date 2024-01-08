@@ -155,7 +155,7 @@ class SearchState implements MultiSearchState {
   ///   - Note: This setting differs from [aroundLatLng], which allows you to
   ///     specify the exact latitude and longitude of the center of the circle.
   ///   - This parameter will be ignored if used along with [insideBoundingBox]
-  ///     or [insidePolygon]
+  ///     or [`insidePolygon`]
   ///   - We currently only support IPv4 addresses. If the end user has an IPv6
   ///     address, this parameter won’t work as intended.
   ///
@@ -181,7 +181,7 @@ class SearchState implements MultiSearchState {
   ///   - Note: This setting differs from [aroundLatLngViaIP], which uses the
   ///   end user’s IP to determine the geo-coordinates.
   ///   - This parameter will be ignored if used along with [insideBoundingBox]
-  ///   or [insidePolygon]
+  ///   or [`insidePolygon`]
   ///   - To control the maximum size of the radius, you would use
   ///     [aroundRadius].
   ///   - To control the minimum size, you would use [minimumAroundRadius].
@@ -309,15 +309,15 @@ class SearchState implements MultiSearchState {
   /// For example: `insideBoundingBox = [[47.3165, 4.9665, 47.3424, 5.0201]]`
   ///
   /// **Usage notes**
-  ///   - You may specify multiple bounding boxes, in which case the search will use the
-  ///     union (OR) of the rectangles. To do this, pass a list of lists of
-  ///     floats (each inner array must contain exactly 4 values); example:
+  ///   - You may specify multiple bounding boxes, in which case the search will
+  ///     use the union (OR) of the rectangles. To do this, pass a list of lists
+  ///     of floats (each inner array must contain exactly 4 values); example:
   ///     [
   ///       [47.3165, 4.9665, 47.3424, 5.0201],
   ///       [40.9234, 2.1185, 38.6430, 1.9916]
   ///     ];
-  ///   - [aroundLatLng] and [aroundLatLngViaIP] will be ignored if used along with this
-  ///     parameter.
+  ///   - [aroundLatLng] and [aroundLatLngViaIP] will be ignored if used along
+  ///     with this parameter.
   ///   - Be careful when your coordinates cross over the `180th meridian`.
   ///
   /// Source: [Learn more](https://www.algolia.com/doc/api-reference/api-parameters/insideBoundingBox/)

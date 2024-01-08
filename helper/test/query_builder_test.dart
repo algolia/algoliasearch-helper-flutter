@@ -37,7 +37,7 @@ void main() {
         Filter.facet('color', 'red'),
         Filter.facet('promo', true),
         Filter.facet('rating', 4.2),
-      })
+      }),
     };
     final query = SearchState(
       indexName: 'index',
@@ -120,7 +120,7 @@ void main() {
     final path = [
       Filter.facet(lvl0, 'a'),
       Filter.facet(lvl1, 'a > b'),
-      Filter.facet(lvl2, 'a > b > c')
+      Filter.facet(lvl2, 'a > b > c'),
     ];
 
     final colorGroup = FacetFilterGroup(
@@ -242,15 +242,15 @@ void main() {
           path: [
             Filter.facet('category.lvl0', 'a'),
             Filter.facet('category.lvl1', 'a > b'),
-            Filter.facet('category.lvl2', 'a > b > c')
+            Filter.facet('category.lvl2', 'a > b > c'),
           ],
           attributes: [
             'category.lvl0',
             'category.lvl1',
             'category.lvl2',
-            'category.lvl3'
+            'category.lvl3',
           ],
-        )
+        ),
       },
     );
 
@@ -266,7 +266,7 @@ void main() {
     };
     final disjunctiveResponse2 = SearchResponse({});
     disjunctiveResponse2.raw['facets'] = {
-      'brand': {'sony': 10, 'apple': 20, 'samsung': 30}
+      'brand': {'sony': 10, 'apple': 20, 'samsung': 30},
     };
     final disjunctiveResponse3 = SearchResponse({});
     disjunctiveResponse3.raw['facets'] = {
@@ -274,7 +274,7 @@ void main() {
         's': 15,
         'm': 20,
         'l': 25,
-      }
+      },
     };
 
     final hierarchicalResponse1 = SearchResponse({});
@@ -283,7 +283,7 @@ void main() {
         'home': 25,
         'electronics': 35,
         'clothes': 45,
-      }
+      },
     };
 
     final hierarchicalResponse2 = SearchResponse({});
@@ -295,7 +295,7 @@ void main() {
         'electronics > appliance': 7,
         'clothes > men': 12,
         'clothes > women': 33,
-      }
+      },
     };
 
     final hierarchicalResponse3 = SearchResponse({});
@@ -309,7 +309,7 @@ void main() {
         'clothes > men > shirts': 12,
         'clothes > women > dresses': 10,
         'clothes > women > jeans': 23,
-      }
+      },
     };
 
     final hierarchicalResponse4 = SearchResponse({});
@@ -330,7 +330,7 @@ void main() {
         'clothes > women > dresses > formal': 3,
         'clothes > women > jeans > regular': 9,
         'clothes > women > jeans > slim': 14,
-      }
+      },
     };
 
     final queryBuilder = QueryBuilder(query);
@@ -361,7 +361,7 @@ void main() {
         Facet('s', 15),
         Facet('m', 20),
         Facet('l', 25),
-      ]
+      ],
     });
 
     expect(aggregatedResponse.disjunctiveFacets, const {
@@ -379,7 +379,7 @@ void main() {
         Facet('s', 15),
         Facet('m', 20),
         Facet('l', 25),
-      ]
+      ],
     });
     expect(aggregatedResponse.hierarchicalFacets, const {
       'categoryl.lvl0': [
@@ -421,7 +421,7 @@ void main() {
         Facet('clothes > women > dresses > formal', 3),
         Facet('clothes > women > jeans > regular', 9),
         Facet('clothes > women > jeans > slim', 14),
-      ]
+      ],
     });
   });
 }

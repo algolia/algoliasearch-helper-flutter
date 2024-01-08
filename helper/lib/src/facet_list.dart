@@ -14,6 +14,7 @@ import 'logger.dart';
 import 'model/facet.dart';
 import 'searcher/hits_searcher.dart';
 import 'selectable_item.dart';
+import 'sequencer.dart';
 
 /// FacetList (refinement list) is a filtering components that displays facets,
 /// and lets the user refine their search results by filtering on specific
@@ -130,7 +131,9 @@ abstract class SelectionState {
   /// Gets a stream of the current selection set.
   ///
   /// This stream emits the latest set of selected items as `Set<String>`.
-  Stream<Set<String>> get selections;
+  Stream<Set<String>> get selectionsStream;
+
+  Set<String> get selections;
 
   /// Applies a differential update to the current selections.
   ///
@@ -141,9 +144,8 @@ abstract class SelectionState {
   /// [selectionsToAdd]: The set of selections to add.
   /// [selectionsToRemove]: An optional set of selections to remove.
   /// `null` indicates that all existing selections should be cleared.
-  void applySelectionsDiff(
-    Set<String> selectionsToAdd,
-    Set<String>? selectionsToRemove,
+  void setSelections(
+    Set<String> selections,
   );
 }
 
@@ -161,7 +163,7 @@ class _FacetList with DisposableMixin implements FacetList {
       ..add(_facets.connect())
       ..add(_inputFacets.connect())
       ..add(
-        _selections.connect(),
+        _selectionsStream.connect(),
       );
   }
 
@@ -183,10 +185,10 @@ class _FacetList with DisposableMixin implements FacetList {
   final Logger _log = algoliaLogger('FacetList');
 
   /// Selectable facets lists stream combining [_inputFacets]
-  /// and [_selections]
+  /// and [_selectionsStream]
   late final _facets = Rx.combineLatest2(
     _inputFacets,
-    _selections,
+    _selectionsStream,
     (List<Facet> facets, Set<String> selections) => _selectableFacets(
       facets,
       selections,
@@ -198,7 +200,10 @@ class _FacetList with DisposableMixin implements FacetList {
   late final _inputFacets = facetsStream.publishValue();
 
   /// Set of selected facet values from the filter state.
-  late final _selections = state.selections.publishValue();
+  late final _selectionsStream = state.selectionsStream.publishValue();
+
+  /// Toggle operations sequencer.
+  final _sequencer = Sequencer();
 
   /// Streams subscriptions composite.
   final CompositeSubscription _subscriptions = CompositeSubscription();
@@ -210,7 +215,7 @@ class _FacetList with DisposableMixin implements FacetList {
   List<SelectableFacet>? snapshot() => _facets.valueOrNull;
 
   void _trackClickIfNeeded(String selection) {
-    _selections.first.then((selections) {
+    _selectionsStream.first.then((selections) {
       if (!selections.contains(selection)) {
         eventTracker?.clickedFilters(
           eventName: 'Filter Applied',
@@ -222,31 +227,25 @@ class _FacetList with DisposableMixin implements FacetList {
 
   @override
   void toggle(String value) {
+    _sequencer.addOperation(() => _performToggle(value));
+  }
+
+  /// Perform toggle operation.
+  Future<void> _performToggle(String value) async {
     _trackClickIfNeeded(value);
-    _log.finest('current selections: $_selections.first -> $value selected');
-    _selectionsSet(_selections, value, selectionMode).then((selections) {
-      switch (selectionMode) {
-        case SelectionMode.single:
-          state.applySelectionsDiff(
-            selections,
-            null,
-          );
-        case SelectionMode.multiple:
-          final input = _inputFacets.first
-              .then((value) => value.map((facet) => facet.value).toSet());
-          final current = _selections.first.then((value) => value.toSet());
-          _facetsToRemove(
-            input,
-            current,
-            persistent,
-          ).then(
-            (toRemove) => state.applySelectionsDiff(
-              selections,
-              toRemove,
-            ),
-          );
-      }
-    });
+    final currentSelections = state.selections;
+    _log.finest('current selections: $currentSelections -> $value selected');
+    final Set<String> selectionsToApply;
+    switch (selectionMode) {
+      case SelectionMode.single:
+        selectionsToApply = currentSelections.contains(value) ? {} : {value};
+      case SelectionMode.multiple:
+        final set = currentSelections.modifiable();
+        selectionsToApply = currentSelections.contains(value)
+            ? (set..remove(value))
+            : (set..add(value));
+    }
+    state.setSelections(selectionsToApply);
   }
 
   /// Creates a list of `SelectableItem<Facet>` from a given list of `Facet`
@@ -305,43 +304,10 @@ class _FacetList with DisposableMixin implements FacetList {
     return [...persistentFacetList, ...facetList];
   }
 
-  /// Get the set of facets to remove in case of multiple selection mode.
-  /// In case of persistent selection, current selections are kept.
-  static Future<Set<String>> _facetsToRemove(
-    Future<Set<String>> input,
-    Future<Set<String>> current,
-    bool persistent,
-  ) async {
-    final inputValues = await input;
-    if (!persistent) return inputValues;
-
-    final currentValues = await current;
-    return {...inputValues, ...currentValues};
-  }
-
-  /// Get new set of selection after a selection operation.
-  /// We use async operation here since [selections] can take some time to get
-  /// current filters (just after initialization).
-  static Future<Set<String>> _selectionsSet(
-    Stream<Set<String>> selections,
-    String selection,
-    SelectionMode selectionMode,
-  ) async {
-    final current = await selections.first;
-    switch (selectionMode) {
-      case SelectionMode.single:
-        return current.contains(selection) ? {} : {selection};
-      case SelectionMode.multiple:
-        final set = current.modifiable();
-        return current.contains(selection)
-            ? (set..remove(selection))
-            : (set..add(selection));
-    }
-  }
-
   @override
   void doDispose() {
     _log.finest('FacetList disposed');
+    _sequencer.dispose();
     _subscriptions.cancel();
   }
 }

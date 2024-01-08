@@ -273,17 +273,20 @@ void main() {
         attribute: 'color',
       );
 
-      FacetList.create(
+      final facetList = FacetList.create(
         facetsStream: facetStream,
         state: filterSelectionState,
-      ).toggle('red');
+      );
+
+      await delay();
+      facetList.toggle('red');
 
       await expectLater(
         filterState.filters,
         emitsThrough(
           StatelessFilters(
             facetGroups: {
-              groupID: {Filter.facet('color', 'green')}
+              groupID: {Filter.facet('color', 'green')},
             },
           ),
         ),
@@ -316,7 +319,6 @@ void main() {
         persistent: true,
       );
 
-      // await for first emit, a quick select will make it skip
       await delay();
       facetList.toggle('green');
 
@@ -332,6 +334,7 @@ void main() {
           ]
         ]),
       );
+      await delay();
     });
   });
 
@@ -419,6 +422,39 @@ void main() {
       ).called(1);
     });
   });
+
+  test('Toggle two facets', () async {
+    final searcher = mockHitsSearcher({
+      'facets': {
+        'color': {
+          'red': 1,
+          'green': 1,
+          'blue': 1,
+        },
+      },
+    });
+
+    final filterState = FilterState();
+    final facetList = searcher.buildFacetList(
+      filterState: filterState,
+      attribute: 'color',
+    );
+
+    final toggleFacets = ['red', 'blue'];
+    await delay();
+
+    for (final facet in toggleFacets) {
+      facetList.toggle(facet);
+    }
+    await delay();
+    final filters = filterState.snapshot();
+    expect(filters.facetGroups, {
+      const FilterGroupID('color', FilterOperator.or): {
+        Filter.facet('color', 'red'),
+        Filter.facet('color', 'blue'),
+      },
+    });
+  });
 }
 
 class MockSelectionState implements SelectionState {
@@ -427,24 +463,19 @@ class MockSelectionState implements SelectionState {
   }
 
   @override
-  void applySelectionsDiff(
-    Set<String> selectionsToAdd,
-    Set<String>? selectionsToRemove,
-  ) {
-    var currentSelections = _selectionsSubject.value;
-    currentSelections = selectionsToRemove == null
-        ? {}
-        : currentSelections.difference(selectionsToRemove.toSet())
-      ..addAll(selectionsToAdd);
-
-    _selectionsSubject.add(currentSelections);
-  }
+  void setSelections(
+    Set<String> selections,
+  ) =>
+      _selectionsSubject.add(selections);
 
   final BehaviorSubject<Set<String>> _selectionsSubject =
       BehaviorSubject<Set<String>>();
 
   @override
-  Stream<Set<String>> get selections => _selectionsSubject.stream;
+  Stream<Set<String>> get selectionsStream => _selectionsSubject.stream;
+
+  @override
+  Set<String> get selections => _selectionsSubject.value;
 }
 
 class MockEventDataDelegate implements EventDataDelegate {

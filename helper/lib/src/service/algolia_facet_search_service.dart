@@ -22,7 +22,7 @@ class AlgoliaFacetSearchService implements FacetSearchService {
                 algolia.AgentSegment(
                   value: 'algolia-helper-flutter',
                   version: libVersion,
-                )
+                ),
               ],
             ),
           ),

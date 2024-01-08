@@ -56,7 +56,7 @@ void main() {
             'value': 'v',
             'count': 1,
           },
-        ]
+        ],
       });
       when(searchService.search(any)).thenAnswer((_) => Future.value(initial));
       final searcher = FacetSearcher.custom(
@@ -149,7 +149,7 @@ void main() {
           emitsInOrder([
             emits(matchesQuery('c')),
             emits(matchesQuery('ca')),
-            emits(matchesQuery('cat'))
+            emits(matchesQuery('cat')),
           ]),
         ),
       );
