@@ -28,7 +28,7 @@ class AlgoliaEventService implements EventService {
                 AgentSegment(
                   value: 'algolia-insights-flutter',
                   version: libVersion,
-                )
+                ),
               ],
             ),
           ),

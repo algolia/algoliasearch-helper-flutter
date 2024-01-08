@@ -10,7 +10,6 @@ import 'filter.dart';
 import 'filter_group.dart';
 import 'filters.dart';
 import 'logger.dart';
-import 'sequencer.dart';
 
 /// [FilterState] holds one or several filters, organized in groups.
 /// [filters] streams filters changes of added or removed filters,

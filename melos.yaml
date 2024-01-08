@@ -11,6 +11,10 @@ scripts:
   format: 
     exec: dart format .
 
+  fix:
+    exec: dart fix --apply
+    description: Find and fix static analysis issues in all packages
+
   pana:
     exec: pana --no-warning --exit-code-threshold 0
     description: |

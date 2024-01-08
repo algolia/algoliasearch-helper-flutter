@@ -286,7 +286,7 @@ void main() {
         emitsThrough(
           StatelessFilters(
             facetGroups: {
-              groupID: {Filter.facet('color', 'green')}
+              groupID: {Filter.facet('color', 'green')},
             },
           ),
         ),
@@ -430,8 +430,8 @@ void main() {
           'red': 1,
           'green': 1,
           'blue': 1,
-        }
-      }
+        },
+      },
     });
 
     final filterState = FilterState();
@@ -452,7 +452,7 @@ void main() {
       const FilterGroupID('color', FilterOperator.or): {
         Filter.facet('color', 'red'),
         Filter.facet('color', 'blue'),
-      }
+      },
     });
   });
 }

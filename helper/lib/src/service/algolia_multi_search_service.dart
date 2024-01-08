@@ -28,7 +28,7 @@ final class AlgoliaMultiSearchService extends MultiSearchService {
                 algolia.AgentSegment(
                   value: 'algolia-helper-flutter',
                   version: libVersion,
-                )
+                ),
               ],
             ),
           ),

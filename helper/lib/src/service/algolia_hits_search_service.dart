@@ -23,7 +23,7 @@ class AlgoliaHitsSearchService implements HitsSearchService {
                 algolia.AgentSegment(
                   value: 'algolia-helper-flutter',
                   version: libVersion,
-                )
+                ),
               ],
             ),
           ),

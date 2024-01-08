@@ -152,7 +152,7 @@ void main() {
           emitsInOrder([
             emits(matchesQuery('c')),
             emits(matchesQuery('ca')),
-            emits(matchesQuery('cat'))
+            emits(matchesQuery('cat')),
           ]),
         ),
       );
@@ -272,7 +272,7 @@ void main() {
 
     final updated = initSearchState.copyWith(
       filterGroups: {
-        FacetFilterGroup(groupColors, {facetColorRed})
+        FacetFilterGroup(groupColors, {facetColorRed}),
       },
     );
     final snapshot = searcher.snapshot();
@@ -477,7 +477,7 @@ Future<SearchResponse> mockResponse(Invocation inv) async {
     'query': state.query,
     'hits': [
       {'objectID': 'h1'},
-      {'objectID': 'h2'}
+      {'objectID': 'h2'},
     ],
     'queryID': '123',
   });

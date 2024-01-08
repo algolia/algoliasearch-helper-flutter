@@ -12,7 +12,7 @@ void main() {
       storage = UserTokenStorage.custom(
         'unit_test',
         Invoker.current!.liveTest.test.name,
-      )
+      ),
     },
   );
 
