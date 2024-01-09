@@ -127,23 +127,26 @@ enum SelectionMode { single, multiple }
 /// [Facet] with selection status.
 typedef SelectableFacet = SelectableItem<Facet>;
 
+/// The `SelectionState` abstract class represents a way to manage a selection
+/// state.
 abstract class SelectionState {
   /// Gets a stream of the current selection set.
   ///
   /// This stream emits the latest set of selected items as `Set<String>`.
   Stream<Set<String>> get selectionsStream;
 
+  /// Gets the current set of selected items.
+  ///
+  /// This getter provides immediate access to the current selection state. It
+  /// returns a `Set<String>` representing the items that are currently
+  /// selected. This can be useful for obtaining the selection state at a
+  /// specific point in time.
   Set<String> get selections;
 
-  /// Applies a differential update to the current selections.
+  /// Sets the current selection set.
   ///
-  /// This method applies a set of selections to add and optionally a set
-  /// of selections to remove. If the removal set is `null`, it indicates
-  /// that all existing selections should be cleared.
-  ///
-  /// [selectionsToAdd]: The set of selections to add.
-  /// [selectionsToRemove]: An optional set of selections to remove.
-  /// `null` indicates that all existing selections should be cleared.
+  /// This method allows for programmatically updating the set of selected
+  /// items.
   void setSelections(
     Set<String> selections,
   );
