@@ -1,6 +1,6 @@
 name: algolia_helper_workspace
 
 environment:
-  sdk: '>=2.18.0 <3.0.0'
+  sdk: ">=2.18.0 <3.0.0"
 dev_dependencies:
-  melos: ^3.0.1
+  melos: ^3.4.0
