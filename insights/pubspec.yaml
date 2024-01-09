@@ -1,6 +1,6 @@
 name: algolia_insights
 description: Algolia Insights for Dart provides a simple and flexible way to track events such as clicks, conversions, and views on search results.
-version: 1.0.0
+version: 1.0.0-pre
 homepage: https://www.algolia.com/doc/guides/building-search-ui/what-is-instantsearch/flutter/
 repository: https://github.com/algolia/algoliasearch-helper-flutter/tree/main/insights
 
