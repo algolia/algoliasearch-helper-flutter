@@ -20,13 +20,13 @@ Packages with other changes:
 
 ---
 
-#### `algolia_helper_flutter` - `v1.0.0`
+#### `algolia_helper_flutter` - `v1.0.0-pre`
 
  - **REFACTOR**(FacetList): refactor facet list component (#118).
  - **FIX**(facetlist): multiple facet toggle (#120).
  - **FIX**(facet): export facet model (#112).
 
-#### `algolia_insights` - `v1.0.0`
+#### `algolia_insights` - `v1.0.0-pre`
 
  - **REFACTOR**(FacetList): refactor facet list component (#118).
  - **FIX**(facetlist): multiple facet toggle (#120).

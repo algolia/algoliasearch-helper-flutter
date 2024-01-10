@@ -1,4 +1,4 @@
-## 1.0.0
+## 1.0.0-pre
 
  - **REFACTOR**(FacetList): refactor facet list component (#118).
  - **FIX**(facetlist): multiple facet toggle (#120).
