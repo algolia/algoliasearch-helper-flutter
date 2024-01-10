@@ -8,8 +8,8 @@
 
 | Package                          | Description                  | Version                                                                                                                    | Release stage                                                          |
 |----------------------------------|------------------------------|----------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------|
-| [algolia_insights](insights)     | Algolia Insights for Flutter | [![pub package](https://img.shields.io/pub/v/algolia_insights.svg)](https://pub.dev/packages/algolia_insights)             | ![beta version](https://img.shields.io/badge/release-beta-yellowgreen) |
-| [algolia_helper_flutter](helper) | Algolia Helpers for Flutter  | [![pub package](https://img.shields.io/pub/v/algolia_helper_flutter.svg)](https://pub.dev/packages/algolia_helper_flutter) | ![beta version](https://img.shields.io/badge/release-beta-yellowgreen) |
+| [algolia_insights](insights)     | Algolia Insights for Flutter | [![pub package](https://img.shields.io/pub/v/algolia_insights.svg)](https://pub.dev/packages/algolia_insights)             | ![stable version](https://img.shields.io/badge/release-stable-green) |
+| [algolia_helper_flutter](helper) | Algolia Helpers for Flutter  | [![pub package](https://img.shields.io/pub/v/algolia_helper_flutter.svg)](https://pub.dev/packages/algolia_helper_flutter) | ![stable version](https://img.shields.io/badge/release-stable-green) |
 
 ## 📄 Documentation
 
