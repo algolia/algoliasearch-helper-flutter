@@ -257,7 +257,7 @@ class _HitsSearcher with DisposableMixin implements HitsSearcher {
   final HitsSearchService searchService;
 
   @override
-  late final HitsEventTracker? eventTracker;
+  HitsEventTracker? eventTracker;
 
   /// Search state debounce duration
   final Duration debounce;
