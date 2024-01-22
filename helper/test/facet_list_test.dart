@@ -152,6 +152,31 @@ void main() {
         ),
       );
     });
+
+    test('Build FacetList without EventTracker', () {
+      final searcher = HitsSearcher.custom(
+        MockHitsSearchService(),
+        null,
+        const SearchState(indexName: 'myIndex'),
+      );
+
+      final filterState = FilterState();
+
+      // Create a disjunctive FacetList
+      searcher.buildFacetList(
+        filterState: filterState,
+        attribute: 'color',
+      );
+
+      expect(
+        searcher.snapshot(),
+        const SearchState(
+          indexName: 'myIndex',
+          facets: ['color'],
+          disjunctiveFacets: {'color'},
+        ),
+      );
+    });
   });
 
   group('Update filter state', () {
