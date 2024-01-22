@@ -1,1 +1,1 @@
-const libVersion = '1.0.0-pre';
+const libVersion = '1.0.0';

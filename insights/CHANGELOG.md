@@ -1,3 +1,7 @@
+## 1.0.0
+
+ - **FIX**(HitsSearcher): non-initialized EventTracker (#123).
+
 ## 1.0.0-pre
 
  - **REFACTOR**(FacetList): refactor facet list component (#118).
