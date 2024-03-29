@@ -184,15 +184,13 @@ class _StatelessFilters implements StatelessFilters {
   /// Checks if [filter] with [groupID] exists.
   @override
   bool contains(FilterGroupID groupID, Filter filter) {
-    switch (filter.runtimeType) {
-      case FilterFacet:
+    switch (filter) {
+      case FilterFacet():
         return facetGroups[groupID]?.contains(filter) ?? false;
-      case FilterTag:
+      case FilterTag():
         return tagGroups[groupID]?.contains(filter) ?? false;
-      case FilterNumeric:
+      case FilterNumeric():
         return numericGroups[groupID]?.contains(filter) ?? false;
-      default:
-        return false;
     }
   }
 
@@ -221,22 +219,20 @@ class _StatelessFilters implements StatelessFilters {
   StatelessFilters add(FilterGroupID groupID, Iterable<Filter> filters) {
     StatelessFilters current = this;
     for (final filter in filters) {
-      switch (filter.runtimeType) {
-        case FilterFacet:
+      switch (filter) {
+        case FilterFacet():
           current = current.copyWith(
-            facetGroups:
-                current.facetGroups.add(groupID, filter as FilterFacet),
+            facetGroups: current.facetGroups.add(groupID, filter),
           );
           break;
-        case FilterTag:
+        case FilterTag():
           current = current.copyWith(
-            tagGroups: current.tagGroups.add(groupID, filter as FilterTag),
+            tagGroups: current.tagGroups.add(groupID, filter),
           );
           break;
-        case FilterNumeric:
+        case FilterNumeric():
           current = current.copyWith(
-            numericGroups:
-                current.numericGroups.add(groupID, filter as FilterNumeric),
+            numericGroups: current.numericGroups.add(groupID, filter),
           );
           break;
       }
@@ -266,22 +262,20 @@ class _StatelessFilters implements StatelessFilters {
   StatelessFilters remove(FilterGroupID groupID, Iterable<Filter> filters) {
     StatelessFilters current = this;
     for (final filter in filters) {
-      switch (filter.runtimeType) {
-        case FilterFacet:
+      switch (filter) {
+        case FilterFacet():
           current = current.copyWith(
-            facetGroups:
-                current.facetGroups.delete(groupID, filter as FilterFacet),
+            facetGroups: current.facetGroups.delete(groupID, filter),
           );
           break;
-        case FilterTag:
+        case FilterTag():
           current = current.copyWith(
-            tagGroups: current.tagGroups.delete(groupID, filter as FilterTag),
+            tagGroups: current.tagGroups.delete(groupID, filter),
           );
           break;
-        case FilterNumeric:
+        case FilterNumeric():
           current = current.copyWith(
-            numericGroups:
-                current.numericGroups.delete(groupID, filter as FilterNumeric),
+            numericGroups: current.numericGroups.delete(groupID, filter),
           );
           break;
       }
