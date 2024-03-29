@@ -11,16 +11,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-        title: 'Algolia Helpers for Flutter',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: Provider<SearchController>(
-          create: (_) => SearchController(),
-          dispose: (_, value) => value.dispose(),
-          child: const MyHomePage(),
-        ),
-      );
+    title: 'Algolia Helpers for Flutter',
+    theme: ThemeData(
+      primarySwatch: Colors.blue,
+    ),
+    home: Provider<SearchController>(
+      create: (_) => SearchController(),
+      dispose: (_, value) => value.dispose(),
+      child: const MyHomePage(),
+    ),
+  );
 }
 
 class SearchController {
@@ -33,16 +33,12 @@ class SearchController {
     apiKey: '1f6fd3a6fb973cb08419fe7d288fa4db',
     indexName: 'instant_search',
   )
-    // 2.2. Create a connection between the searcher and the filter state
+  // 2.2. Create a connection between the searcher and the filter state
     ..connectFilterState(filterState);
 
   // 3. Create facet list (refinement list) component.
-  late final FacetList facetList = FacetList(
-    searcher: searcher,
-    filterState: filterState,
-    attribute: 'brand',
-    persistent: true,
-  );
+  late final facetList = searcher.buildFacetList(
+      filterState: filterState, attribute: 'brand', persistent: true);
 
   // 4.1 Components (disposables) composite
   late final _components = CompositeDisposable()
@@ -107,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       text: TextSpan(
                         style: Theme.of(context).textTheme.titleSmall,
                         children:
-                            hit.getHighlightedString('name').toInlineSpans(),
+                        hit.getHighlightedString('name').toInlineSpans(),
                       ),
                     ),
                   );
@@ -155,7 +151,7 @@ class _FiltersPageState extends State<FiltersPage> {
                 return ListTile(
                   title: Text(
                     '${facet.value} '
-                    "${facet.count > 0 ? '(${facet.count})' : ''} ",
+                        "${facet.count > 0 ? '(${facet.count})' : ''} ",
                   ),
                   trailing: model.isSelected ? const Icon(Icons.check) : null,
                   onTap: () {

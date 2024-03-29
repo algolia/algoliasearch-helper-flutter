@@ -1,4 +1,5 @@
 import 'package:algolia_insights/algolia_insights.dart';
+import 'package:meta/meta.dart';
 
 import 'facet_list.dart';
 import 'filter_group.dart';
@@ -22,6 +23,7 @@ extension HitsSearcherFacetListExtension on HitsSearcher {
     );
   }
 
+  @experimental
   FacetList buildFacetList({
     required FilterState filterState,
     required String attribute,

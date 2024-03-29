@@ -87,22 +87,6 @@ abstract interface class FacetList implements Disposable {
         eventTracker: eventTracker,
       );
 
-  /// Create [FacetList] instance.
-  factory FacetList.create({
-    required Stream<List<Facet>> facetsStream,
-    required SelectionState state,
-    SelectionMode selectionMode = SelectionMode.multiple,
-    bool persistent = false,
-    FilterEventTracker? eventTracker,
-  }) =>
-      _FacetList(
-        facetsStream: facetsStream,
-        state: state,
-        selectionMode: selectionMode,
-        persistent: persistent,
-        eventTracker: eventTracker,
-      );
-
   /// Selection state
   SelectionState get state;
 
