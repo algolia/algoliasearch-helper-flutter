@@ -78,7 +78,7 @@ extension HighlightableFacet on Facet {
 ///    HighlightToken{content: 'athan.', highlighted: false},
 /// ]
 /// ```
-class HighlightedString {
+final class HighlightedString {
   /// Creates [HighlightedString] instance.
   HighlightedString._(
     this.original,
@@ -149,7 +149,7 @@ HighlightedString _highlightTokenizer(
 
 /// Highlightable string token.
 /// [isHighlighted] returning `true` indicates that [content] is highlighted.
-class HighlightableToken {
+final class HighlightableToken {
   HighlightableToken._(this.content, this.isHighlighted);
 
   /// Token string.

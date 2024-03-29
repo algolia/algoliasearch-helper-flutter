@@ -69,7 +69,7 @@ import 'filter.dart';
 ///   filters: {Filter.facet('category.lvl1', 'Shoes > Running')},
 /// );
 /// ```
-abstract class FilterGroup<T extends Filter> implements Set<T> {
+abstract interface class FilterGroup<T extends Filter> implements Set<T> {
   /// Create a filter group of [FilterFacet] filters.
   @factory
   static FacetFilterGroup facet({
@@ -139,7 +139,7 @@ abstract class FilterGroup<T extends Filter> implements Set<T> {
 /// ```dart
 /// const groupID = FilterGroupID('colors', FilterOperator.or);
 /// ```
-class FilterGroupID {
+final class FilterGroupID {
   const FilterGroupID([this.name = '', this.operator = FilterOperator.and]);
 
   /// Create and [FilterGroupID] with operator [FilterOperator.and].
@@ -212,7 +212,7 @@ enum FilterOperator {
 ///   operator: FilterOperator.and,
 /// );
 /// ```
-class FacetFilterGroup extends DelegatingSet<FilterFacet>
+final class FacetFilterGroup extends DelegatingSet<FilterFacet>
     implements FilterGroup<FilterFacet> {
   /// Creates a [FilterGroup] instance.
   const FacetFilterGroup(this.groupID, this._filters) : super(_filters);
@@ -279,7 +279,7 @@ class FacetFilterGroup extends DelegatingSet<FilterFacet>
 ///   },
 /// );
 /// ```
-class TagFilterGroup extends DelegatingSet<FilterTag>
+final class TagFilterGroup extends DelegatingSet<FilterTag>
     implements FilterGroup<FilterTag> {
   /// Creates a [TagFilterGroup] instance.
   const TagFilterGroup(this.groupID, this._filters) : super(_filters);
@@ -345,7 +345,7 @@ class TagFilterGroup extends DelegatingSet<FilterTag>
 ///   },
 /// );
 /// ```
-class NumericFilterGroup extends DelegatingSet<FilterNumeric>
+final class NumericFilterGroup extends DelegatingSet<FilterNumeric>
     implements FilterGroup<FilterNumeric> {
   /// Creates a [NumericFilterGroup] instance.
   const NumericFilterGroup(this.groupID, this._filters) : super(_filters);
@@ -420,7 +420,7 @@ class NumericFilterGroup extends DelegatingSet<FilterNumeric>
 ///     filters: {shoesRunning},
 ///   );
 /// ```
-class HierarchicalFilterGroup extends DelegatingSet<FilterFacet>
+final class HierarchicalFilterGroup extends DelegatingSet<FilterFacet>
     implements FilterGroup<FilterFacet> {
   /// Creates an [HierarchicalFilterGroup] instance.
   HierarchicalFilterGroup(

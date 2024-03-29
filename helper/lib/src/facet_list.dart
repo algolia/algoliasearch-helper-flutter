@@ -70,8 +70,7 @@ import 'sequencer.dart';
 /// facetList.dispose();
 /// ```
 @experimental
-@sealed
-abstract class FacetList implements Disposable {
+abstract interface class FacetList implements Disposable {
   /// Create [FacetList] instance.
   factory FacetList({
     required Stream<List<Facet>> facetsStream,
@@ -129,7 +128,7 @@ typedef SelectableFacet = SelectableItem<Facet>;
 
 /// The `SelectionState` abstract class represents a way to manage a selection
 /// state.
-abstract class SelectionState {
+abstract interface class SelectionState {
   /// Gets a stream of the current selection set.
   ///
   /// This stream emits the latest set of selected items as `Set<String>`.
@@ -153,7 +152,7 @@ abstract class SelectionState {
 }
 
 /// Default implementation of [FacetList].
-class _FacetList with DisposableMixin implements FacetList {
+final class _FacetList with DisposableMixin implements FacetList {
   /// Create [_FacetList] instance.
   _FacetList({
     required this.facetsStream,

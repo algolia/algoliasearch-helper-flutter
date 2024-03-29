@@ -8,8 +8,7 @@ import 'filter_group.dart';
 typedef FilterGroupMap<T> = Map<FilterGroupID, Set<T>>;
 
 /// Filter groups: facet, tag, numeric and hierarchical.
-@sealed
-abstract class Filters {
+abstract interface class Filters {
   /// Map of facet filter groups.
   FilterGroupMap<FilterFacet> get facetGroups;
 
@@ -61,8 +60,7 @@ typedef ImmutableFilters = StatelessFilters;
 
 /// Stateless (immutable) filters implementation.
 /// **All operations create a new object with requested changes.**
-@sealed
-abstract class StatelessFilters implements Filters {
+abstract interface class StatelessFilters implements Filters {
   /// Stateless filters' factory.
   factory StatelessFilters({
     Map<FilterGroupID, Set<FilterFacet>> facetGroups = const {},
@@ -115,7 +113,7 @@ abstract class StatelessFilters implements Filters {
 }
 
 /// Default implementation of [StatelessFilters].
-class _StatelessFilters implements StatelessFilters {
+final class _StatelessFilters implements StatelessFilters {
   /// Creates [_StatelessFilters] instance.
   const _StatelessFilters({
     this.facetGroups = const {},

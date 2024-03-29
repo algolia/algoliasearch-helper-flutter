@@ -4,7 +4,7 @@ import 'filter.dart';
 import 'filter_group.dart';
 
 /// Converts [FilterGroup] to an SQL like syntax.
-class FilterGroupConverter {
+final class FilterGroupConverter {
   /// Creates [FilterGroupConverter] instance.
   const FilterGroupConverter();
 
@@ -40,7 +40,7 @@ class FilterGroupConverter {
 }
 
 /// Converts [Filter] to an SQL like syntax.
-class FilterConverter {
+final class FilterConverter {
   /// Creates [FilterConverter] instance.
   const FilterConverter();
 
