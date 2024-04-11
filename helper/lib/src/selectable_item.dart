@@ -1,5 +1,5 @@
 /// Represents a value with selection status.
-class SelectableItem<T> {
+final class SelectableItem<T> {
   /// Creates [SelectableItem] instance.
   const SelectableItem({required this.item, required this.isSelected});
 

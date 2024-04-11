@@ -4,7 +4,7 @@ import 'filter_state.dart';
 import 'searcher/hits_searcher.dart';
 
 /// Represents an object able to release it's resources.
-abstract class Disposable {
+abstract interface class Disposable {
   /// Whether this [Disposable] has already released its resources.
   bool get isDisposed;
 
@@ -50,7 +50,7 @@ abstract class Disposable {
 /// ```dart
 /// composite.dispose()
 /// ```
-abstract class CompositeDisposable implements Disposable {
+abstract interface class CompositeDisposable implements Disposable {
   /// Creates [CompositeDisposable] instance.
   factory CompositeDisposable() => _CompositeDisposable();
 
@@ -75,7 +75,9 @@ abstract class CompositeDisposable implements Disposable {
 }
 
 /// Default implementation of [CompositeDisposable].
-class _CompositeDisposable with DisposableMixin implements CompositeDisposable {
+final class _CompositeDisposable
+    with DisposableMixin
+    implements CompositeDisposable {
   /// List of [Disposable]s.
   final List<Disposable> _disposables = [];
 

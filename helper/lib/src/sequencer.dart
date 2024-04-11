@@ -5,7 +5,7 @@ import 'disposable_mixin.dart';
 import 'logger.dart';
 
 /// A simple sequencer that ensures that tasks are run in order.
-class Sequencer with DisposableMixin {
+final class Sequencer with DisposableMixin {
   final _operationQueue = Queue<Future<void> Function()>();
   var _isProcessing = false;
   var _isCancelled = false;

@@ -198,7 +198,7 @@ void main() {
         attribute: 'color',
       );
 
-      FacetList.create(
+      FacetList(
         facetsStream: facetStream,
         state: filterSelectionState,
       ).toggle('red');
@@ -227,7 +227,7 @@ void main() {
         attribute: 'color',
       );
 
-      final facetList = FacetList.create(
+      final facetList = FacetList(
         facetsStream: facetStream,
         state: filterSelectionState,
         persistent: true,
@@ -263,7 +263,7 @@ void main() {
         attribute: 'color',
       );
 
-      final facetList = FacetList.create(
+      final facetList = FacetList(
         facetsStream: facetStream,
         state: filterSelectionState,
         selectionMode: SelectionMode.single,
@@ -298,7 +298,7 @@ void main() {
         attribute: 'color',
       );
 
-      final facetList = FacetList.create(
+      final facetList = FacetList(
         facetsStream: facetStream,
         state: filterSelectionState,
       );
@@ -338,7 +338,7 @@ void main() {
         attribute: 'color',
       );
 
-      final facetList = FacetList.create(
+      final facetList = FacetList(
         facetsStream: facetStream,
         state: filterSelectionState,
         persistent: true,
@@ -385,7 +385,7 @@ void main() {
       expect(realInvocation.positionalArguments[2], 'red');
     });
 
-    FacetList.create(
+    FacetList(
       facetsStream: facetStream,
       state: MockSelectionState(),
       persistent: true,

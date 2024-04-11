@@ -1,11 +1,10 @@
 import 'package:meta/meta.dart';
 
 /// Exception thrown when an error occurs during search operations.
-@sealed
-abstract class AlgoliaException implements Exception {}
+sealed class AlgoliaException implements Exception {}
 
 /// Exception thrown when an error occurs during search requests.
-class SearchError extends AlgoliaException {
+final class SearchError extends AlgoliaException {
   /// Creates [SearchError] instance.
   @internal
   SearchError(this.error, this.statusCode);

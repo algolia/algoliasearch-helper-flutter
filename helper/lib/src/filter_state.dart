@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:logging/logging.dart';
-import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'disposable.dart';
@@ -59,8 +58,7 @@ import 'logger.dart';
 ///   filterState.clear(authors); // clears filter group 'authors'
 ///   filterState.clearExcept([authors]); // clears all filter groups except 'authors'
 /// ```
-@sealed
-abstract class FilterState implements Disposable {
+abstract interface class FilterState implements Disposable {
   /// FilterState's factory.
   factory FilterState() => _FilterState();
 
@@ -114,7 +112,7 @@ typedef AsyncFiltersBuilder = Future<StatelessFilters> Function(
 );
 
 /// Default implementation of [FilterState].
-class _FilterState with DisposableMixin implements FilterState {
+final class _FilterState with DisposableMixin implements FilterState {
   @override
   Stream<Filters> get filters => _filters.stream.distinct();
 

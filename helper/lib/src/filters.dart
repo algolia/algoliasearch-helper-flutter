@@ -8,8 +8,7 @@ import 'filter_group.dart';
 typedef FilterGroupMap<T> = Map<FilterGroupID, Set<T>>;
 
 /// Filter groups: facet, tag, numeric and hierarchical.
-@sealed
-abstract class Filters {
+abstract interface class Filters {
   /// Map of facet filter groups.
   FilterGroupMap<FilterFacet> get facetGroups;
 
@@ -61,8 +60,7 @@ typedef ImmutableFilters = StatelessFilters;
 
 /// Stateless (immutable) filters implementation.
 /// **All operations create a new object with requested changes.**
-@sealed
-abstract class StatelessFilters implements Filters {
+abstract interface class StatelessFilters implements Filters {
   /// Stateless filters' factory.
   factory StatelessFilters({
     Map<FilterGroupID, Set<FilterFacet>> facetGroups = const {},
@@ -115,7 +113,7 @@ abstract class StatelessFilters implements Filters {
 }
 
 /// Default implementation of [StatelessFilters].
-class _StatelessFilters implements StatelessFilters {
+final class _StatelessFilters implements StatelessFilters {
   /// Creates [_StatelessFilters] instance.
   const _StatelessFilters({
     this.facetGroups = const {},
@@ -184,15 +182,13 @@ class _StatelessFilters implements StatelessFilters {
   /// Checks if [filter] with [groupID] exists.
   @override
   bool contains(FilterGroupID groupID, Filter filter) {
-    switch (filter.runtimeType) {
-      case FilterFacet:
+    switch (filter) {
+      case FilterFacet():
         return facetGroups[groupID]?.contains(filter) ?? false;
-      case FilterTag:
+      case FilterTag():
         return tagGroups[groupID]?.contains(filter) ?? false;
-      case FilterNumeric:
+      case FilterNumeric():
         return numericGroups[groupID]?.contains(filter) ?? false;
-      default:
-        return false;
     }
   }
 
@@ -221,22 +217,20 @@ class _StatelessFilters implements StatelessFilters {
   StatelessFilters add(FilterGroupID groupID, Iterable<Filter> filters) {
     StatelessFilters current = this;
     for (final filter in filters) {
-      switch (filter.runtimeType) {
-        case FilterFacet:
+      switch (filter) {
+        case FilterFacet():
           current = current.copyWith(
-            facetGroups:
-                current.facetGroups.add(groupID, filter as FilterFacet),
+            facetGroups: current.facetGroups.add(groupID, filter),
           );
           break;
-        case FilterTag:
+        case FilterTag():
           current = current.copyWith(
-            tagGroups: current.tagGroups.add(groupID, filter as FilterTag),
+            tagGroups: current.tagGroups.add(groupID, filter),
           );
           break;
-        case FilterNumeric:
+        case FilterNumeric():
           current = current.copyWith(
-            numericGroups:
-                current.numericGroups.add(groupID, filter as FilterNumeric),
+            numericGroups: current.numericGroups.add(groupID, filter),
           );
           break;
       }
@@ -266,22 +260,20 @@ class _StatelessFilters implements StatelessFilters {
   StatelessFilters remove(FilterGroupID groupID, Iterable<Filter> filters) {
     StatelessFilters current = this;
     for (final filter in filters) {
-      switch (filter.runtimeType) {
-        case FilterFacet:
+      switch (filter) {
+        case FilterFacet():
           current = current.copyWith(
-            facetGroups:
-                current.facetGroups.delete(groupID, filter as FilterFacet),
+            facetGroups: current.facetGroups.delete(groupID, filter),
           );
           break;
-        case FilterTag:
+        case FilterTag():
           current = current.copyWith(
-            tagGroups: current.tagGroups.delete(groupID, filter as FilterTag),
+            tagGroups: current.tagGroups.delete(groupID, filter),
           );
           break;
-        case FilterNumeric:
+        case FilterNumeric():
           current = current.copyWith(
-            numericGroups:
-                current.numericGroups.delete(groupID, filter as FilterNumeric),
+            numericGroups: current.numericGroups.delete(groupID, filter),
           );
           break;
       }

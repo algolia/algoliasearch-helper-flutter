@@ -4,7 +4,7 @@ import 'filter.dart';
 import 'filter_group.dart';
 
 /// Converts [FilterGroup] to an SQL like syntax.
-class FilterGroupConverter {
+final class FilterGroupConverter {
   /// Creates [FilterGroupConverter] instance.
   const FilterGroupConverter();
 
@@ -18,7 +18,7 @@ class FilterGroupConverter {
 
   /// Same as [sql], but removes quotes for readability purposes.
   String? unquoted(Set<FilterGroup<Filter>> filterGroups) =>
-      sql(filterGroups)?.replaceAll('\"', '');
+      sql(filterGroups)?.replaceAll('"', '');
 
   /// Convert a filter group to an SQL-like syntax
   String _sqlGroup(FilterGroup<Filter> group) {
@@ -40,21 +40,19 @@ class FilterGroupConverter {
 }
 
 /// Converts [Filter] to an SQL like syntax.
-class FilterConverter {
+final class FilterConverter {
   /// Creates [FilterConverter] instance.
   const FilterConverter();
 
   /// Converts [Filter] to its SQL-like [String] representation.
   String sql(Filter filter) {
-    switch (filter.runtimeType) {
-      case FilterFacet:
-        return _sqlFacet(filter as FilterFacet);
-      case FilterTag:
-        return _sqlTag(filter as FilterTag);
-      case FilterNumeric:
-        return _sqlNumeric(filter as FilterNumeric);
-      default:
-        throw ArgumentError('Filter type ${filter.runtimeType} not supported');
+    switch (filter) {
+      case FilterFacet():
+        return _sqlFacet(filter);
+      case FilterTag():
+        return _sqlTag(filter);
+      case FilterNumeric():
+        return _sqlNumeric(filter);
     }
   }
 
@@ -77,16 +75,17 @@ class FilterConverter {
 
   /// Converts [FilterNumeric] to its SQL-like [String] representation.
   String _sqlNumeric(FilterNumeric filter) {
-    switch (filter.value.runtimeType) {
-      case NumericRange:
+    var value = filter.value;
+    switch (value) {
+      case NumericRange():
         return _sqlRange(
-          filter.value as NumericRange,
+          value,
           filter.attribute,
           filter.isNegated,
         );
-      case NumericComparison:
+      case NumericComparison():
         return _sqlComparison(
-          filter.value as NumericComparison,
+          value,
           filter.attribute,
           filter.isNegated,
         );
@@ -120,12 +119,12 @@ class FilterConverter {
 
   /// Converts [value] to its SQL-like [String] representation.
   String _sqlValue(dynamic value) {
-    switch (value.runtimeType) {
-      case String:
-        return _escape(value as String);
-      case int:
-      case double:
-      case bool:
+    switch (value) {
+      case String():
+        return _escape(value);
+      case int():
+      case double():
+      case bool():
         return value.toString();
       default:
         throw ArgumentError('value type ${value.runtimeType} not supported');
@@ -133,5 +132,5 @@ class FilterConverter {
   }
 
   /// String escape [value].
-  String _escape(String value) => '\"$value\"';
+  String _escape(String value) => '"$value"';
 }

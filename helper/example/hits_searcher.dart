@@ -19,18 +19,18 @@ void main() {
 
   searcher.query('a');
 
-  searcher.eventTracker.clickedObjects(
+  searcher.eventTracker?.clickedObjects(
     eventName: 'clicked objects',
     objectIDs: ['object1', 'object2', 'object3'],
     positions: [1, 2, 3],
   );
 
-  searcher.eventTracker.viewedObjects(
+  searcher.eventTracker?.viewedObjects(
     eventName: 'viewed objects',
     objectIDs: ['object1', 'object2', 'object3'],
   );
 
-  searcher.eventTracker.convertedObjects(
+  searcher.eventTracker?.convertedObjects(
     eventName: 'converted objects',
     objectIDs: ['object1', 'object2', 'object3'],
   );

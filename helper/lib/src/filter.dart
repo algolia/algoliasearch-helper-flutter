@@ -46,8 +46,7 @@ import 'package:meta/meta.dart';
 /// // rating:3 TO 5
 /// final filter = Filter.range('rating', lowerBound: 3, upperBound: 5);
 /// ```
-@sealed
-abstract class Filter {
+sealed class Filter {
   /// Creates [Filter] instance.
   const Filter._(this.attribute, this.isNegated);
 
@@ -100,7 +99,7 @@ abstract class Filter {
 /// A [FilterFacet] matches exactly an [attribute] with a [value].
 /// An optional [score] allows to assign a priority between several
 /// [FilterFacet] that are evaluated in the same filter group.
-class FilterFacet implements Filter {
+final class FilterFacet implements Filter {
   /// Creates [FilterFacet] instance.
   const FilterFacet._(
     this.attribute,
@@ -162,7 +161,7 @@ class FilterFacet implements Filter {
 
 /// A [FilterTag] filters on a specific [value].
 /// It uses a reserved keywords `_tags` as [attribute].
-class FilterTag implements Filter {
+final class FilterTag implements Filter {
   /// Creates [FilterTag] instance.
   const FilterTag._(this.value, [this.isNegated = false]);
 
@@ -227,7 +226,7 @@ class FilterTag implements Filter {
 /// ```dart
 /// final filter = Filter.range('rating', lowerBound: 3, upperBound: 5);
 /// ```
-class FilterNumeric implements Filter {
+final class FilterNumeric implements Filter {
   /// Creates [FilterNumeric] instance.
   const FilterNumeric._(this.attribute, this.value, [this.isNegated = false]);
 
@@ -280,14 +279,13 @@ class FilterNumeric implements Filter {
 /// Represents a filter numeric value:
 /// - [NumericRange] for a range between lower/upper bounds
 /// - [NumericComparison] to compares a number using a numeric operator
-@sealed
-abstract class NumericValue {
+sealed class NumericValue {
   /// Creates an [NumericValue] instance.
   NumericValue._();
 }
 
 /// Numeric range comprised within a [lowerBound] and an [upperBound].
-class NumericRange implements NumericValue {
+final class NumericRange implements NumericValue {
   /// Creates [NumericRange] instance.
   const NumericRange._(this.lowerBound, this.upperBound);
 
@@ -299,7 +297,7 @@ class NumericRange implements NumericValue {
 }
 
 /// Numeric comparison of a [number] using a [NumericOperator].
-class NumericComparison implements NumericValue {
+final class NumericComparison implements NumericValue {
   /// Creates [NumericComparison] instance.
   const NumericComparison._(this.operator, this.number);
 
@@ -354,7 +352,7 @@ enum NumericOperator {
 ///   filterShoesRunning,
 /// );
 /// ```
-class HierarchicalFilter {
+final class HierarchicalFilter {
   /// Creates an [HierarchicalFilter] instance.
   HierarchicalFilter(this.attributes, this.path, this.filter);
 
