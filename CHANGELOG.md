@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-04-11
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`algolia_helper_flutter` - `v1.0.0`](#algolia_helper_flutter---v100)
+ - [`algolia_insights` - `v1.0.0`](#algolia_insights---v100)
+
+---
+
+#### `algolia_helper_flutter` - `v1.0.0`
+
+ - **REFACTOR**(FacetList): refactor facet list component (#118).
+ - **FIX**(HitsSearcher): non-initialized EventTracker (#123).
+ - **FIX**(facetlist): multiple facet toggle (#120).
+ - **FIX**(facet): export facet model (#112).
+ - **FEAT**(GeoSearch): add geospatial query support (#105).
+ - **FEAT**: MultiSearcher and FacetSearcher (#92).
+
+#### `algolia_insights` - `v1.0.0`
+
+ - **REFACTOR**(FacetList): refactor facet list component (#118).
+ - **FIX**(facetlist): multiple facet toggle (#120).
+ - **FIX**(insights): avoid empty payload in Insights events (#116).
+ - **FIX**(facetlist): add missing filter attribute for insights event (#115).
+ - **FEAT**(GeoSearch): add geospatial query support (#105).
+ - **FEAT**: MultiSearcher and FacetSearcher (#92).
+
+
 ## 2024-01-08
 
 ### Changes
