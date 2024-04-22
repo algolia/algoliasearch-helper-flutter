@@ -4,6 +4,7 @@
 /// experiences at a deeper level for Flutter framework.
 library algolia_helper_flutter;
 
+export 'src/client_options.dart';
 export 'src/disposable.dart';
 export 'src/exception.dart';
 export 'src/facet_list.dart';

@@ -5,6 +5,7 @@ import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../client_options.dart';
 import '../disposable.dart';
 import '../disposable_mixin.dart';
 import '../filter_state.dart';
@@ -103,6 +104,7 @@ abstract interface class HitsSearcher implements Disposable, EventDataDelegate {
     bool disjunctiveFacetingEnabled = true,
     Duration debounce = const Duration(milliseconds: 100),
     bool insights = false,
+    ClientOptions? options,
   }) =>
       _HitsSearcher(
         applicationID: applicationID,
@@ -114,6 +116,7 @@ abstract interface class HitsSearcher implements Disposable, EventDataDelegate {
         ),
         debounce: debounce,
         insights: insights,
+        options: options,
       );
 
   /// HitsSearcher's factory.
@@ -124,6 +127,7 @@ abstract interface class HitsSearcher implements Disposable, EventDataDelegate {
     bool disjunctiveFacetingEnabled = true,
     Duration debounce = const Duration(milliseconds: 100),
     bool insights = false,
+    ClientOptions? options,
   }) =>
       _HitsSearcher(
         applicationID: applicationID,
@@ -132,6 +136,7 @@ abstract interface class HitsSearcher implements Disposable, EventDataDelegate {
         disjunctiveFacetingEnabled: disjunctiveFacetingEnabled,
         debounce: debounce,
         insights: insights,
+        options: options,
       );
 
   /// Creates [HitsSearcher] using a custom [HitsSearchService].
@@ -194,10 +199,12 @@ final class _HitsSearcher with DisposableMixin implements HitsSearcher {
     bool disjunctiveFacetingEnabled = true,
     Duration debounce = const Duration(milliseconds: 100),
     bool insights = false,
+    ClientOptions? options,
   }) {
     final service = AlgoliaHitsSearchService(
       applicationID: applicationID,
       apiKey: apiKey,
+      options: options,
     );
 
     EventTracker? eventTracker;
