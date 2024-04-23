@@ -1,11 +1,12 @@
 import 'package:algoliasearch/algoliasearch.dart' as algolia;
 import 'package:logging/logging.dart';
 
-import '../lib_version.dart';
+import '../client_options.dart';
 import '../logger.dart';
 import '../model/multi_search_response.dart';
 import '../model/multi_search_state.dart';
 import 'algolia_client_extensions.dart';
+import 'client_options.dart';
 import 'facet_search_service.dart';
 
 class AlgoliaFacetSearchService implements FacetSearchService {
@@ -13,20 +14,12 @@ class AlgoliaFacetSearchService implements FacetSearchService {
   AlgoliaFacetSearchService({
     required String applicationID,
     required String apiKey,
-  }) : this.create(
-          algolia.SearchClient(
-            appId: applicationID,
-            apiKey: apiKey,
-            options: const algolia.ClientOptions(
-              agentSegments: [
-                algolia.AgentSegment(
-                  value: 'algolia-helper-flutter',
-                  version: libVersion,
-                ),
-              ],
-            ),
-          ),
-        );
+    ClientOptions? options,
+  }) : this.create(algolia.SearchClient(
+          appId: applicationID,
+          apiKey: apiKey,
+          options: createClientOptions(options),
+        ));
 
   /// Creates [AlgoliaFacetSearchService] instance.
   AlgoliaFacetSearchService.create(

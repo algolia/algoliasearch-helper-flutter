@@ -5,6 +5,7 @@ import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../client_options.dart';
 import '../disposable.dart';
 import '../disposable_mixin.dart';
 import '../logger.dart';
@@ -89,12 +90,14 @@ abstract interface class MultiSearcher implements Disposable {
     required String apiKey,
     EventTracker? eventTracker,
     Duration debounce = const Duration(milliseconds: 100),
+    ClientOptions? options,
   }) =>
       _MultiSearcher(
         applicationID: applicationID,
         apiKey: apiKey,
         eventTracker: eventTracker,
         debounce: debounce,
+        options: options,
       );
 
   /// Creates [MultiSearcher] using a custom [MultiSearchService] and
@@ -141,10 +144,12 @@ class _MultiSearcher with DisposableMixin implements MultiSearcher {
     required String apiKey,
     EventTracker? eventTracker,
     Duration debounce = const Duration(milliseconds: 100),
+    ClientOptions? options,
   }) {
     final service = AlgoliaMultiSearchService(
       applicationID: applicationID,
       apiKey: apiKey,
+      options: options,
     );
     final actualEventTracker = eventTracker ??
         Insights(

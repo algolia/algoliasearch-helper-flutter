@@ -2,6 +2,7 @@ import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../client_options.dart';
 import '../disposable.dart';
 import '../disposable_mixin.dart';
 import '../logger.dart';
@@ -106,6 +107,7 @@ abstract interface class FacetSearcher implements Disposable {
     required String indexName,
     required String facet,
     Duration debounce = const Duration(milliseconds: 100),
+    ClientOptions? options,
   }) =>
       _FacetSearcher(
         applicationID: applicationID,
@@ -115,6 +117,7 @@ abstract interface class FacetSearcher implements Disposable {
           facet: facet,
         ),
         debounce: debounce,
+        options: options,
       );
 
   /// HitsSearcher's factory.
@@ -123,12 +126,14 @@ abstract interface class FacetSearcher implements Disposable {
     required String apiKey,
     required FacetSearchState state,
     Duration debounce = const Duration(milliseconds: 100),
+    ClientOptions? options,
   }) =>
       _FacetSearcher(
         applicationID: applicationID,
         apiKey: apiKey,
         state: state,
         debounce: debounce,
+        options: options,
       );
 
   /// Creates [FacetSearcher] using a custom [FacetSearchService].
@@ -170,10 +175,12 @@ class _FacetSearcher with DisposableMixin implements FacetSearcher {
     required String apiKey,
     required FacetSearchState state,
     Duration debounce = const Duration(milliseconds: 100),
+    ClientOptions? options,
   }) {
     final service = AlgoliaFacetSearchService(
       applicationID: applicationID,
       apiKey: apiKey,
+      options: options,
     );
     return _FacetSearcher.create(
       service,
