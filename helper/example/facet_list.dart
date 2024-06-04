@@ -11,12 +11,13 @@ void main() {
     apiKey: '1f6fd3a6fb973cb08419fe7d288fa4db',
     indexName: 'instant_search',
   )
-  // Create a connection between the searcher and the filter state
+    // Create a connection between the searcher and the filter state
     ..connectFilterState(filterState);
 
   // Create facet list components that displays facets, and lets the user refine
   // their search results by filtering on specific values.
-  final facetList = searcher.buildFacetList(filterState: filterState, attribute: 'brand');
+  final facetList =
+      searcher.buildFacetList(filterState: filterState, attribute: 'brand');
 
   // Listen to facet lists with selection status.
   facetList.facets.listen((facets) {

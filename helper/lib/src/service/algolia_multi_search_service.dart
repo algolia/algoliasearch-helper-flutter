@@ -3,6 +3,8 @@ import 'package:logging/logging.dart';
 
 import '../client_options.dart';
 import '../logger.dart';
+import '../model/multi_search_response.dart';
+import '../model/multi_search_state.dart';
 import '../multi_search_state_folder.dart';
 import 'algolia_client_extensions.dart';
 import 'client_options.dart';
