@@ -2,12 +2,12 @@ import 'package:algoliasearch/algoliasearch.dart' as algolia;
 import 'package:logging/logging.dart';
 
 import '../client_options.dart';
-import '../lib_version.dart';
 import '../logger.dart';
 import '../model/multi_search_response.dart';
 import '../model/multi_search_state.dart';
 import '../query_builder.dart';
 import 'algolia_client_extensions.dart';
+import 'client_options.dart';
 import 'hits_search_service.dart';
 
 class AlgoliaHitsSearchService implements HitsSearchService {
@@ -20,26 +20,9 @@ class AlgoliaHitsSearchService implements HitsSearchService {
           algolia.SearchClient(
             appId: applicationID,
             apiKey: apiKey,
-            options: _createClientOptions(options),
+            options: createClientOptions(options),
           ),
         );
-
-  /// Create [algolia.ClientOptions] instance.
-  static algolia.ClientOptions _createClientOptions(ClientOptions? options) {
-    return algolia.ClientOptions(
-      connectTimeout: options?.connectTimeout ?? const Duration(seconds: 2),
-      writeTimeout: options?.writeTimeout ?? const Duration(seconds: 30),
-      readTimeout: options?.readTimeout ?? const Duration(seconds: 5),
-      headers: options?.headers,
-      logger: options?.logger,
-      agentSegments: [
-        algolia.AgentSegment(
-          value: 'algolia-helper-flutter',
-          version: libVersion,
-        ),
-      ],
-    );
-  }
 
   /// Creates [HitsSearchService] instance.
   AlgoliaHitsSearchService.create(
