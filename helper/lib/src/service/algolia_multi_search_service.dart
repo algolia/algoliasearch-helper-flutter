@@ -1,7 +1,7 @@
 import 'package:algoliasearch/algoliasearch.dart' as algolia;
 import 'package:logging/logging.dart';
 
-import '../../algolia_helper_flutter.dart';
+import '../client_options.dart';
 import '../logger.dart';
 import '../multi_search_state_folder.dart';
 import 'algolia_client_extensions.dart';
