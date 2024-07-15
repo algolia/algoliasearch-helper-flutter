@@ -29,6 +29,7 @@ extension AlgolisSearchStateExt on SearchState {
     final search = algolia.SearchForHits(
       indexName: indexName,
       analytics: analytics,
+      analyticsTags: analyticsTags,
       attributesToHighlight: attributesToHighlight,
       attributesToRetrieve: attributesToRetrieve,
       attributesToSnippet: attributesToSnippet,
@@ -75,6 +76,7 @@ extension AlgolisFacetSearchStateExt on FacetSearchState {
       type: algolia.SearchTypeFacet.facet,
       indexName: searchState.indexName,
       analytics: searchState.analytics,
+      analyticsTags: searchState.analyticsTags,
       attributesToHighlight: searchState.attributesToHighlight,
       attributesToRetrieve: searchState.attributesToRetrieve,
       attributesToSnippet: searchState.attributesToSnippet,

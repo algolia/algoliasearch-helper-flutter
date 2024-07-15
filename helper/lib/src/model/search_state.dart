@@ -18,6 +18,7 @@ class SearchState implements MultiSearchState {
   const SearchState({
     required this.indexName,
     this.analytics,
+    this.analyticsTags,
     this.attributesToHighlight,
     this.attributesToRetrieve,
     this.attributesToSnippet,
@@ -123,6 +124,9 @@ class SearchState implements MultiSearchState {
 
   /// Whether the current query will be taken into account in the Analytics.
   final bool? analytics;
+
+  /// Tags to apply to the query for [segmenting analytics data](https://www.algolia.com/doc/guides/search-analytics/guides/segments/).
+  final List<String>? analyticsTags;
 
   /// Add a query ID parameter to the response for tracking click and conversion
   /// events.
@@ -344,6 +348,7 @@ class SearchState implements MultiSearchState {
     String? query,
     String? userToken,
     bool? analytics,
+    List<String>? analyticsTags,
     bool? sumOrFiltersScore,
     int? hitsPerPage,
     int? maxFacetHits,
@@ -378,6 +383,7 @@ class SearchState implements MultiSearchState {
         query: query ?? this.query,
         userToken: userToken ?? this.userToken,
         analytics: analytics ?? this.analytics,
+        analyticsTags: analyticsTags ?? this.analyticsTags,
         sumOrFiltersScore: sumOrFiltersScore ?? this.sumOrFiltersScore,
         hitsPerPage: hitsPerPage ?? this.hitsPerPage,
         maxFacetHits: maxFacetHits ?? this.maxFacetHits,
@@ -420,6 +426,7 @@ class SearchState implements MultiSearchState {
           sumOrFiltersScore == other.sumOrFiltersScore &&
           tagFilters.equals(other.tagFilters) &&
           analytics == other.analytics &&
+          analyticsTags == other.analyticsTags &&
           userToken == other.userToken &&
           clickAnalytics == other.clickAnalytics &&
           aroundLatLngViaIP == other.aroundLatLngViaIP &&
@@ -453,6 +460,7 @@ class SearchState implements MultiSearchState {
       sumOrFiltersScore.hashCode ^
       tagFilters.hashing() ^
       analytics.hashCode ^
+      analyticsTags.hashCode ^
       userToken.hashCode ^
       clickAnalytics.hashCode ^
       aroundLatLngViaIP.hashCode ^
@@ -467,6 +475,7 @@ class SearchState implements MultiSearchState {
       'indexName: $indexName, '
       'query: $query, '
       'analytics: $analytics, '
+      'analyticsTags: $analyticsTags, '
       'attributesToHighlight: $attributesToHighlight, '
       'attributesToRetrieve: $attributesToRetrieve, '
       'attributesToSnippet: $attributesToSnippet, '
