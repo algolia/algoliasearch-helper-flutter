@@ -286,6 +286,6 @@ class _FacetSearcher with DisposableMixin implements FacetSearcher {
   void doDispose() {
     _log.fine('FacetSearcher disposed');
     _request.close();
-    _subscriptions.cancel();
+    _subscriptions.dispose();
   }
 }

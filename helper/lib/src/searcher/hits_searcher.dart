@@ -336,7 +336,7 @@ final class _HitsSearcher with DisposableMixin implements HitsSearcher {
   void doDispose() {
     _log.fine('HitsSearcher disposed');
     _request.close();
-    _subscriptions.cancel();
+    _subscriptions.dispose();
   }
 
   @override
