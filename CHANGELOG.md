@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-07-17
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`algolia_helper_flutter` - `v1.1.0`](#algolia_helper_flutter---v110)
+ - [`algolia_insights` - `v1.0.1`](#algolia_insights---v101)
+
+---
+
+#### `algolia_helper_flutter` - `v1.1.0`
+
+ - **REFACTOR**(FacetList): refactor facet list component (#118).
+ - **FIX**(search-state): add support for `analyticsTags` (#141).
+ - **FIX**(HitsSearcher): non-initialized EventTracker (#123).
+ - **FIX**(facetlist): multiple facet toggle (#120).
+ - **FIX**(facet): export facet model (#112).
+ - **FEAT**(searcher): add `ClientOptions` to `MultiSearcher` and `FacetSearcher` (#132).
+ - **FEAT**(searcher): add client options (#131).
+
+#### `algolia_insights` - `v1.0.1`
+
+ - **REFACTOR**(FacetList): refactor facet list component (#118).
+ - **FIX**(facetlist): multiple facet toggle (#120).
+ - **FIX**(insights): avoid empty payload in Insights events (#116).
+ - **FIX**(facetlist): add missing filter attribute for insights event (#115).
+
+
 ## 2024-04-11
 
 ### Changes

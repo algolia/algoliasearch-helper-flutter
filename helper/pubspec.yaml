@@ -1,13 +1,13 @@
 name: algolia_helper_flutter
 description: Patterns and APIs to implement advanced search features with Algolia for Flutter
-version: 1.0.0
+version: 1.1.0
 homepage: https://www.algolia.com/doc/guides/building-search-ui/what-is-instantsearch/flutter/
 repository: https://github.com/algolia/algoliasearch-helper-flutter/tree/main/helper
 environment:
   sdk: '>=3.0.0 <4.0.0'
   flutter: '>=1.17.0'
 dependencies:
-  algolia_insights: ^1.0.0
+  algolia_insights: ^1.0.1
   algoliasearch: ">=1.3.0 <2.0.0"
   collection: ">=1.17.0 <2.0.0"
   flutter:
