@@ -15,6 +15,10 @@ scripts:
     exec: dart fix --apply
     description: Find and fix static analysis issues in all packages
 
+  get:
+    exec: dart pub get
+    description: Run `dart pub get` in all packages.
+
   pana:
     exec: pana --no-warning --exit-code-threshold 0
     description: |

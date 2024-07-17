@@ -1,0 +1,46 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  check:
+    name: Run checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          cache: true
+          channel: stable
+      - name: Install Tools
+        run: flutter pub global activate melos
+      - name: Bootstrap Workspace
+        run: melos bootstrap
+      - name: Install dependencies
+        run: melos get
+      - name: Run tests
+        run: melos test --no-select
+
+
+  publish-helper:
+    if: ${{ contains(github.ref, 'helper') }}
+    needs:
+      - check
+    permissions:
+      id-token: write
+    uses: dart-lang/setup-dart/.github/workflows/publish.yaml@v1
+    with:
+      working-directory: helper
+  
+  publish-insights:
+    if: ${{ contains(github.ref, 'insights') }}
+    needs:
+      - check
+    permissions:
+      id-token: write
+    uses: dart-lang/setup-dart/.github/workflows/publish.yaml@v1
+    with:
+      working-directory: insights
