@@ -1,3 +1,13 @@
+## 1.1.0
+
+ - **REFACTOR**(FacetList): refactor facet list component (#118).
+ - **FIX**(search-state): add support for `analyticsTags` (#141).
+ - **FIX**(HitsSearcher): non-initialized EventTracker (#123).
+ - **FIX**(facetlist): multiple facet toggle (#120).
+ - **FIX**(facet): export facet model (#112).
+ - **FEAT**(searcher): add `ClientOptions` to `MultiSearcher` and `FacetSearcher` (#132).
+ - **FEAT**(searcher): add client options (#131).
+
 ## 1.0.0
 
 - **FIX**(HitsSearcher): non-initialized EventTracker (#123).

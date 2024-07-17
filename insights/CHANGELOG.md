@@ -1,3 +1,10 @@
+## 1.0.1
+
+ - **REFACTOR**(FacetList): refactor facet list component (#118).
+ - **FIX**(facetlist): multiple facet toggle (#120).
+ - **FIX**(insights): avoid empty payload in Insights events (#116).
+ - **FIX**(facetlist): add missing filter attribute for insights event (#115).
+
 ## 1.0.0
 
  - **FIX**(HitsSearcher): non-initialized EventTracker (#123).
