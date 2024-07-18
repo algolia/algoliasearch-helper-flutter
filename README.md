@@ -25,7 +25,7 @@
 
 ## ♻️ Getting involved
 
-* If you **want to contribute** please feel free to **submit pull requests**.
+* If you **want to contribute** please read [**our contribution process**](./CONTRIBUTING.md) to learn more.
 * If you **have a feature request** please **open an issue**.
 * If you use **Algolia Flutter Helper** in your app, we would love to hear about it! Drop us a line
-  on [Twitter](https://twitter.com/algolia).
+  on [Discord](https://alg.li/discord) or [Twitter](https://twitter.com/algolia).
