@@ -1,3 +1,4 @@
+import 'package:algolia_client_insights/algolia_client_insights.dart';
 import 'package:collection/collection.dart';
 import 'algolia_event_service.dart';
 import 'event.dart';
@@ -65,6 +66,9 @@ class Insights implements EventTracker {
   }
 
   Insights.custom(this._service, this._userTokenStorage) : isEnabled = true;
+
+  @override
+  InsightsClient get client => _service.client;
 
   @override
   void clickedFilters({
