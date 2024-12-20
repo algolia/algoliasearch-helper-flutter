@@ -20,7 +20,13 @@ final class QueryBuilder {
   /// Number of generated disjunctive queries for given hierarchical
   /// filters list
   int get _disjunctiveQueriesCount =>
-      _searchState.disjunctiveFacets?.length ?? 0;
+      _searchState.disjunctiveFacets
+          ?.where((facet) =>
+              _searchState.filterGroups?.any((group) =>
+                  group.any((filter) => filter.attribute == facet)) ??
+              false)
+          .length ??
+      0;
 
   /// Number of generated hierarchical queries for given hierarchical
   /// filters list
@@ -119,7 +125,11 @@ final class QueryBuilder {
           hitsPerPage: 0,
           analytics: false,
         );
-      }) ??
+        // }) ??
+      }).where((query) =>
+          _searchState.filterGroups
+              ?.any((group) => group.groupID.name == query.facets!.first) ??
+          false) ??
       [];
 
   /// Create modifiable copy of filter groups.

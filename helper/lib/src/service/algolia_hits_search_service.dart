@@ -69,6 +69,9 @@ class AlgoliaHitsSearchService implements HitsSearchService {
     try {
       final queryBuilder = QueryBuilder(state);
       final queries = queryBuilder.build().map((it) => it.toRequest()).toList();
+      print('QUERIES');
+      print(queries);
+      print('\n');
       final responses = await _client.search(
         searchMethodParams: algolia.SearchMethodParams(requests: queries),
       );
@@ -86,6 +89,9 @@ class AlgoliaHitsSearchService implements HitsSearchService {
       return foldedResponses;
     } catch (exception) {
       _log.severe('Search exception thrown: $exception');
+      print('EXCEPTION');
+      print(exception);
+      print('\n');
       throw _client.launderException(exception);
     }
   }

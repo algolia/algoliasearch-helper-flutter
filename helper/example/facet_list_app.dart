@@ -40,11 +40,15 @@ class SearchController {
   late final facetList = searcher.buildFacetList(
       filterState: filterState, attribute: 'brand', persistent: true);
 
+  late final categories = searcher.buildFacetList(
+      filterState: filterState, attribute: 'categories', persistent: true);
+
   // 4.1 Components (disposables) composite
   late final _components = CompositeDisposable()
     ..add(searcher)
     ..add(filterState)
-    ..add(facetList);
+    ..add(facetList)
+    ..add(categories);
 
   // 4.2 Dispose of all underlying resources when done
   void dispose() => _components.dispose();
@@ -81,6 +85,9 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ),
+      ),
+      drawer: const Drawer(
+        child: LeftFiltersPage(),
       ),
       endDrawer: const Drawer(
         child: FiltersPage(),
@@ -156,6 +163,56 @@ class _FiltersPageState extends State<FiltersPage> {
                   trailing: model.isSelected ? const Icon(Icons.check) : null,
                   onTap: () {
                     facetList.toggle(facet.value);
+                  },
+                );
+              },
+            );
+          } else {
+            return const LinearProgressIndicator();
+          }
+        },
+      ),
+    );
+  }
+}
+
+class LeftFiltersPage extends StatefulWidget {
+  const LeftFiltersPage({super.key});
+
+  @override
+  State<LeftFiltersPage> createState() => _LeftFiltersPageState();
+}
+
+class _LeftFiltersPageState extends State<LeftFiltersPage> {
+  @override
+  Widget build(BuildContext context) {
+    final categories = context.read<SearchController>().categories;
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Categories'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: StreamBuilder<List<SelectableFacet>>(
+        stream: categories.facets,
+        builder: (context, AsyncSnapshot<List<SelectableFacet>> snapshot) {
+          if (snapshot.hasData) {
+            final facets = snapshot.data ?? [];
+            return ListView.builder(
+              itemCount: facets.length,
+              itemBuilder: (BuildContext context, int index) {
+                final model = facets[index];
+                final facet = model.item;
+                return ListTile(
+                  title: Text(
+                    '${facet.value} '
+                    "${facet.count > 0 ? '(${facet.count})' : ''} ",
+                  ),
+                  trailing: model.isSelected ? const Icon(Icons.check) : null,
+                  onTap: () {
+                    categories.toggle(facet.value);
                   },
                 );
               },
