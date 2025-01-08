@@ -89,6 +89,7 @@ final class FilterConverter {
           filter.attribute,
           filter.isNegated,
         );
+      // ignore: unreachable_switch_default
       default:
         throw ArgumentError('Filter type ${filter.runtimeType} not supported');
     }
