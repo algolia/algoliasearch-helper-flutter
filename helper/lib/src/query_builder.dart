@@ -17,10 +17,16 @@ final class QueryBuilder {
   /// Number of search result queries
   int get _resultQueriesCount => 1;
 
-  /// Number of generated disjunctive queries for given hierarchical
-  /// filters list
-  int get _disjunctiveQueriesCount =>
-      _searchState.disjunctiveFacets?.length ?? 0;
+  /// Number of generated disjunctive queries for given filters list
+  int get _disjunctiveQueriesCount => _getRefinedDisjunctiveFacets().length;
+
+  /// Get refined disjunctive facets from the search state's filter groups.
+  Iterable<String> _getRefinedDisjunctiveFacets() {
+    final currentFilterGroups = _searchState.filterGroups ?? {};
+    return (_searchState.disjunctiveFacets ?? {}).where((facetName) =>
+        currentFilterGroups.any(
+            (group) => group.any((facet) => facet.attribute == facetName)));
+  }
 
   /// Number of generated hierarchical queries for given hierarchical
   /// filters list
@@ -92,35 +98,35 @@ final class QueryBuilder {
 
   /// Build additional queries to fetch correct facets count values
   /// for disjunctive facets
-  Iterable<SearchState> _buildDisjunctiveFacetingQueries(SearchState query) =>
-      query.disjunctiveFacets?.map((facet) {
-        final filterGroupsCopy = <FilterGroup>{};
-        final currentFilterGroups = _searchState.filterGroups ?? {};
-        for (final filterGroup in currentFilterGroups) {
-          final Set<Filter> updatedFilters;
-          if (filterGroup.groupID.operator == FilterOperator.or) {
-            updatedFilters = filterGroup
-                .where(
-                  (element) =>
-                      !(element is FilterFacet && element.attribute == facet),
-                )
-                .toSet();
-          } else {
-            updatedFilters = filterGroup;
-          }
-          filterGroupsCopy.add(filterGroup.copyWith(filters: updatedFilters));
+  Iterable<SearchState> _buildDisjunctiveFacetingQueries(SearchState query) {
+    final currentFilterGroups = _searchState.filterGroups ?? {};
+    return _getRefinedDisjunctiveFacets().map((facet) {
+      final filterGroupsCopy = <FilterGroup>{};
+      for (final filterGroup in currentFilterGroups) {
+        final Set<Filter> updatedFilters;
+        if (filterGroup.groupID.operator == FilterOperator.or) {
+          updatedFilters = filterGroup
+              .where(
+                (element) =>
+                    !(element is FilterFacet && element.attribute == facet),
+              )
+              .toSet();
+        } else {
+          updatedFilters = filterGroup;
         }
-        return query.copyWith(
-          facets: [facet],
-          filterGroups: filterGroupsCopy,
-          attributesToRetrieve: ['objectID'],
-          // TODO: should be [], workaround to avoid the client exception
-          attributesToHighlight: ['objectID'],
-          hitsPerPage: 0,
-          analytics: false,
-        );
-      }) ??
-      [];
+        filterGroupsCopy.add(filterGroup.copyWith(filters: updatedFilters));
+      }
+      return query.copyWith(
+        facets: [facet],
+        filterGroups: filterGroupsCopy,
+        attributesToRetrieve: ['objectID'],
+        // TODO: should be [], workaround to avoid the client exception
+        attributesToHighlight: ['objectID'],
+        hitsPerPage: 0,
+        analytics: false,
+      );
+    });
+  }
 
   /// Create modifiable copy of filter groups.
   Set<FilterGroup> _copyFilterGroups() =>
