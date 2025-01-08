@@ -38,7 +38,6 @@ extension AlgolisSearchStateExt on SearchState {
       highlightPostTag: highlightPostTag,
       highlightPreTag: highlightPreTag,
       hitsPerPage: hitsPerPage,
-      maxFacetHits: maxFacetHits,
       maxValuesPerFacet: maxValuesPerFacet,
       numericFilters: numericFilters,
       optionalFilters: optionalFilters,
