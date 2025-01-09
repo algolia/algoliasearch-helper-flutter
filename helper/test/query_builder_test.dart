@@ -16,10 +16,33 @@ void main() {
     const queryBuilder = QueryBuilder(query);
     final queries = queryBuilder.build();
     final disjunctiveFacetingQueries = queries.skip(1);
-    expect(disjunctiveFacetingQueries.length, 2);
-    for (final query in disjunctiveFacetingQueries) {
-      expect(query.facets?.length, 1);
-    }
+    expect(disjunctiveFacetingQueries.length, 0);
+  });
+
+  test('test disjunctive faceting queries with some unrefined facets', () {
+    final filterGroups = <FilterGroup>{
+      FacetFilterGroup(FilterGroupID.or('g1'), {
+        Filter.facet('brand', 'samsung'),
+        Filter.facet('price', 100),
+      }),
+      FacetFilterGroup(FilterGroupID.or('g2'), {
+        Filter.facet('color', 'red'),
+      }),
+    };
+    final query = SearchState(
+      indexName: 'index',
+      query: 'phone',
+      disjunctiveFacets: {'brand', 'category', 'color', 'price'},
+      filterGroups: filterGroups,
+    );
+    final queryBuilder = QueryBuilder(query);
+    final queries = queryBuilder.build();
+    final disjunctiveFacetingQueries = queries.skip(1);
+    expect(disjunctiveFacetingQueries.length, 3);
+
+    final hasCategory = disjunctiveFacetingQueries
+        .any((query) => (query.facets ?? []).contains('category'));
+    expect(hasCategory, false);
   });
 
   test('test disjunctive faceting queries generation with filters', () {
@@ -236,6 +259,14 @@ void main() {
       query: 'phone',
       disjunctiveFacets: {'color', 'brand', 'size'},
       filterGroups: {
+        FacetFilterGroup(
+          FilterGroupID.or('g1'),
+          {
+            Filter.facet('color', 'blue'),
+            Filter.facet('brand', 'samsung'),
+            Filter.facet('size', 'l'),
+          },
+        ),
         FilterGroup.hierarchical(
           name: 'category',
           filters: {Filter.facet('category.lvl2', 'a > b > c')},
