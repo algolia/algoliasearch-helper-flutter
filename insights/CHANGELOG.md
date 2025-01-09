@@ -1,3 +1,7 @@
+## 1.0.2
+
+ - **FIX**(client): remove invalid `maxFacetHits` in `SearchForHits` extension (#153).
+
 ## 1.0.1
 
  - **REFACTOR**(FacetList): refactor facet list component (#118).

@@ -1,3 +1,9 @@
+## 1.2.0
+
+ - **FIX**(client): remove invalid `maxFacetHits` in `SearchForHits` extension (#153).
+ - **FEAT**(queryBuilder): remove aux queries for unrefined facets (#152).
+ - **FEAT**(clientOption): enable pass interceptor as parameters (#149).
+
 ## 1.1.0
 
  - **REFACTOR**(FacetList): refactor facet list component (#118).

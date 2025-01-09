@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-01-09
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`algolia_helper_flutter` - `v1.2.0`](#algolia_helper_flutter---v120)
+ - [`algolia_insights` - `v1.0.2`](#algolia_insights---v102)
+
+---
+
+#### `algolia_helper_flutter` - `v1.2.0`
+
+ - **FIX**(client): remove invalid `maxFacetHits` in `SearchForHits` extension (#153).
+ - **FEAT**(queryBuilder): remove aux queries for unrefined facets (#152).
+ - **FEAT**(clientOption): enable pass interceptor as parameters (#149).
+
+#### `algolia_insights` - `v1.0.2`
+
+ - **FIX**(client): remove invalid `maxFacetHits` in `SearchForHits` extension (#153).
+
+
 ## 2024-07-17
 
 ### Changes
