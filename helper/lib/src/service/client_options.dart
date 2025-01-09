@@ -11,6 +11,7 @@ algolia.ClientOptions createClientOptions(ClientOptions? options) {
     readTimeout: options?.readTimeout ?? const Duration(seconds: 5),
     headers: options?.headers,
     logger: options?.logger,
+    interceptors: options?.interceptors,
     agentSegments: [
       algolia.AgentSegment(
         value: 'algolia-helper-flutter',
