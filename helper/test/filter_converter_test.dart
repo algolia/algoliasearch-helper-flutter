@@ -10,11 +10,11 @@ void main() {
       final filterScore = Filter.facet('attributeA', true, score: 4);
 
       const converter = FilterConverter();
-      expect(converter.sql(filterTrue), '\"attributeA\":true');
-      expect(converter.sql(filterFalse), '\"attributeA\":false');
-      expect(converter.sql(filterTrue.not()), 'NOT \"attributeA\":true');
-      expect(converter.sql(filterFalse.not()), 'NOT \"attributeA\":false');
-      expect(converter.sql(filterScore), '\"attributeA\":true<score=4>');
+      expect(converter.sql(filterTrue), '"attributeA":true');
+      expect(converter.sql(filterFalse), '"attributeA":false');
+      expect(converter.sql(filterTrue.not()), 'NOT "attributeA":true');
+      expect(converter.sql(filterFalse.not()), 'NOT "attributeA":false');
+      expect(converter.sql(filterScore), '"attributeA":true<score=4>');
     });
 
     test('Filter facet Number', () {
@@ -23,11 +23,11 @@ void main() {
       final filterScore = Filter.facet('attributeA', 1, score: 2);
 
       const converter = FilterConverter();
-      expect(converter.sql(filterInt), '\"attributeA\":1');
-      expect(converter.sql(filterDouble), '\"attributeA\":${1.0}');
-      expect(converter.sql(filterDouble.not()), 'NOT \"attributeA\":${1.0}');
-      expect(converter.sql(filterScore), '\"attributeA\":1<score=2>');
-      expect(converter.sql(filterScore), '\"attributeA\":1<score=2>');
+      expect(converter.sql(filterInt), '"attributeA":1');
+      expect(converter.sql(filterDouble), '"attributeA":${1.0}');
+      expect(converter.sql(filterDouble.not()), 'NOT "attributeA":${1.0}');
+      expect(converter.sql(filterScore), '"attributeA":1<score=2>');
+      expect(converter.sql(filterScore), '"attributeA":1<score=2>');
     });
 
     test('Filter facet String', () {
@@ -37,15 +37,15 @@ void main() {
       final filterScore = Filter.facet('attributeA', 'valueA', score: 1);
 
       const converter = FilterConverter();
-      expect(converter.sql(filter), '\"attributeA\":\"valueA\"');
-      expect(converter.sql(filterNegate), 'NOT \"attributeA\":\"valueA\"');
+      expect(converter.sql(filter), '"attributeA":"valueA"');
+      expect(converter.sql(filterNegate), 'NOT "attributeA":"valueA"');
       expect(
         converter.sql(filterSpace),
-        '\"attributeA\":\"value with space\"',
+        '"attributeA":"value with space"',
       );
       expect(
         converter.sql(filterScore),
-        '\"attributeA\":\"valueA\"<score=1>',
+        '"attributeA":"valueA"<score=1>',
       );
     });
   });
@@ -64,13 +64,13 @@ void main() {
           Filter.comparison('attributeA', NumericOperator.greaterOrEquals, 5);
 
       const converter = FilterConverter();
-      expect(converter.sql(less), '\"attributeA\" < 5');
-      expect(converter.sql(lessOrEquals), '\"attributeA\" <= 5');
-      expect(converter.sql(equals), '\"attributeA\" = 5');
-      expect(converter.sql(notEquals), '\"attributeA\" != 5');
-      expect(converter.sql(greater), '\"attributeA\" > 5');
-      expect(converter.sql(greaterOrEquals), '\"attributeA\" >= 5');
-      expect(converter.sql(less.not()), 'NOT \"attributeA\" < 5');
+      expect(converter.sql(less), '"attributeA" < 5');
+      expect(converter.sql(lessOrEquals), '"attributeA" <= 5');
+      expect(converter.sql(equals), '"attributeA" = 5');
+      expect(converter.sql(notEquals), '"attributeA" != 5');
+      expect(converter.sql(greater), '"attributeA" > 5');
+      expect(converter.sql(greaterOrEquals), '"attributeA" >= 5');
+      expect(converter.sql(less.not()), 'NOT "attributeA" < 5');
     });
 
     test('Filter numeric range', () {
@@ -80,17 +80,17 @@ void main() {
           Filter.range('attributeA', lowerBound: 0.0, upperBound: 6.0);
 
       const converter = FilterConverter();
-      expect(converter.sql(filterInt), '\"attributeA\":0 TO 6');
-      expect(converter.sql(filterDouble), '\"attributeA\":${0.0} TO ${6.0}');
-      expect(converter.sql(filterInt.not()), 'NOT \"attributeA\":0 TO 6');
+      expect(converter.sql(filterInt), '"attributeA":0 TO 6');
+      expect(converter.sql(filterDouble), '"attributeA":${0.0} TO ${6.0}');
+      expect(converter.sql(filterInt.not()), 'NOT "attributeA":0 TO 6');
     });
   });
 
   test('Filter tag SQL', () {
     final filter = Filter.tag('valueA');
     const converter = FilterConverter();
-    expect(converter.sql(filter), '_tags:\"valueA\"');
-    expect(converter.sql(filter.not()), 'NOT _tags:\"valueA\"');
+    expect(converter.sql(filter), '_tags:"valueA"');
+    expect(converter.sql(filter.not()), 'NOT _tags:"valueA"');
   });
 
   group('Filter group SQL', () {
