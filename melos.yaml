@@ -41,4 +41,4 @@ scripts:
 command:
   version:
     hooks:
-      post: ./sync_version.sh
+      preCommit: ./sync_version.sh

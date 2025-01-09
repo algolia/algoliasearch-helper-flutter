@@ -17,6 +17,3 @@ for dir in ${packages[@]}; do
   sed "${sed_arg[@]}" "s/^const libVersion = .*;$/const libVersion = '$version';/" "${dir}/lib/src/lib_version.dart";
   git add "${dir}/lib/src/lib_version.dart"
 done
-
-git commit --amend --no-edit
-
