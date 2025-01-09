@@ -1,5 +1,4 @@
 import 'package:algolia_client_insights/algolia_client_insights.dart';
-import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
 
 import 'event.dart';
@@ -42,8 +41,8 @@ class AlgoliaEventService implements EventService {
   void send(List<Event> events) => _client
       .pushEvents(
         insightsEvents: InsightsEvents(
-          events: events.map((e) => e.toAlgoliaEvent()).whereNotNull(),
-        ),
+            events:
+                events.map((e) => e.toAlgoliaEvent()).where((e) => e != null)),
       )
       .then(
         (_) => _log.fine('Events upload: $events'),
