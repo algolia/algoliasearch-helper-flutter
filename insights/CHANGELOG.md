@@ -1,3 +1,7 @@
+## 1.1.0
+
+ - **FIX**(UserTokenStorage): Migrate from hive to hive_ce fix wasm runtime error (#21).
+
 ## 1.0.2
 
  - **FIX**(client): remove invalid `maxFacetHits` in `SearchForHits` extension (#153).
