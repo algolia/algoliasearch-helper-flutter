@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-07-01
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`algolia_helper_flutter` - `v1.2.1`](#algolia_helper_flutter---v121)
+
+---
+
+#### `algolia_helper_flutter` - `v1.2.1`
+
+ - **FIX**(pubspec): update algoliasearch dependency (#158).
+ - **FIX**(multiSearcher): forward error (#161).
+ - **FIX**(add*Searcher): debounce with constructor setting (#160).
+
+
 ## 2025-01-09
 
 ### Changes

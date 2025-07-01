@@ -1,3 +1,9 @@
+## 1.2.1
+
+ - **FIX**(pubspec): update algoliasearch dependency (#158).
+ - **FIX**(multiSearcher): forward error (#161).
+ - **FIX**(add*Searcher): debounce with constructor setting (#160).
+
 ## 1.2.0
 
  - **FIX**(client): remove invalid `maxFacetHits` in `SearchForHits` extension (#153).
