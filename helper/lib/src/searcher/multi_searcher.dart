@@ -243,12 +243,7 @@ class _MultiSearcher with DisposableMixin implements MultiSearcher {
     _resultsSubscription = Rx.combineLatest(
       _delegates.map((e) => e.multiSearchState),
       (states) => states,
-    )
-        .debounceTime(
-          const Duration(milliseconds: 100),
-        )
-        .asyncMap(_service.search)
-        .listen((responses) {
+    ).debounceTime(debounce).asyncMap(_service.search).listen((responses) {
       for (var i = 0; i < responses.length; i++) {
         _delegates[i].updateResponse(responses[i]);
       }
