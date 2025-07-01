@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:algolia_helper_flutter/algolia_helper_flutter.dart';
 import 'package:algolia_helper_flutter/src/model/multi_search_response.dart';
 import 'package:algolia_helper_flutter/src/model/multi_search_state.dart';
 import 'package:algolia_helper_flutter/src/searcher/multi_searcher.dart';
@@ -219,6 +220,42 @@ void main() {
       clearInteractions(mockMultiSearchService);
 
       // await newSubscription.cancel();
+    });
+
+    test('Should emit error after failure', () async {
+      final initialStates = [
+        const SearchState(indexName: 'index1', query: 'q0'),
+        const SearchState(indexName: 'index2', query: 'q0'),
+      ];
+
+      final searchers = initialStates
+          .map(
+            (state) => multiSearcher.addHitsSearcher(initialState: state),
+          )
+          .toList();
+
+      final error = SearchError({}, 500);
+      when(
+        mockMultiSearchService.search([
+          const SearchState(indexName: 'index1', query: 'error_query'),
+          const SearchState(indexName: 'index2', query: 'error_query'),
+        ]),
+      ).thenThrow(error);
+
+      for (final searcher in searchers) {
+        searcher.query('error_query');
+      }
+
+      // Listen to both searchers to ensure error is caught
+      final futures = searchers.map((searcher) {
+        searcher.query('error_query');
+        return expectLater(
+          searcher.responses,
+          emitsError(isA<SearchError>()),
+        );
+      });
+
+      await Future.wait(futures);
     });
   });
 
