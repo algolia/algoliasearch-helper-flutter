@@ -56,7 +56,7 @@ Some examples of valid commit messages (used as first lines):
 
 ## Publish
 
-All packages in this project are published on [pub.dev](https://pub.dev/publishers/algolia.com/packages). To Publish a stable version, go on `main` (`git checkout main`) and use:
+The packages are published automatically with [GitHub Actions](./.github/workflows/publish.yml). All packages in this project are published on [pub.dev](https://pub.dev/publishers/algolia.com/packages). To manually publish a stable version, go on `main` (`git checkout main`) and use:
 
 ```sh
 melos version
