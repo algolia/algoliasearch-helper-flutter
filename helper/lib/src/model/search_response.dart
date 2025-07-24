@@ -72,6 +72,12 @@ class SearchResponse extends MultiSearchResponse {
   /// This does not include network time.
   int get processingTimeMS => raw['processingTimeMS'] as int? ?? 0;
 
+  /// Defines how you want to render results in the search interface.
+  RenderingContent? get renderingContent => raw['renderingContent'] != null
+      ? RenderingContent.fromJson(
+          raw['renderingContent'] as Map<String, dynamic>)
+      : null;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
