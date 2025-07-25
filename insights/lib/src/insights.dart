@@ -202,7 +202,7 @@ class Insights implements EventTracker {
     final events = objectIDs
         .slices(_maxObjectIDsPerEvent)
         .map(
-          (filters) => Event.viewHits(
+          (objectIDs) => Event.viewHits(
             eventName,
             indexName,
             userToken,
