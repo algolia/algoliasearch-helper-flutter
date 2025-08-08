@@ -38,6 +38,9 @@ class AlgoliaEventService implements EventService {
       : _log = Logger('Algolia/EventsService');
 
   @override
+  InsightsClient get client => _client;
+
+  @override
   void send(List<Event> events) => _client
       .pushEvents(
         insightsEvents: InsightsEvents(
