@@ -1,3 +1,7 @@
+## 1.3.0
+
+ - **FEAT**(search-reponse): expose renderingContent in model.
+
 ## 1.2.1
 
  - **FIX**(pubspec): update algoliasearch dependency (#158).
