@@ -1,3 +1,7 @@
+## 1.0.3
+
+ - **FIX**(insights): properly divide viewed objects events.
+
 ## 1.0.2
 
  - **FIX**(client): remove invalid `maxFacetHits` in `SearchForHits` extension (#153).

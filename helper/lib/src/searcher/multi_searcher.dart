@@ -243,14 +243,14 @@ class _MultiSearcher with DisposableMixin implements MultiSearcher {
     _resultsSubscription = Rx.combineLatest(
       _delegates.map((e) => e.multiSearchState),
       (states) => states,
-    )
-        .debounceTime(
-          const Duration(milliseconds: 100),
-        )
-        .asyncMap(_service.search)
-        .listen((responses) {
+    ).debounceTime(debounce).asyncMap(_service.search).listen((responses) {
       for (var i = 0; i < responses.length; i++) {
         _delegates[i].updateResponse(responses[i]);
+      }
+    }, onError: (error, stack) {
+      // Propagate the error to all delegates
+      for (final delegate in _delegates) {
+        delegate.updateResponseError(error, stack);
       }
     });
   }
@@ -295,6 +295,10 @@ abstract class MultiSearcherDelegate with DisposableMixin {
   ///   - `response`: The new [MultiSearchResponse] to set for the search unit.
   void updateResponse(MultiSearchResponse response) {
     _responseStream.add(response);
+  }
+
+  void updateResponseError(Object error, [StackTrace? stackTrace]) {
+    _responseStream.addError(error, stackTrace);
   }
 
   /// Provides public access to the stream of the encapsulated search units'

@@ -1,3 +1,4 @@
+import 'package:algoliasearch/algoliasearch.dart';
 import 'package:collection/collection.dart';
 import 'facet.dart';
 
