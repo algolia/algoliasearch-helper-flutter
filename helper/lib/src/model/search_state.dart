@@ -37,6 +37,7 @@ class SearchState implements MultiSearchState {
     this.page,
     this.query,
     this.ruleContexts,
+    this.sortFacetValuesBy,
     this.sumOrFiltersScore,
     this.tagFilters,
     this.userToken,
@@ -112,6 +113,9 @@ class SearchState implements MultiSearchState {
   /// where records that match the filter
   /// are ranked highest.
   final List<String>? optionalFilters;
+
+  /// Order in which to retrieve facet values - `count`.   Facet values are retrieved by decreasing count.   The count is the number of matching records containing this facet value - `alpha`.   Retrieve facet values alphabetically This setting doesn't influence how facet values are displayed in your UI (see `renderingContent`). For more information, see [facet value display](https://www.algolia.com/doc/guides/building-search-ui/ui-and-ux-patterns/facet-display/js/).
+  final String? sortFacetValuesBy;
 
   /// Determines how to calculate the total score for filtering.
   final bool? sumOrFiltersScore;
@@ -349,6 +353,7 @@ class SearchState implements MultiSearchState {
     String? userToken,
     bool? analytics,
     List<String>? analyticsTags,
+    String? sortFacetValuesBy,
     bool? sumOrFiltersScore,
     int? hitsPerPage,
     int? maxFacetHits,
@@ -384,6 +389,7 @@ class SearchState implements MultiSearchState {
         userToken: userToken ?? this.userToken,
         analytics: analytics ?? this.analytics,
         analyticsTags: analyticsTags ?? this.analyticsTags,
+        sortFacetValuesBy: sortFacetValuesBy ?? this.sortFacetValuesBy,
         sumOrFiltersScore: sumOrFiltersScore ?? this.sumOrFiltersScore,
         hitsPerPage: hitsPerPage ?? this.hitsPerPage,
         maxFacetHits: maxFacetHits ?? this.maxFacetHits,
@@ -423,6 +429,7 @@ class SearchState implements MultiSearchState {
           maxValuesPerFacet == other.maxValuesPerFacet &&
           numericFilters.equals(other.numericFilters) &&
           optionalFilters.equals(other.optionalFilters) &&
+          sortFacetValuesBy == other.sortFacetValuesBy &&
           sumOrFiltersScore == other.sumOrFiltersScore &&
           tagFilters.equals(other.tagFilters) &&
           analytics == other.analytics &&
