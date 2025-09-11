@@ -1,3 +1,5 @@
+import 'package:algoliasearch/algoliasearch.dart';
+
 import '../extensions.dart';
 import '../filter_group.dart';
 part 'search_state.dart';
