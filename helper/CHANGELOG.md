@@ -1,3 +1,7 @@
+## 1.4.0
+
+ - **FEAT**(search-state): support sortFacetValuesBy (#165).
+
 ## 1.3.0
 
  - **FEAT**(search-reponse): expose renderingContent in model.
