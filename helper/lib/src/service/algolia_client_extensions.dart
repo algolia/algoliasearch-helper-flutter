@@ -11,14 +11,14 @@ extension ClientHelperAdapter on algolia.SearchClient {
   Exception launderException(dynamic error) =>
       error is algolia.AlgoliaApiException
           ? error.toSearchError()
-          : Exception(error);
+          : SearchError({'message': error.toString()}, 0, error);
 }
 
 /// Extensions over [AlgoliaException].
 extension AlgoliaExceptionExt on algolia.AlgoliaApiException {
   /// Converts API error to [SearchError].
   SearchError toSearchError() =>
-      SearchError({'message': error.toString()}, statusCode);
+      SearchError({'message': error.toString()}, statusCode, this);
 }
 
 extension AlgolisSearchStateExt on SearchState {
