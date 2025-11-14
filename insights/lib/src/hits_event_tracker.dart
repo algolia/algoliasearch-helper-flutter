@@ -1,3 +1,5 @@
+import 'package:algolia_client_insights/algolia_client_insights.dart';
+
 import '../algolia_insights.dart';
 
 /// Wrapper for an EventTracker with associated indexName and queryID
@@ -92,4 +94,6 @@ class HitsEventTracker {
       );
     }
   }
+
+  InsightsClient get client => tracker.client;
 }

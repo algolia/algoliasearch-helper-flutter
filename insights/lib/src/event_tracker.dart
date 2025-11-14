@@ -1,6 +1,10 @@
+import 'package:algolia_client_insights/algolia_client_insights.dart';
+
 abstract class EventTracker {
   /// Flag that blocks the sending of event packets when set to false
   bool get isEnabled;
+
+  InsightsClient get client;
 
   /// Send a filters click event
   /// Optional custom [timestamp] can be provided.
