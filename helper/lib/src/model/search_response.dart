@@ -104,7 +104,7 @@ class Hit extends DelegatingMap<String, dynamic> {
   }
 
   /// Creates List of [Hit] from [data].
-  static List<Hit> _fromList(data) {
+  static List<Hit> _fromList(List<dynamic> data) {
     final hits = data as List?;
     if (hits == null) return const [];
     return List<Map>.from(hits).map(Hit._from).toList();
