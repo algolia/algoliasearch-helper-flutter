@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-11-18
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`algolia_helper_flutter` - `v1.5.0`](#algolia_helper_flutter---v150)
+ - [`algolia_insights` - `v1.0.4`](#algolia_insights---v104)
+
+---
+
+#### `algolia_helper_flutter` - `v1.5.0`
+
+ - **FEAT**(errors): add a cause to laundered exceptions (#168).
+
+#### `algolia_insights` - `v1.0.4`
+
+ - **FIX**(insights): skip pushing events if empty (#170).
+
+
 ## 2025-09-11
 
 ### Changes

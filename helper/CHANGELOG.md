@@ -1,3 +1,7 @@
+## 1.5.0
+
+ - **FEAT**(errors): add a cause to laundered exceptions (#168).
+
 ## 1.4.0
 
  - **FEAT**(search-state): support sortFacetValuesBy (#165).

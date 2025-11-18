@@ -1,3 +1,7 @@
+## 1.0.4
+
+ - **FIX**(insights): skip pushing events if empty (#170).
+
 ## 1.0.3
 
  - **FIX**(insights): properly divide viewed objects events.
