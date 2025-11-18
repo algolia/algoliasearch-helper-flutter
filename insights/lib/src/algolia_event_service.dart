@@ -1,14 +1,32 @@
 import 'package:algolia_client_insights/algolia_client_insights.dart';
 import 'package:logging/logging.dart';
+import 'package:meta/meta.dart';
 
 import 'event.dart';
 import 'event_service.dart';
 import 'lib_version.dart';
 
+/// Abstraction over the Insights client's push API to enable testing.
+/// @nodoc - Internal use only, exposed for testing.
+@internal
+abstract class PushEvents {
+  Future<void> pushEvents({required InsightsEvents insightsEvents});
+}
+
+class _InsightsClient implements PushEvents {
+  final InsightsClient _client;
+  _InsightsClient(this._client);
+
+  @override
+  Future<void> pushEvents({required InsightsEvents insightsEvents}) {
+    return _client.pushEvents(insightsEvents: insightsEvents);
+  }
+}
+
 /// EventService implementation using community client instance
 class AlgoliaEventService implements EventService {
-  /// Client instance
-  InsightsClient _client;
+  /// client instance
+  final PushEvents _client;
 
   /// Logger instance
   final Logger _log;
@@ -33,21 +51,33 @@ class AlgoliaEventService implements EventService {
           ),
         );
 
-  /// Creates [AlgoliaEventService] instance.
-  AlgoliaEventService.create(this._client)
+  /// Creates [AlgoliaEventService] instance from an InsightsClient.
+  AlgoliaEventService.create(InsightsClient client)
+      : this.withClient(_InsightsClient(client));
+
+  /// Creates [AlgoliaEventService] instance with a custom client.
+  /// @nodoc - Internal use only, exposed for testing.
+  @internal
+  AlgoliaEventService.withClient(this._client)
       : _log = Logger('Algolia/EventsService');
 
   @override
-  void send(List<Event> events) => _client
-      .pushEvents(
-        insightsEvents: InsightsEvents(
-            events:
-                events.map((e) => e.toAlgoliaEvent()).where((e) => e != null)),
-      )
-      .then(
-        (_) => _log.fine('Events upload: $events'),
-        onError: (exception) => _log.severe('Events upload error: $exception'),
-      );
+  void send(List<Event> events) {
+    final validEvents =
+        events.map((e) => e.toAlgoliaEvent()).where((e) => e != null).toList();
+    if (validEvents.isEmpty) {
+      return;
+    }
+    _client
+        .pushEvents(
+          insightsEvents: InsightsEvents(events: validEvents),
+        )
+        .then(
+          (_) => _log.fine('Events upload: $events'),
+          onError: (exception) =>
+              _log.severe('Events upload error: $exception'),
+        );
+  }
 }
 
 extension AlgoliaEventConversion on Event {

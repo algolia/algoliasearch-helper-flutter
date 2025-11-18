@@ -94,7 +94,7 @@ jobs:
           flutter-version: ${{ env.flutter_version }}
       - name: "Install Tools"
         run: |
-          dart pub global activate pana
+          flutter pub global activate pana
           flutter pub global activate melos
       - name: "Bootstrap Workspace"
         run: melos bootstrap --verbose
