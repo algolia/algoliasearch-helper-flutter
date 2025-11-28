@@ -72,6 +72,9 @@ class SearchResponse extends MultiSearchResponse {
   /// This does not include network time.
   int get processingTimeMS => raw['processingTimeMS'] as int? ?? 0;
 
+  /// An object with custom data.  You can store up to 32kB as custom data.
+  Object userData() => raw['userData'] as Object? ?? {};
+
   /// Defines how you want to render results in the search interface.
   RenderingContent? get renderingContent => raw['renderingContent'] != null
       ? RenderingContent.fromJson(
