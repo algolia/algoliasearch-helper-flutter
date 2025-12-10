@@ -176,17 +176,9 @@ abstract interface class HitsSearcher implements Disposable, EventDataDelegate {
 
   /// Re-run the last search query
   void rerun();
-}
 
-/// Extensions over [HitsSearcher]
-extension SearcherExt on HitsSearcher {
   /// Creates a connection between [HitsSearcher] and [FilterState].
-  StreamSubscription connectFilterState(FilterState filterState) =>
-      filterState.filters.listen(
-        (filters) => applyState(
-          (state) => state.copyWith(filterGroups: filters.toFilterGroups()),
-        ),
-      );
+  StreamSubscription connectFilterState(FilterState filterState);
 }
 
 /// Default implementation of [HitsSearcher].
@@ -344,4 +336,12 @@ final class _HitsSearcher with DisposableMixin implements HitsSearcher {
 
   @override
   String? get queryID => lastResponse?.queryID;
+
+  @override
+  StreamSubscription connectFilterState(FilterState filterState) =>
+      _subscriptions.add(filterState.filters.listen(
+        (filters) => applyState(
+          (state) => state.copyWith(filterGroups: filters.toFilterGroups()),
+        ),
+      ));
 }
