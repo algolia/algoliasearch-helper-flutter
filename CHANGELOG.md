@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-12-17
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`algolia_helper_flutter` - `v1.6.0`](#algolia_helper_flutter---v160)
+
+---
+
+#### `algolia_helper_flutter` - `v1.6.0`
+
+ - **FEAT**(response): add userData (#172).
+
+
 ## 2025-11-18
 
 ### Changes

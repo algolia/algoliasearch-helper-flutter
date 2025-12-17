@@ -1,3 +1,7 @@
+## 1.6.0
+
+ - **FEAT**(response): add userData (#172).
+
 ## 1.5.0
 
  - **FEAT**(errors): add a cause to laundered exceptions (#168).
