@@ -1,3 +1,7 @@
+## 1.7.0
+
+ - **FEAT**(composition): add Composition API support with `CompositionSearcher` and `CompositionFacetSearcher`, including `FilterState`, `FacetList`, and Insights integration.
+
 ## 1.6.0
 
  - **FEAT**(response): add userData (#172).

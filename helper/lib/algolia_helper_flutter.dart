@@ -5,6 +5,7 @@
 library algolia_helper_flutter;
 
 export 'src/client_options.dart';
+export 'src/composition_searcher_facet_list_extension.dart';
 export 'src/disposable.dart';
 export 'src/exception.dart';
 export 'src/facet_list.dart';
@@ -15,9 +16,15 @@ export 'src/filters.dart';
 export 'src/highlighting.dart';
 export 'src/highlighting_core.dart';
 export 'src/hits_searcher_facet_list_extension.dart';
+export 'src/model/composition_facet_search_response.dart';
+export 'src/model/composition_facet_search_state.dart';
+export 'src/model/composition_response.dart';
+export 'src/model/composition_state.dart';
 export 'src/model/facet.dart';
 export 'src/model/multi_search_response.dart';
 export 'src/model/multi_search_state.dart';
+export 'src/searcher/composition_facet_searcher.dart';
+export 'src/searcher/composition_searcher.dart';
 export 'src/searcher/facet_searcher.dart';
 export 'src/searcher/hits_searcher.dart';
 export 'src/searcher/multi_searcher.dart';
