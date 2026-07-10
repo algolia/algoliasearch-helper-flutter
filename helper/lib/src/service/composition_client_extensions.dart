@@ -13,11 +13,10 @@ import '../model/composition_response.dart';
 import '../model/composition_state.dart';
 
 /// Coerce an [composition.AlgoliaApiException] to a [SearchError].
-Exception launderCompositionException(dynamic error) =>
-    error is composition.AlgoliaApiException
-        ? SearchError({'message': error.error.toString()}, error.statusCode,
-            error)
-        : SearchError({'message': error.toString()}, 0, error);
+Exception launderCompositionException(dynamic error) => error
+        is composition.AlgoliaApiException
+    ? SearchError({'message': error.error.toString()}, error.statusCode, error)
+    : SearchError({'message': error.toString()}, 0, error);
 
 extension CompositionStateExt on CompositionState {
   /// Build a Composition run [composition.RequestBody] from this state.

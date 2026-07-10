@@ -190,8 +190,8 @@ void main() {
     });
 
     test('empty results produce an empty response', () {
-      final response = composition.SearchResponse(results: const [])
-          .toCompositionResponse();
+      final response =
+          composition.SearchResponse(results: const []).toCompositionResponse();
       expect(response.hits, isEmpty);
       expect(response.feeds, isNull);
     });

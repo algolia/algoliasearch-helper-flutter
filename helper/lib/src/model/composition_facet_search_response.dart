@@ -19,7 +19,8 @@ class CompositionFacetSearchResponse {
   final List<Facet> facetHits;
 
   /// Whether the count returned for each facets is exhaustive.
-  bool get exhaustiveFacetsCount => raw['exhaustiveFacetsCount'] as bool? ?? false;
+  bool get exhaustiveFacetsCount =>
+      raw['exhaustiveFacetsCount'] as bool? ?? false;
 
   /// Time the server took to process the request, in milliseconds.
   int get processingTimeMS => raw['processingTimeMS'] as int? ?? 0;

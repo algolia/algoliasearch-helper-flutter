@@ -13,7 +13,8 @@ class CompositionResponse {
   /// Creates [CompositionResponse] instance.
   CompositionResponse(this.raw, {List<CompositionResponse>? feeds})
       : hits = _hitsFromList(raw['hits'] as List<dynamic>?),
-        feeds = feeds == null || feeds.isEmpty ? null : List.unmodifiable(feeds),
+        feeds =
+            feeds == null || feeds.isEmpty ? null : List.unmodifiable(feeds),
         disjunctiveFacets = {},
         hierarchicalFacets = {};
 
