@@ -27,12 +27,14 @@ framework**.
 
 | Component          | Description                                                                                                    |
 |--------------------|----------------------------------------------------------------------------------------------------------------|
-| [HitsSearcher][0]  | Component handling search requests.                                                                            |
-| [FacetSearcher][1] | Component handling search for facet values requests                                                            |
-| [MultiSearcher][2] | Component handling multi-search experiences aggregating [HitsSearcher][0] and [FacetSearcher][4]               |
-| [FilterState][3]   | Component providing a friendly interface to manage search filters.                                             |
-| [FacetList][4]     | Component to get and manage facets, lets the user refine their search results by filtering on specific values. |
-| [Highlighting][5]  | Set of tools to highlight relevant parts of the search results.                                                |
+| [HitsSearcher][0]           | Component handling search requests.                                                                            |
+| [FacetSearcher][1]          | Component handling search for facet values requests                                                            |
+| [MultiSearcher][2]          | Component handling multi-search experiences aggregating [HitsSearcher][0] and [FacetSearcher][4]               |
+| [CompositionSearcher][6]    | Component handling [Composition][8] run requests.                                                              |
+| [CompositionFacetSearcher][7] | Component handling search for facet values requests on a composition.                                        |
+| [FilterState][3]            | Component providing a friendly interface to manage search filters.                                             |
+| [FacetList][4]              | Component to get and manage facets, lets the user refine their search results by filtering on specific values. |
+| [Highlighting][5]           | Set of tools to highlight relevant parts of the search results.                                                |
 
 
 [0]: lib/src/searcher/hits_searcher.dart
@@ -41,3 +43,6 @@ framework**.
 [3]: lib/src/filter_state.dart
 [4]: lib/src/facet_list.dart
 [5]: lib/src/highlighting.dart
+[6]: lib/src/searcher/composition_searcher.dart
+[7]: lib/src/searcher/composition_facet_searcher.dart
+[8]: https://www.algolia.com/doc/guides/building-search-ui/going-further/composition/what-is-composition/js/

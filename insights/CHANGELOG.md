@@ -1,3 +1,7 @@
+## 1.0.5
+
+ - **FIX**(deps): require `algolia_client_insights >=1.51.0` to pull a `dio`-compatible `algolia_client_core`.
+
 ## 1.0.4
 
  - **FIX**(insights): skip pushing events if empty (#170).
