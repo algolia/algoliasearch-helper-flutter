@@ -404,6 +404,115 @@ class SearchState implements MultiSearchState {
         insideBoundingBox: insideBoundingBox ?? this.insideBoundingBox,
       );
 
+  /// Make a copy of the search state that supports setting nullable fields
+  /// explicitly to `null`. Pass nothing (or omit an arg) to keep the
+  /// previous value, pass `null` to explicitly clear the value.
+  SearchState copyWithV2({
+    List<String>? attributesToHighlight = _unsetListString,
+    List<String>? attributesToRetrieve = _unsetListString,
+    List<String>? attributesToSnippet = _unsetListString,
+    List<String>? facetFilters = _unsetListString,
+    List<String>? facets = _unsetListString,
+    List<String>? numericFilters = _unsetListString,
+    List<String>? optionalFilters = _unsetListString,
+    List<String>? ruleContexts = _unsetListString,
+    List<String>? tagFilters = _unsetListString,
+    Set<FilterGroup>? filterGroups = _unsetSetFilterGroup,
+    Set<String>? disjunctiveFacets = _unsetSetString,
+    bool? isDisjunctiveFacetingEnabled,
+    String? highlightPostTag = _unsetString,
+    String? highlightPreTag = _unsetString,
+    String? indexName = _unsetString,
+    String? query = _unsetString,
+    String? userToken = _unsetString,
+    bool? analytics,
+    List<String>? analyticsTags = _unsetListString,
+    String? sortFacetValuesBy = _unsetString,
+    bool? sumOrFiltersScore,
+    int? hitsPerPage,
+    int? maxFacetHits,
+    int? maxValuesPerFacet,
+    int? page,
+    bool? clickAnalytics,
+    bool? aroundLatLngViaIP,
+    String? aroundLatLng = _unsetString,
+    dynamic aroundRadius = null,
+    int? aroundPrecision,
+    int? minimumAroundRadius,
+    List<List<double>>? insideBoundingBox = _unsetListListDouble,
+  }) =>
+      SearchState(
+        attributesToHighlight:
+            identical(attributesToHighlight, _unsetListString)
+                ? this.attributesToHighlight
+                : attributesToHighlight,
+        attributesToRetrieve: identical(attributesToRetrieve, _unsetListString)
+            ? this.attributesToRetrieve
+            : attributesToRetrieve,
+        attributesToSnippet: identical(attributesToSnippet, _unsetListString)
+            ? this.attributesToSnippet
+            : attributesToSnippet,
+        facetFilters: identical(facetFilters, _unsetListString)
+            ? this.facetFilters
+            : facetFilters,
+        facets: identical(facets, _unsetListString) ? this.facets : facets,
+        numericFilters: identical(numericFilters, _unsetListString)
+            ? this.numericFilters
+            : numericFilters,
+        optionalFilters: identical(optionalFilters, _unsetListString)
+            ? this.optionalFilters
+            : optionalFilters,
+        ruleContexts: identical(ruleContexts, _unsetListString)
+            ? this.ruleContexts
+            : ruleContexts,
+        tagFilters: identical(tagFilters, _unsetListString)
+            ? this.tagFilters
+            : tagFilters,
+        filterGroups: identical(filterGroups, _unsetSetFilterGroup)
+            ? this.filterGroups
+            : filterGroups,
+        disjunctiveFacets: identical(disjunctiveFacets, _unsetSetString)
+            ? this.disjunctiveFacets
+            : disjunctiveFacets,
+        isDisjunctiveFacetingEnabled:
+            isDisjunctiveFacetingEnabled ?? this.isDisjunctiveFacetingEnabled,
+        highlightPostTag: identical(highlightPostTag, _unsetString)
+            ? this.highlightPostTag
+            : highlightPostTag,
+        highlightPreTag: identical(highlightPreTag, _unsetString)
+            ? this.highlightPreTag
+            : highlightPreTag,
+        indexName: identical(indexName, _unsetString)
+            ? this.indexName
+            : indexName as String,
+        query: identical(query, _unsetString) ? this.query : query,
+        userToken:
+            identical(userToken, _unsetString) ? this.userToken : userToken,
+        analytics: analytics ?? this.analytics,
+        analyticsTags: identical(analyticsTags, _unsetListString)
+            ? this.analyticsTags
+            : analyticsTags,
+        sortFacetValuesBy: identical(sortFacetValuesBy, _unsetString)
+            ? this.sortFacetValuesBy
+            : sortFacetValuesBy,
+        sumOrFiltersScore: sumOrFiltersScore ?? this.sumOrFiltersScore,
+        hitsPerPage: hitsPerPage ?? this.hitsPerPage,
+        maxFacetHits: maxFacetHits ?? this.maxFacetHits,
+        maxValuesPerFacet: maxValuesPerFacet ?? this.maxValuesPerFacet,
+        page: page ?? this.page,
+        clickAnalytics: clickAnalytics ?? this.clickAnalytics,
+        aroundLatLngViaIP: aroundLatLngViaIP ?? this.aroundLatLngViaIP,
+        aroundLatLng: identical(aroundLatLng, _unsetString)
+            ? this.aroundLatLng
+            : aroundLatLng,
+        aroundRadius: aroundRadius ?? this.aroundRadius,
+        aroundPrecision: aroundPrecision ?? this.aroundPrecision,
+        minimumAroundRadius: minimumAroundRadius ?? this.minimumAroundRadius,
+        insideBoundingBox: identical(insideBoundingBox, _unsetListListDouble)
+            ? this.insideBoundingBox
+            : insideBoundingBox,
+      );
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -511,3 +620,64 @@ class SearchState implements MultiSearchState {
       'minimumAroundRadius: $minimumAroundRadius, '
       'insideBoundingBox: $insideBoundingBox}';
 }
+
+// INTERNAL USE
+
+/// Private typed sentinel and helpers for `copyWithV2`.
+///
+/// These sentinels are used as default values for `copyWithV2` parameters
+/// to distinguish between an argument being omitted (use the old value)
+/// and being explicitly provided (including `null`).
+/// Private sentinel implementations for typed fields so we can detect
+/// "argument omitted" while keeping the original parameter types.
+///
+/// These sentinels are private singletons; since they're instances of a
+/// private subclass, external code cannot construct or compare them.
+
+final class _UnsetList<T> extends ListBase<T> {
+  const _UnsetList();
+
+  @override
+  int get length => throw UnsupportedError('Unset list');
+
+  @override
+  set length(int newLength) => throw UnsupportedError('Unset list');
+
+  @override
+  T operator [](int index) => throw UnsupportedError('Unset list');
+
+  @override
+  void operator []=(int index, T value) => throw UnsupportedError('Unset list');
+}
+
+final class _UnsetSet<T> extends SetBase<T> {
+  const _UnsetSet();
+
+  @override
+  Iterator<T> get iterator => throw UnsupportedError('Unset set');
+
+  @override
+  int get length => throw UnsupportedError('Unset set');
+
+  @override
+  bool contains(Object? element) => throw UnsupportedError('Unset set');
+
+  @override
+  bool add(T value) => throw UnsupportedError('Unset set');
+
+  @override
+  bool remove(Object? value) => throw UnsupportedError('Unset set');
+
+  @override
+  T? lookup(Object? element) => throw UnsupportedError('Unset set');
+
+  @override
+  Set<T> toSet() => throw UnsupportedError('Unset set');
+}
+
+// Unique sentinel instances for types used in `SearchState`.
+const _unsetListString = _UnsetList<String>();
+const _unsetListListDouble = _UnsetList<List<double>>();
+const _unsetSetString = _UnsetSet<String>();
+const _unsetSetFilterGroup = _UnsetSet<FilterGroup>();
+const String _unsetString = '\u{FFFD}\u{2026}_ALGOLIA_UNSET_SENTINEL';

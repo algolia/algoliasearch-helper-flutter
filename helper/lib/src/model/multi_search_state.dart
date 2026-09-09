@@ -1,3 +1,4 @@
+import 'dart:collection';
 import '../extensions.dart';
 import '../filter_group.dart';
 part 'search_state.dart';
