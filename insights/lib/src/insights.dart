@@ -84,7 +84,7 @@ class Insights implements EventTracker {
             indexName,
             userToken,
             attribute,
-            values,
+            values: filters,
             timestamp: timestamp,
           ),
         )
@@ -110,7 +110,7 @@ class Insights implements EventTracker {
             indexName,
             userToken,
             attribute,
-            values,
+            values: filters,
             timestamp: timestamp,
           ),
         )
@@ -136,7 +136,7 @@ class Insights implements EventTracker {
             indexName,
             userToken,
             attribute,
-            values,
+            values: filters,
             timestamp: timestamp,
           ),
         )
